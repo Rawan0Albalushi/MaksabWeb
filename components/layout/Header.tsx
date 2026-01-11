@@ -31,7 +31,7 @@ const Header = () => {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
 
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated, logout, _hasHydrated } = useAuthStore();
   const { getItemCount } = useCartStore();
   const { locale, setLocale } = useSettingsStore();
 
@@ -230,7 +230,12 @@ const Header = () => {
               </Link>
 
               {/* Auth */}
-              {isAuthenticated ? (
+              {!_hasHydrated ? (
+                // Show loading state while hydrating to prevent flash
+                <div className="hidden sm:flex items-center gap-2">
+                  <div className="w-20 h-9 bg-[var(--main-bg)] rounded-full animate-pulse" />
+                </div>
+              ) : isAuthenticated ? (
                 <div className="relative hidden sm:block">
                   <button
                     onClick={(e) => {
@@ -411,7 +416,13 @@ const Header = () => {
 
           {/* Mobile Auth */}
           <div className="p-4 border-t border-[var(--border)]">
-            {isAuthenticated ? (
+            {!_hasHydrated ? (
+              // Show loading state while hydrating
+              <div className="flex gap-3">
+                <div className="flex-1 h-10 bg-[var(--main-bg)] rounded-xl animate-pulse" />
+                <div className="flex-1 h-10 bg-[var(--main-bg)] rounded-xl animate-pulse" />
+              </div>
+            ) : isAuthenticated ? (
               <div className="space-y-4">
                 <Link
                   href="/profile"

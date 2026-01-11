@@ -136,14 +136,8 @@ api.interceptors.response.use(
       });
     }
     
-    if (error.response?.status === 401) {
-      // Handle unauthorized - clear token and redirect to login
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/auth/login';
-      }
-    }
+    // Don't do any automatic redirects for 401 errors
+    // Let the app handle auth state through the auth store
     return Promise.reject(error);
   }
 );

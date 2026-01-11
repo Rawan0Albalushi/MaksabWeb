@@ -1,12 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
-import { Mail, Lock, Phone, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Phone } from 'lucide-react';
 import { Button, Input } from '@/components/ui';
 import { authService } from '@/services';
 import { useAuthStore } from '@/store';
@@ -16,8 +15,14 @@ type LoginMethod = 'email' | 'phone';
 const LoginPage = () => {
   const t = useTranslations('auth');
   const tCommon = useTranslations('common');
-  const router = useRouter();
-  const { login } = useAuthStore();
+  const { login, isAuthenticated, _hasHydrated } = useAuthStore();
+
+  // Redirect if already authenticated (on page load)
+  useEffect(() => {
+    if (_hasHydrated && isAuthenticated) {
+      window.location.href = '/';
+    }
+  }, [_hasHydrated, isAuthenticated]);
 
   const [loginMethod, setLoginMethod] = useState<LoginMethod>('email');
   const [email, setEmail] = useState('');
@@ -39,16 +44,19 @@ const LoginPage = () => {
       const response = await authService.login(credentials);
       
       if (response.status && response.data) {
+        // Store token and user data
         login(response.data.user, response.data.token);
-        router.push('/');
+        // Use full page redirect to ensure token is used in subsequent requests
+        window.location.href = '/';
       } else {
         setError(response.message || 'Login failed');
+        setLoading(false);
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'An error occurred');
-    } finally {
       setLoading(false);
     }
+    // Don't set loading to false on success - let the redirect happen
   };
 
   return (

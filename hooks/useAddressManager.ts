@@ -1,8 +1,7 @@
 'use client';
 
 import { useCallback, useEffect } from 'react';
-import { useLocationStore } from '@/store';
-import { useAuthStore } from '@/store';
+import { useLocationStore, useAuthStore } from '@/store';
 import { userService } from '@/services';
 import { Address } from '@/types';
 
@@ -44,7 +43,7 @@ export interface AddressFormData {
 }
 
 export const useAddressManager = (): UseAddressManagerReturn => {
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, _hasHydrated } = useAuthStore();
   const {
     selectedAddress,
     savedAddresses,
@@ -66,8 +65,10 @@ export const useAddressManager = (): UseAddressManagerReturn => {
 
   // Fetch addresses when authenticated
   const fetchAddresses = useCallback(async () => {
-    if (!isAuthenticated) {
-      setSavedAddresses([]);
+    if (!isAuthenticated || !_hasHydrated) {
+      if (!isAuthenticated) {
+        setSavedAddresses([]);
+      }
       return;
     }
 
@@ -79,16 +80,26 @@ export const useAddressManager = (): UseAddressManagerReturn => {
       if (response.status && response.data) {
         setSavedAddresses(response.data);
       }
-    } catch (err) {
-      console.error('Failed to fetch addresses:', err);
-      setError('FETCH_ADDRESSES_FAILED');
+    } catch (err: any) {
+      // If 401 error, the token is invalid/expired - just skip fetching
+      // Don't logout here as it can cause a loop
+      if (err?.response?.status === 401) {
+        console.warn('Token expired or invalid, skipping address fetch');
+        setSavedAddresses([]);
+      } else {
+        console.error('Failed to fetch addresses:', err);
+        setError('FETCH_ADDRESSES_FAILED');
+      }
     } finally {
       setLoadingAddresses(false);
     }
-  }, [isAuthenticated, setSavedAddresses, setLoadingAddresses, setError]);
+  }, [isAuthenticated, _hasHydrated, setSavedAddresses, setLoadingAddresses, setError]);
 
   // Load addresses on mount and when authentication changes
   useEffect(() => {
+    // Wait for hydration to complete before fetching
+    if (!_hasHydrated) return;
+    
     if (isAuthenticated) {
       // Use addresses from user profile if available
       if (user?.addresses && user.addresses.length > 0) {
@@ -99,7 +110,7 @@ export const useAddressManager = (): UseAddressManagerReturn => {
     } else {
       setSavedAddresses([]);
     }
-  }, [isAuthenticated, user?.addresses, fetchAddresses, setSavedAddresses]);
+  }, [_hasHydrated, isAuthenticated, user?.addresses, fetchAddresses, setSavedAddresses]);
 
   // Select a saved address
   const selectAddress = useCallback((address: Address) => {
