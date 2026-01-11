@@ -2,6 +2,57 @@ import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'ax
 
 const BASE_URL = 'https://uatapi.maksab.om';
 
+// Default location (Muscat, Oman)
+const DEFAULT_LOCATION = {
+  latitude: 23.5880,
+  longitude: 58.3829,
+};
+
+// Endpoints that require location parameters
+const LOCATION_REQUIRED_ENDPOINTS = [
+  '/api/v1/rest/shops/paginate',
+  '/api/v1/rest/shops/recommended',
+  '/api/v1/rest/shops/families/paginate',
+  '/api/v1/rest/shops/ruwad/paginate',
+  '/api/v1/rest/shops/search',
+  '/api/v1/rest/shops/nearby',
+];
+
+// Helper to get selected location from localStorage
+const getSelectedLocation = (): { latitude: number; longitude: number } => {
+  if (typeof window === 'undefined') {
+    return DEFAULT_LOCATION;
+  }
+
+  try {
+    const locationData = localStorage.getItem('location-storage');
+    if (locationData) {
+      const parsed = JSON.parse(locationData);
+      const state = parsed.state;
+      
+      // Check selectedAddress first
+      if (state?.selectedAddress?.location) {
+        return {
+          latitude: state.selectedAddress.location.latitude,
+          longitude: state.selectedAddress.location.longitude,
+        };
+      }
+      
+      // Then check currentLocation
+      if (state?.currentLocation) {
+        return {
+          latitude: state.currentLocation.latitude,
+          longitude: state.currentLocation.longitude,
+        };
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to parse location from storage:', e);
+  }
+
+  return DEFAULT_LOCATION;
+};
+
 // Create axios instance
 const api: AxiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -45,6 +96,22 @@ api.interceptors.request.use(
         ...config.params,
         currency_id: currencyId,
       };
+    }
+
+    // Add location for shop-related endpoints
+    const url = config.url || '';
+    const shouldAddLocation = LOCATION_REQUIRED_ENDPOINTS.some(endpoint => url.includes(endpoint));
+    
+    if (shouldAddLocation) {
+      // Only add location if not already provided
+      if (!config.params?.['address[latitude]'] && !config.params?.latitude) {
+        const location = getSelectedLocation();
+        config.params = {
+          ...config.params,
+          'address[latitude]': location.latitude,
+          'address[longitude]': location.longitude,
+        };
+      }
     }
 
     return config;
@@ -116,4 +183,3 @@ export const postFormData = async <T>(url: string, formData: FormData): Promise<
   });
   return response.data;
 };
-

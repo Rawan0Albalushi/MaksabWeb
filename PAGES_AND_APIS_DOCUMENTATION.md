@@ -15,6 +15,7 @@
 12. [صفحة المفضلة (Favorites)](#12-صفحة-المفضلة-favorites)
 13. [صفحة الخريطة (Map)](#13-صفحة-الخريطة-map)
 14. [صفحات أخرى](#14-صفحات-أخرى)
+15. [آلية عمل تحديد الموقع والعناوين وعرض المتاجر](#15-آلية-عمل-تحديد-الموقع-والعناوين-وعرض-المتاجر)
 
 ---
 
@@ -415,6 +416,347 @@
 |---|--------------|-------------|-------|------------------|
 | 1 | `/api/v1/rest/blogs/paginate` | GET | المقالات | `BlogsPaginateResponse` - قائمة `BlogData`: `id`, `uuid`, `translation`, `img`, `created_at` |
 | 2 | `/api/v1/rest/blogs/{uuid}` | GET | تفاصيل المقال | `BlogDetailsResponse`: `id`, `uuid`, `translation` (title, description, short_desc) |
+
+---
+
+## 15. آلية عمل تحديد الموقع والعناوين وعرض المتاجر
+
+> **ملاحظة:** هذا القسم مهم جداً لفهم كيفية عمل النظام ومفيد لتطبيق مكسب ويب.
+
+### 15.1 تدفق العمل الرئيسي (Flow)
+
+```
+المستخدم يفتح التطبيق
+        ↓
+هل المستخدم مسجل دخول؟
+        ↓
+    ✅ نعم → جلب بيانات المستخدم (fetchUser)
+        ↓
+هل لديه عناوين محفوظة؟
+        ↓
+    ✅ عنوان واحد → اختياره تلقائياً
+    ✅ عناوين متعددة → عرض شاشة اختيار العنوان
+    ❌ لا عناوين → عرض الخريطة لإضافة عنوان
+        ↓
+حفظ العنوان المختار محلياً (LocalStorage)
+        ↓
+جلب المتاجر بناءً على الإحداثيات
+```
+
+---
+
+### 15.2 الـ APIs المستخدمة للعناوين
+
+| # | API Endpoint | HTTP Method | الوصف | البيانات المرجعة |
+|---|--------------|-------------|-------|------------------|
+| 1 | `/api/v1/dashboard/user/profile/show` | GET | جلب بيانات المستخدم **مع العناوين** | `ProfileResponse` - يحتوي على `addresses` |
+| 2 | `/api/v1/dashboard/user/addresses` | GET | جلب جميع العناوين | `AddressesResponse` - قائمة `AddressNewModel` |
+| 3 | `/api/v1/dashboard/user/addresses` | POST | إضافة عنوان جديد | `SingleAddressResponse` |
+| 4 | `/api/v1/dashboard/user/addresses/{id}` | PUT | تعديل عنوان | `void` |
+| 5 | `/api/v1/dashboard/user/addresses/{id}` | DELETE | حذف عنوان | `void` |
+| 6 | `/api/v1/dashboard/user/address/set-active/{id}` | POST | تفعيل عنوان كافتراضي | `void` |
+
+---
+
+### 15.3 الـ APIs المستخدمة للمتاجر (تعتمد على الموقع)
+
+| # | API Endpoint | HTTP Method | الوصف | معاملات الموقع |
+|---|--------------|-------------|-------|----------------|
+| 1 | `/api/v1/rest/shops/paginate` | GET | جلب المتاجر | `address[latitude]`, `address[longitude]` |
+| 2 | `/api/v1/rest/shops/recommended` | GET | المتاجر الموصى بها | `address[latitude]`, `address[longitude]` |
+| 3 | `/api/v1/rest/shops/nearby` | GET | المتاجر القريبة | `clientLocation=lat,lng` |
+| 4 | `/api/v1/rest/shops/search` | GET | البحث في المتاجر | `latitude`, `longitude` |
+| 5 | `/api/v1/rest/shops/families/paginate` | GET | الأسر المنتجة | `address[latitude]`, `address[longitude]` |
+| 6 | `/api/v1/rest/shops/ruwad/paginate` | GET | متاجر رواد | `address[latitude]`, `address[longitude]` |
+| 7 | `/api/v1/rest/shop/{shopId}/delivery-zone/check/distance` | GET | التحقق من منطقة التوصيل | `address[latitude]`, `address[longitude]` |
+
+---
+
+### 15.4 كيف يتم إرسال الموقع مع طلب المتاجر؟
+
+**المسار:** `lib/infrastructure/models/request/shop_request.dart`
+
+عند إنشاء أي طلب للمتاجر، يتم تلقائياً إضافة الموقع المحفوظ محلياً:
+
+```dart
+Map<String, dynamic> toJson() {
+  final savedAddress = LocalStorage.getAddressSelected();
+  final latitude = savedAddress?.location?.latitude ?? AppConstants.demoLatitude;
+  final longitude = savedAddress?.location?.longitude ?? AppConstants.demoLongitude;
+
+  map["address"] = {"latitude": latitude, "longitude": longitude};
+  return map;
+}
+```
+
+**مثال الطلب الفعلي:**
+```
+GET /api/v1/rest/shops/paginate?page=1&perPage=6&lang=ar&address[latitude]=24.7136&address[longitude]=46.6753
+```
+
+---
+
+### 15.5 هيكل بيانات العنوان
+
+#### AddressNewModel (من الـ API)
+**المسار:** `lib/infrastructure/models/data/address_new_data.dart`
+
+```json
+{
+  "id": 123,
+  "title": "المنزل",
+  "user_id": 456,
+  "active": true,
+  "address": {
+    "address": "شارع الملك فهد، الرياض",
+    "floor": "3",
+    "house": "15"
+  },
+  "location": [24.7136, 46.6753],
+  "created_at": "2024-01-15T10:30:00.000Z",
+  "updated_at": "2024-01-15T10:30:00.000Z"
+}
+```
+
+> **ملاحظة:** `location` هو مصفوفة بترتيب `[latitude, longitude]`
+
+#### AddressData (محفوظ محلياً)
+**المسار:** `lib/infrastructure/models/data/address_old_data.dart`
+
+```json
+{
+  "id": 123,
+  "title": "المنزل",
+  "address": "شارع الملك فهد، الرياض",
+  "location": {
+    "latitude": 24.7136,
+    "longitude": 46.6753
+  },
+  "active": true
+}
+```
+
+---
+
+### 15.6 حفظ واسترجاع العنوان المختار
+
+**المسار:** `lib/infrastructure/services/local_storage.dart`
+
+```dart
+// حفظ العنوان المختار
+static Future<void> setAddressSelected(AddressData data) async {
+  await _preferences?.setString(
+      StorageKeys.keyAddressSelected, jsonEncode(data.toJson()));
+}
+
+// استرجاع العنوان المختار
+static AddressData? getAddressSelected() {
+  String dataString = _preferences?.getString(StorageKeys.keyAddressSelected) ?? "";
+  if (dataString.isNotEmpty) {
+    AddressData data = AddressData.fromJson(jsonDecode(dataString));
+    return data;
+  }
+  return null;
+}
+```
+
+---
+
+### 15.7 ماذا يحدث عند تغيير العنوان؟
+
+**المسار:** `lib/application/home/home_notifier.dart`
+
+عند تغيير العنوان يتم:
+1. حفظ العنوان الجديد في `LocalStorage`
+2. إعادة تعيين فهارس الصفحات (pagination)
+3. تحديث حالة التحميل
+4. إعادة جلب جميع المتاجر
+
+```dart
+Future<void> _refreshShopDataOnAddressChange() async {
+  // Reset pagination indices
+  marketIndex = 1;
+  shopIndex = 1;
+  newShopIndex = 1;
+  
+  // Set loading states
+  state = state.copyWith(
+    isShopRecommendLoading: true,
+    isShopLoading: true,
+    isRestaurantLoading: true,
+    isRestaurantNewLoading: true,
+  );
+  
+  // Trigger refresh
+  triggerRefreshHomeShopsList();
+}
+```
+
+---
+
+### 15.8 التحقق من المسافة
+
+**المسار:** `lib/presentation/components/sellect_address_screen.dart`
+
+يتم التحقق من المسافة بين موقع المستخدم الحالي والعنوان المختار (الحد الأقصى 5 كم):
+
+```dart
+final distance = Geolocator.distanceBetween(
+  currentPosition.latitude,
+  currentPosition.longitude,
+  selectedAddress.location!.first,  // latitude
+  selectedAddress.location!.last,   // longitude
+) / 1000;  // تحويل إلى كيلومتر
+
+if (distance > 5) {
+  _showDistanceWarningDialog(distance, selectedAddress);
+} else {
+  _saveAddress(selectedAddress);
+}
+```
+
+---
+
+### 15.9 دليل التطبيق لمكسب ويب
+
+#### أ) تخزين العنوان المختار (JavaScript)
+
+```javascript
+// حفظ العنوان
+const selectedAddress = {
+  id: 123,
+  title: "المنزل",
+  address: "شارع الملك فهد، الرياض",
+  location: {
+    latitude: 24.7136,
+    longitude: 46.6753
+  }
+};
+localStorage.setItem('selectedAddress', JSON.stringify(selectedAddress));
+
+// استرجاع العنوان
+const getSelectedAddress = () => {
+  const data = localStorage.getItem('selectedAddress');
+  return data ? JSON.parse(data) : null;
+};
+```
+
+#### ب) جلب المتاجر مع الموقع (JavaScript)
+
+```javascript
+const fetchShops = async (page = 1) => {
+  const address = getSelectedAddress();
+  const DEFAULT_LAT = 24.7136;  // إحداثيات افتراضية
+  const DEFAULT_LNG = 46.6753;
+  
+  const params = new URLSearchParams({
+    page: page,
+    perPage: 10,
+    lang: 'ar',
+    'address[latitude]': address?.location?.latitude || DEFAULT_LAT,
+    'address[longitude]': address?.location?.longitude || DEFAULT_LNG
+  });
+
+  const response = await fetch(`${BASE_URL}/api/v1/rest/shops/paginate?${params}`, {
+    headers: {
+      'Accept-Language': 'ar',
+      'Currency-Id': currencyId
+    }
+  });
+  
+  return response.json();
+};
+```
+
+#### ج) التحقق من منطقة التوصيل (JavaScript)
+
+```javascript
+const checkDeliveryZone = async (shopId) => {
+  const address = getSelectedAddress();
+  
+  const params = new URLSearchParams({
+    'address[latitude]': address?.location?.latitude,
+    'address[longitude]': address?.location?.longitude
+  });
+
+  const response = await fetch(
+    `${BASE_URL}/api/v1/rest/shop/${shopId}/delivery-zone/check/distance?${params}`
+  );
+  
+  const data = await response.json();
+  return data.status; // true = يمكن التوصيل, false = خارج النطاق
+};
+```
+
+#### د) إضافة عنوان جديد (JavaScript)
+
+```javascript
+const addNewAddress = async (addressData) => {
+  const response = await fetch(`${BASE_URL}/api/v1/dashboard/user/addresses`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      'Accept-Language': 'ar'
+    },
+    body: JSON.stringify({
+      title: addressData.title,
+      address: {
+        address: addressData.fullAddress,
+        floor: addressData.floor,
+        house: addressData.house
+      },
+      location: [addressData.latitude, addressData.longitude],
+      active: 1
+    })
+  });
+  
+  return response.json();
+};
+```
+
+---
+
+### 15.10 ملخص تقني للويب
+
+| الخطوة | الوصف | التفاصيل |
+|--------|-------|----------|
+| 1 | **تحديد الموقع** | استخدم `Geolocation API` أو خريطة Google/Leaflet |
+| 2 | **حفظ العنوان** | `localStorage` أو State Management (Redux/Zustand/Context) |
+| 3 | **إرسال الموقع** | إضافة `address[latitude]` و `address[longitude]` لكل طلب متاجر |
+| 4 | **إدارة العناوين** | استخدام APIs في `/api/v1/dashboard/user/addresses` |
+| 5 | **تحديث المتاجر** | إعادة الطلب عند تغيير العنوان المختار |
+| 6 | **التحقق من التوصيل** | استدعاء `delivery-zone/check/distance` قبل إتمام الطلب |
+
+---
+
+### 15.11 نقاط مهمة
+
+1. **المستخدم الزائر (Guest):**
+   - استخدم إحداثيات افتراضية أو اطلب الموقع من المتصفح مباشرة
+   - لا يمكنه حفظ العناوين (يحتاج تسجيل دخول)
+
+2. **المستخدم المسجل:**
+   - جلب العناوين المحفوظة عند تسجيل الدخول
+   - إمكانية إضافة/تعديل/حذف العناوين
+   - العنوان `active = true` هو الافتراضي
+
+3. **الـ Headers المطلوبة:**
+   ```javascript
+   headers: {
+     'Authorization': 'Bearer {token}',  // للمستخدم المسجل فقط
+     'Accept-Language': 'ar',
+     'Currency-Id': currencyId  // اختياري
+   }
+   ```
+
+4. **ترتيب الإحداثيات:**
+   - في `location` array: `[latitude, longitude]`
+   - في URL params: `address[latitude]=X&address[longitude]=Y`
+
+5. **التحقق من المسافة:**
+   - الحد الأقصى المقترح: 5 كم بين موقع المستخدم والعنوان المختار
+   - يمكن تجاوز هذا بموافقة المستخدم
 
 ---
 

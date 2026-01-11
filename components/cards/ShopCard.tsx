@@ -162,14 +162,14 @@ const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
     <Link
       href={`/shops/${shop.uuid}`}
       className={clsx(
-        'group block bg-white rounded-2xl overflow-hidden border border-[var(--border)] hover:border-[var(--primary)]/30 hover:shadow-xl transition-all duration-300',
+        'group block bg-white rounded-xl sm:rounded-2xl overflow-hidden border border-[var(--border)] hover:border-[var(--primary)]/30 hover:shadow-xl transition-all duration-300',
         className
       )}
     >
       {/* Background Image + Logo Container */}
       <div className="relative">
         {/* Background Image */}
-        <div className="relative h-52 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
+        <div className="relative h-36 sm:h-52 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
           {shop.background_img ? (
             <Image
               src={shop.background_img}
@@ -188,28 +188,29 @@ const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
           <button
             onClick={handleFavoriteClick}
             className={clsx(
-              'absolute top-3 end-3 w-9 h-9 flex items-center justify-center rounded-full transition-all hover:scale-110',
+              'absolute top-2 end-2 sm:top-3 sm:end-3 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full transition-all hover:scale-110',
               'bg-white/95 backdrop-blur-sm shadow-md',
               isFavorite ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
             )}
           >
-            <Heart size={18} className={isFavorite ? 'fill-current' : ''} />
+            <Heart size={16} className={clsx("sm:hidden", isFavorite && 'fill-current')} />
+            <Heart size={18} className={clsx("hidden sm:block", isFavorite && 'fill-current')} />
           </button>
 
           {/* Status badge */}
           {!shop.open && (
-            <Badge variant="error" className="absolute top-3 start-3 shadow-md">
+            <Badge variant="error" className="absolute top-2 start-2 sm:top-3 sm:start-3 shadow-md text-[10px] sm:text-xs">
               {t('closed')}
             </Badge>
           )}
         </div>
 
         {/* Spacer for logo overlap */}
-        <div className="h-11 bg-white" />
+        <div className="h-9 sm:h-11 bg-white" />
 
         {/* Logo - Absolutely positioned at the boundary */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
-          <div className="relative w-[88px] h-[88px] rounded-2xl overflow-hidden bg-white ring-4 ring-[var(--primary)] shadow-xl group-hover:ring-[var(--primary-hover)] transition-all">
+          <div className="relative w-[68px] h-[68px] sm:w-[88px] sm:h-[88px] rounded-xl sm:rounded-2xl overflow-hidden bg-white ring-3 sm:ring-4 ring-[var(--primary)] shadow-xl group-hover:ring-[var(--primary-hover)] transition-all">
           {shop.logo_img ? (
             <Image
               src={shop.logo_img}
@@ -218,7 +219,7 @@ const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
               className="object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] text-white font-bold text-2xl">
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] text-white font-bold text-xl sm:text-2xl">
               {shop.translation?.title?.charAt(0)}
             </div>
           )}
@@ -227,32 +228,48 @@ const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
       </div>
 
       {/* Content */}
-      <div className="px-5 pt-3 pb-5 text-center">
+      <div className="px-3 sm:px-5 pt-2 sm:pt-3 pb-4 sm:pb-5 text-center">
         {/* Title with verify badge */}
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <h3 className="font-bold text-lg text-[var(--black)] group-hover:text-[var(--primary)] transition-colors line-clamp-1">
+        <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+          <h3 className="font-bold text-base sm:text-lg text-[var(--black)] group-hover:text-[var(--primary)] transition-colors line-clamp-1">
             {shop.translation?.title}
           </h3>
           {shop.verify && (
-            <BadgeCheck size={20} className="text-blue-500 fill-blue-100 shrink-0" />
+            <BadgeCheck size={16} className="text-blue-500 fill-blue-100 shrink-0 sm:hidden" />
+          )}
+          {shop.verify && (
+            <BadgeCheck size={20} className="text-blue-500 fill-blue-100 shrink-0 hidden sm:block" />
           )}
         </div>
 
         {/* Description/Categories */}
-        <p className="text-sm text-[var(--text-grey)] line-clamp-1 mb-4">
+        <p className="text-xs sm:text-sm text-[var(--text-grey)] line-clamp-1 mb-3 sm:mb-4">
           {shop.translation?.description}
         </p>
 
         {/* Rating */}
         {shop.rating_avg !== undefined && shop.rating_avg > 0 && (
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <span className="font-bold text-lg text-[var(--black)]">{shop.rating_avg.toFixed(1)}</span>
+          <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-3 sm:mb-4">
+            <span className="font-bold text-base sm:text-lg text-[var(--black)]">{shop.rating_avg.toFixed(1)}</span>
             <div className="flex items-center gap-0.5">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
+                  size={14}
+                  className={clsx(
+                    "sm:hidden",
+                    i < Math.round(shop.rating_avg || 0)
+                      ? 'fill-[var(--star)] text-[var(--star)]'
+                      : 'fill-gray-200 text-gray-200'
+                  )}
+                />
+              ))}
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={`lg-${i}`}
                   size={16}
                   className={clsx(
+                    "hidden sm:block",
                     i < Math.round(shop.rating_avg || 0)
                       ? 'fill-[var(--star)] text-[var(--star)]'
                       : 'fill-gray-200 text-gray-200'
@@ -261,21 +278,22 @@ const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
               ))}
             </div>
             {shop.reviews_count !== undefined && (
-              <span className="text-sm text-[var(--text-grey)]">({shop.reviews_count})</span>
+              <span className="text-xs sm:text-sm text-[var(--text-grey)]">({shop.reviews_count})</span>
             )}
           </div>
         )}
 
         {/* Shop Info - Horizontal layout */}
-        <div className="flex items-center justify-center gap-4 text-xs text-[var(--text-grey)] mb-5 flex-wrap">
+        <div className="flex items-center justify-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-[var(--text-grey)] mb-4 sm:mb-5 flex-wrap">
           {deliveryTime && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 rounded-lg">
-              <Clock size={13} className="text-[var(--primary)]" />
+            <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 bg-gray-50 rounded-lg">
+              <Clock size={11} className="text-[var(--primary)] sm:hidden" />
+              <Clock size={13} className="text-[var(--primary)] hidden sm:block" />
               <span>{deliveryTime}</span>
             </div>
           )}
           {shop.created_at && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 rounded-lg">
+            <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 bg-gray-50 rounded-lg hidden sm:flex">
               <Calendar size={13} className="text-[var(--primary)]" />
               <span>{formatDate(shop.created_at)}</span>
             </div>
@@ -283,9 +301,10 @@ const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
         </div>
 
         {/* Visit Store Button */}
-        <Button className="w-full py-3 rounded-xl font-semibold bg-[var(--primary)] hover:bg-[var(--primary-hover)] group-hover:shadow-lg transition-all flex items-center justify-center gap-2">
+        <Button className="w-full py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base bg-[var(--primary)] hover:bg-[var(--primary-hover)] group-hover:shadow-lg transition-all flex items-center justify-center gap-1.5 sm:gap-2">
           {tShop('visitStore')}
-          <ArrowUpRight size={18} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          <ArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform sm:hidden" />
+          <ArrowUpRight size={18} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform hidden sm:block" />
         </Button>
       </div>
     </Link>

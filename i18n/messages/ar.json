@@ -61,7 +61,13 @@
     "startShopping": "ابدأ التسوق",
     "follow": "متابعة",
     "following": "متابَع",
-    "minOrder": "الحد الأدنى"
+    "minOrder": "الحد الأدنى",
+    "chooseDeliveryAddress": "اختر عنوان التوصيل",
+    "useGPSLocation": "استخدم موقع GPS الحالي",
+    "change": "تغيير",
+    "loadingAddresses": "جاري تحميل العناوين...",
+    "addNewAddress": "إضافة عنوان جديد",
+    "default": "الافتراضي"
   },
   "home": {
     "title": "مكسب",

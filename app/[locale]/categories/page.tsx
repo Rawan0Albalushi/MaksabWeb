@@ -9,6 +9,7 @@ import { CategorySkeleton } from '@/components/ui';
 import { CategoryCard } from '@/components/cards';
 import { shopService } from '@/services';
 import { Category } from '@/types';
+import { demoCategories } from '@/utils/demoData';
 
 const CategoriesPage = () => {
   const t = useTranslations('common');
@@ -25,9 +26,18 @@ const CategoriesPage = () => {
     setLoading(true);
     try {
       const response = await shopService.getCategories({ perPage: 50 });
-      setCategories(response.data || []);
+      if (response.data && response.data.length > 0) {
+        setCategories(response.data);
+      } else {
+        // Use demo data if API returns empty
+        setCategories(demoCategories);
+      }
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      // Use demo data as fallback when API fails
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Using demo data for categories - API failed:', error);
+      }
+      setCategories(demoCategories);
     } finally {
       setLoading(false);
     }

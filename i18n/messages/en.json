@@ -61,7 +61,13 @@
     "startShopping": "Start Shopping",
     "follow": "Follow",
     "following": "Following",
-    "minOrder": "Min. Order"
+    "minOrder": "Min. Order",
+    "chooseDeliveryAddress": "Choose delivery address",
+    "useGPSLocation": "Use current GPS location",
+    "change": "Change",
+    "loadingAddresses": "Loading addresses...",
+    "addNewAddress": "Add new address",
+    "default": "Default"
   },
   "home": {
     "title": "Maksab",

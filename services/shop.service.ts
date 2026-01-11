@@ -41,25 +41,31 @@ const formatParams = (params?: { page?: number; perPage?: number }) => {
   if (!params) return undefined;
   const result: Record<string, unknown> = {};
   if (params.page !== undefined) result.page = params.page;
-  if (params.perPage !== undefined) result.perPage = params.perPage;
+  if (params.perPage !== undefined) result.per_page = params.perPage;
   return Object.keys(result).length > 0 ? result : undefined;
 };
 
 export const shopService = {
-  // Get all categories
+  // Get main categories with children (subcategories)
   getCategories: async (params?: { page?: number; perPage?: number }): Promise<PaginatedResponse<Category>> => {
-    return get('/api/v1/rest/categories/paginate', formatParams(params));
+    const apiParams = {
+      ...formatParams(params),
+      type: 'main',
+    };
+    return get('/api/v1/rest/categories/paginate', apiParams);
   },
 
   // Get shops with pagination and filters
   getShops: async (filters?: ShopFilters): Promise<PaginatedResponse<Shop>> => {
     if (!filters) return get('/api/v1/rest/shops/paginate');
     
-    // Clean up undefined values
+    // Clean up undefined values and convert perPage to per_page
     const apiParams: Record<string, unknown> = {};
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined) {
-        apiParams[key] = value;
+        // Convert perPage to per_page for API compatibility
+        const apiKey = key === 'perPage' ? 'per_page' : key;
+        apiParams[apiKey] = value;
       }
     });
     
@@ -100,11 +106,13 @@ export const shopService = {
   getShopProducts: async (shopId: number, params?: ProductFilters): Promise<PaginatedResponse<Product>> => {
     if (!params) return get(`/api/v1/rest/shops/${shopId}/products/paginate`);
     
-    // Clean up undefined values
+    // Clean up undefined values and convert perPage to per_page
     const apiParams: Record<string, unknown> = {};
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined) {
-        apiParams[key] = value;
+        // Convert perPage to per_page for API compatibility
+        const apiKey = key === 'perPage' ? 'per_page' : key;
+        apiParams[apiKey] = value;
       }
     });
     
@@ -127,7 +135,9 @@ export const shopService = {
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined) {
-          apiParams[key] = value;
+          // Convert perPage to per_page for API compatibility
+          const apiKey = key === 'perPage' ? 'per_page' : key;
+          apiParams[apiKey] = value;
         }
       });
     }
@@ -143,7 +153,9 @@ export const shopService = {
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined) {
-          apiParams[key] = value;
+          // Convert perPage to per_page for API compatibility
+          const apiKey = key === 'perPage' ? 'per_page' : key;
+          apiParams[apiKey] = value;
         }
       });
     }

@@ -1,5 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { Address } from '@/types';
+
+// Default coordinates (Muscat, Oman)
+export const DEFAULT_LOCATION = {
+  latitude: 23.5880,
+  longitude: 58.3829,
+};
 
 export interface UserLocation {
   latitude: number;
@@ -8,38 +15,163 @@ export interface UserLocation {
   city?: string;
 }
 
+export interface SelectedAddress {
+  id?: number;
+  title?: string;
+  address?: string;
+  location: {
+    latitude: number;
+    longitude: number;
+  };
+  active?: boolean;
+  isCurrentLocation?: boolean; // true if from browser geolocation
+}
+
 interface LocationState {
-  location: UserLocation | null;
+  // Current browser location (from geolocation)
+  currentLocation: UserLocation | null;
+  
+  // Selected address for shopping (either from saved addresses or current location)
+  selectedAddress: SelectedAddress | null;
+  
+  // Saved addresses from user profile
+  savedAddresses: Address[];
+  
+  // Loading states
   isLoading: boolean;
+  isLoadingAddresses: boolean;
+  
+  // Errors
   error: string | null;
   
-  setLocation: (location: UserLocation) => void;
+  // Actions
+  setCurrentLocation: (location: UserLocation | null) => void;
+  setSelectedAddress: (address: SelectedAddress | null) => void;
+  setSavedAddresses: (addresses: Address[]) => void;
   clearLocation: () => void;
   setLoading: (loading: boolean) => void;
+  setLoadingAddresses: (loading: boolean) => void;
   setError: (error: string | null) => void;
+  
+  // Select address from saved addresses
+  selectSavedAddress: (address: Address) => void;
+  
+  // Use current location as selected address
+  useCurrentLocationAsSelected: () => void;
   
   // Get current location using browser geolocation
   getCurrentLocation: () => Promise<UserLocation | null>;
+  
+  // Get location for API requests
+  getLocationForApi: () => { latitude: number; longitude: number };
+  
+  // Check if location is set
+  hasLocation: () => boolean;
+  
+  // Refresh shops trigger (incremented when address changes to trigger refetch)
+  refreshTrigger: number;
+  triggerRefresh: () => void;
 }
 
 export const useLocationStore = create<LocationState>()(
   persist(
     (set, get) => ({
-      location: null,
+      currentLocation: null,
+      selectedAddress: null,
+      savedAddresses: [],
       isLoading: false,
+      isLoadingAddresses: false,
       error: null,
+      refreshTrigger: 0,
 
-      setLocation: (location) => {
-        set({ location, error: null });
+      setCurrentLocation: (location) => {
+        set({ currentLocation: location, error: null });
+      },
+
+      setSelectedAddress: (address) => {
+        set({ selectedAddress: address, error: null });
+        // Trigger refresh when address changes
+        get().triggerRefresh();
+      },
+
+      setSavedAddresses: (addresses) => {
+        set({ savedAddresses: addresses });
+        
+        // If no selected address and there are saved addresses, select the active one
+        const state = get();
+        if (!state.selectedAddress && addresses.length > 0) {
+          const activeAddress = addresses.find(a => a.active) || addresses[0];
+          if (activeAddress?.location) {
+            set({
+              selectedAddress: {
+                id: activeAddress.id,
+                title: activeAddress.title,
+                address: activeAddress.address,
+                location: {
+                  latitude: activeAddress.location.latitude,
+                  longitude: activeAddress.location.longitude,
+                },
+                active: activeAddress.active,
+                isCurrentLocation: false,
+              }
+            });
+          }
+        }
       },
 
       clearLocation: () => {
-        set({ location: null, error: null });
+        set({ 
+          currentLocation: null, 
+          selectedAddress: null,
+          error: null 
+        });
+        get().triggerRefresh();
       },
 
       setLoading: (isLoading) => set({ isLoading }),
 
+      setLoadingAddresses: (isLoadingAddresses) => set({ isLoadingAddresses }),
+
       setError: (error) => set({ error }),
+
+      selectSavedAddress: (address) => {
+        if (address.location) {
+          set({
+            selectedAddress: {
+              id: address.id,
+              title: address.title,
+              address: address.address,
+              location: {
+                latitude: address.location.latitude,
+                longitude: address.location.longitude,
+              },
+              active: address.active,
+              isCurrentLocation: false,
+            },
+            error: null,
+          });
+          get().triggerRefresh();
+        }
+      },
+
+      useCurrentLocationAsSelected: () => {
+        const { currentLocation } = get();
+        if (currentLocation) {
+          set({
+            selectedAddress: {
+              title: currentLocation.city || 'الموقع الحالي',
+              address: currentLocation.address,
+              location: {
+                latitude: currentLocation.latitude,
+                longitude: currentLocation.longitude,
+              },
+              isCurrentLocation: true,
+            },
+            error: null,
+          });
+          get().triggerRefresh();
+        }
+      },
 
       getCurrentLocation: async () => {
         if (typeof window === 'undefined' || !navigator.geolocation) {
@@ -91,7 +223,22 @@ export const useLocationStore = create<LocationState>()(
                 city: city || undefined,
               };
 
-              set({ location: newLocation, isLoading: false, error: null });
+              set({ currentLocation: newLocation, isLoading: false, error: null });
+              
+              // Also set as selected address if no address is selected
+              const state = get();
+              if (!state.selectedAddress) {
+                set({
+                  selectedAddress: {
+                    title: city || 'الموقع الحالي',
+                    address: address || undefined,
+                    location: { latitude, longitude },
+                    isCurrentLocation: true,
+                  }
+                });
+                get().triggerRefresh();
+              }
+              
               resolve(newLocation);
             },
             (error) => {
@@ -118,10 +265,46 @@ export const useLocationStore = create<LocationState>()(
           );
         });
       },
+
+      getLocationForApi: () => {
+        const { selectedAddress, currentLocation } = get();
+        
+        // Priority: selectedAddress > currentLocation > default
+        if (selectedAddress?.location) {
+          return {
+            latitude: selectedAddress.location.latitude,
+            longitude: selectedAddress.location.longitude,
+          };
+        }
+        
+        if (currentLocation) {
+          return {
+            latitude: currentLocation.latitude,
+            longitude: currentLocation.longitude,
+          };
+        }
+        
+        return DEFAULT_LOCATION;
+      },
+
+      hasLocation: () => {
+        const { selectedAddress, currentLocation } = get();
+        return !!(selectedAddress?.location || currentLocation);
+      },
+
+      triggerRefresh: () => {
+        set((state) => ({ refreshTrigger: state.refreshTrigger + 1 }));
+      },
     }),
     {
       name: 'location-storage',
-      partialize: (state) => ({ location: state.location }),
+      partialize: (state) => ({ 
+        selectedAddress: state.selectedAddress,
+        currentLocation: state.currentLocation,
+      }),
     }
   )
 );
+
+// Legacy export for backward compatibility
+export const location = null;
