@@ -686,3 +686,299 @@ select {
 footer {
   margin-top: 4rem !important;
 }
+
+/* Authentication Page Theme - Form Elements on Background */
+.auth-page {
+  /* Allow gradient background to show through */
+  background: transparent !important;
+}
+
+/* Text colors on dark background - blue text for left side */
+/* Override all text-white classes in auth page */
+.auth-page h1.text-white,
+.auth-page h1 {
+  text-shadow: 0 2px 8px rgba(255, 255, 255, 0.3), 0 1px 3px rgba(255, 255, 255, 0.2) !important;
+  color: var(--primary-dark) !important;
+}
+
+/* Right side text - white color (targeting the right panel) */
+.auth-page > div > div.hidden h2,
+.auth-page > div > div.hidden h2.text-white,
+.auth-page > div > div.hidden p,
+.auth-page > div > div.hidden p.text-white,
+.auth-page div[class*="hidden"] h2,
+.auth-page div[class*="hidden"] p {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.4) !important;
+  color: rgba(255, 255, 255, 1) !important;
+}
+
+.auth-page h2.text-white,
+.auth-page h2,
+.auth-page h3.text-white,
+.auth-page h3 {
+  text-shadow: 0 2px 8px rgba(255, 255, 255, 0.3), 0 1px 3px rgba(255, 255, 255, 0.2) !important;
+  color: var(--primary-dark) !important;
+}
+
+.auth-page p.text-white,
+.auth-page span.text-white,
+.auth-page a.text-white,
+.auth-page p,
+.auth-page span,
+.auth-page a {
+  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.3), 0 1px 2px rgba(255, 255, 255, 0.2) !important;
+  color: var(--primary-dark) !important;
+}
+
+/* Input labels - blue color on white background (above white input fields) */
+.auth-page form label,
+.auth-page .flex.flex-col > label,
+.auth-page form .flex.flex-col label,
+.auth-page form .flex.flex-col label.text-sm,
+.auth-page form .flex.flex-col label.font-medium {
+  color: var(--primary-dark) !important;
+  text-shadow: none !important;
+  font-weight: 500 !important;
+}
+
+/* Override any text color classes on labels - blue for labels above white inputs */
+.auth-page form label[class*="text-"],
+.auth-page form label[class*="black"],
+.auth-page .flex.flex-col label[class*="text-"] {
+  color: var(--primary-dark) !important;
+  text-shadow: none !important;
+}
+
+/* Remember me label and other labels on dark background - blue color */
+.auth-page label.flex.items-center,
+.auth-page label[class*="cursor-pointer"] {
+  color: var(--primary-dark) !important;
+  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.3), 0 1px 2px rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Logo - keep original colors (no filter) for left side */
+.auth-page img[alt="Maksab"] {
+  filter: none !important;
+}
+
+/* Logo on right side - white with orange accent */
+/* First make it white, then we'll try to preserve/add orange */
+.auth-page img[alt="Maksab Right"] {
+  filter: brightness(0) invert(1) !important;
+}
+
+/* Try to add orange color to specific parts - this is complex with CSS filters */
+/* Alternative: Use a CSS mask or separate image for orange parts */
+/* For now, the logo will be white. To add orange, we might need SVG manipulation */
+
+/* Override input styles in auth pages - white inputs on gradient background */
+.auth-page input[type="text"],
+.auth-page input[type="email"],
+.auth-page input[type="password"],
+.auth-page input[type="tel"],
+.auth-page input[type="number"],
+.auth-page textarea,
+.auth-page select {
+  height: 52px !important;
+  min-height: 52px !important;
+  border: 1px solid rgba(38, 120, 129, 0.2) !important;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 1) !important;
+  color: var(--primary-dark) !important;
+  /* Enhanced shadow for better depth */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04) !important;
+  outline: none !important;
+  transition: all 0.2s ease !important;
+}
+
+/* REMOVED - Duplicate rules, using the ones below instead */
+
+.auth-page input::placeholder {
+  color: rgba(38, 120, 129, 0.5) !important;
+}
+
+.auth-page input:hover {
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Override focus styles - enhanced focus with primary color */
+.auth-page input:focus,
+.auth-page input:focus-visible,
+.auth-page textarea:focus,
+.auth-page select:focus {
+  --tw-ring-offset-shadow: none !important;
+  --tw-ring-shadow: none !important;
+  border-color: var(--primary) !important;
+  background: rgba(255, 255, 255, 1) !important;
+  color: var(--primary-dark) !important;
+  box-shadow: 0 0 0 4px rgba(255, 61, 0, 0.15), 0 6px 20px rgba(255, 61, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  outline: none !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Override button styles in auth pages - enhanced button styling */
+.auth-page button {
+  border-radius: 10px !important;
+  transition: all 0.2s ease !important;
+  font-weight: 600 !important;
+}
+
+.auth-page button:not(:disabled):hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Primary button enhancement - white background with blue text */
+.auth-page button[type="submit"] {
+  background: rgba(255, 255, 255, 1) !important;
+  color: var(--primary-dark) !important;
+  border: 2px solid var(--primary-dark) !important;
+}
+
+.auth-page button[type="submit"]:not(:disabled):hover {
+  background: var(--primary-dark) !important;
+  color: white !important;
+  box-shadow: 0 8px 24px rgba(38, 120, 129, 0.4), 0 4px 10px rgba(38, 120, 129, 0.3) !important;
+}
+
+/* Outline button styling for social login - target buttons with border-2 class */
+.auth-page button.border-2 {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  color: var(--black) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  font-weight: 600 !important;
+}
+
+.auth-page button.border-2:hover {
+  background: rgba(255, 255, 255, 1) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  color: var(--black) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Remove any hover lift effects */
+.auth-page .hover-lift:hover {
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Override card shadow hover */
+.auth-page .card-shadow-hover:hover {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+  transform: none !important;
+}
+
+/* Ensure no border glow */
+.auth-page .border-glow {
+  box-shadow: 0 0 0 1px var(--border) !important;
+}
+
+/* Remove focus ring glow */
+.auth-page .focus-ring-primary:focus-visible {
+  box-shadow: 0 0 0 3px rgba(255, 61, 0, 0.1) !important;
+}
+
+/* Override any search glow */
+.auth-page .search-glow {
+  animation: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure inputs with icons maintain proper height and padding */
+.auth-page .relative input {
+  height: 52px !important;
+  min-height: 52px !important;
+  box-sizing: border-box !important;
+}
+
+/* Force proper padding for inputs with left icon only (like email) - prevent text overlap */
+/* Use maximum specificity to override Tailwind classes */
+.auth-page form .relative input.ps-11:not(.pe-11),
+.auth-page .relative input.ps-11:not(.pe-11),
+.auth-page input.ps-11:not(.pe-11),
+.auth-page .relative input[class*="ps-11"]:not([class*="pe-11"]),
+/* Target email inputs specifically */
+.auth-page form input[type="email"].ps-11,
+.auth-page input[type="email"].ps-11 {
+  padding-left: 52px !important;
+  padding-inline-start: 52px !important;
+  padding-right: 16px !important;
+  padding-inline-end: 16px !important;
+}
+
+/* Force proper padding for inputs with right icon or password toggle */
+.auth-page form .relative input.pe-11,
+.auth-page .relative input.pe-11,
+.auth-page input.pe-11,
+.auth-page .relative input[class*="pe-11"] {
+  padding-right: 52px !important;
+  padding-inline-end: 52px !important;
+}
+
+/* RTL support - ensure padding works in both directions */
+[dir="rtl"] .auth-page form .relative input.ps-11,
+[dir="rtl"] .auth-page .relative input.ps-11 {
+  padding-right: 52px !important;
+  padding-inline-end: 52px !important;
+}
+
+[dir="rtl"] .auth-page form .relative input.pe-11,
+[dir="rtl"] .auth-page .relative input.pe-11 {
+  padding-left: 52px !important;
+  padding-inline-start: 52px !important;
+}
+
+/* Inputs with both icons - password field */
+.auth-page form .relative input.ps-11.pe-11,
+.auth-page .relative input.ps-11.pe-11,
+.auth-page input.ps-11.pe-11,
+.auth-page .relative input.ps-11[class*="pe-11"],
+.auth-page .relative input[class*="ps-11"][class*="pe-11"] {
+  padding-left: 52px !important;
+  padding-right: 52px !important;
+  padding-inline-start: 52px !important;
+  padding-inline-end: 52px !important;
+}
+
+/* Error messages - enhanced styling for better visibility */
+.auth-page p.text-sm {
+  background: rgba(255, 235, 238, 0.98) !important;
+  border: 1px solid rgba(229, 57, 53, 0.4) !important;
+  color: var(--error) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  box-shadow: 0 2px 8px rgba(229, 57, 53, 0.2) !important;
+}
+
+/* Links on dark background - blue color */
+.auth-page a {
+  color: var(--primary-dark) !important;
+  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.3), 0 1px 2px rgba(255, 255, 255, 0.2) !important;
+}
+
+.auth-page a:hover {
+  color: var(--primary-dark-hover) !important;
+}
+
+/* Override Input component label styles specifically for auth page - blue on white background */
+.auth-page form .flex.flex-col > label {
+  color: var(--primary-dark) !important;
+  text-shadow: none !important;
+}
+
+/* Icon colors in inputs - blue color to match text */
+.auth-page .relative span svg {
+  color: var(--primary-dark) !important;
+  opacity: 0.7 !important;
+  transition: all 0.2s ease !important;
+}
+
+.auth-page input:focus ~ span svg,
+.auth-page input:focus + span svg,
+.auth-page .relative:has(input:focus) span svg {
+  color: var(--primary) !important;
+  opacity: 1 !important;
+}
