@@ -33,14 +33,29 @@ const LoginPage = () => {
 
     try {
       const response = await authService.login({ email, password });
+      console.log('🔐 Login Response:', response);
+      
       if (response.status && response.data) {
-        login(response.data.user, response.data.token);
+        // Handle different token formats from API
+        const token = response.data.token || (response.data as any).access_token;
+        const user = response.data.user;
+        
+        if (!token) {
+          console.error('❌ No token in response:', response.data);
+          setError('Login failed: No token received');
+          setLoading(false);
+          return;
+        }
+        
+        console.log('✅ Token received:', token.substring(0, 30) + '...');
+        login(user, token);
         window.location.href = '/';
       } else {
         setError(response.message || 'Login failed');
         setLoading(false);
       }
     } catch (err: any) {
+      console.error('❌ Login error:', err.response?.data || err);
       setError(err.response?.data?.message || 'An error occurred');
       setLoading(false);
     }

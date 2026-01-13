@@ -171,6 +171,7 @@ export interface UserCart {
   uuid: string;
   name?: string;
   cart_details?: CartDetail[];
+  cartDetails?: CartDetail[]; // API sometimes returns camelCase
 }
 
 export interface CartDetail {

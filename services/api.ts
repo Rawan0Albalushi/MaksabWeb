@@ -74,7 +74,26 @@ api.interceptors.request.use(
 
     // Get values from localStorage if available
     if (typeof window !== 'undefined') {
+      // Try to get token from standalone key first
       token = localStorage.getItem('token');
+      
+      // If not found, try to get from auth-storage (zustand persist)
+      if (!token) {
+        try {
+          const authStorage = localStorage.getItem('auth-storage');
+          if (authStorage) {
+            const parsed = JSON.parse(authStorage);
+            token = parsed?.state?.token || null;
+            // Sync to standalone key for future requests
+            if (token) {
+              localStorage.setItem('token', token);
+            }
+          }
+        } catch (e) {
+          console.warn('Failed to parse auth-storage:', e);
+        }
+      }
+      
       locale = localStorage.getItem('locale') || 'ar';
       currencyId = localStorage.getItem('currency_id');
     }
@@ -82,6 +101,16 @@ api.interceptors.request.use(
     // Set Authorization header if token exists
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    // Debug: Log token status for authenticated endpoints
+    if (config.url?.includes('/dashboard/')) {
+      console.log('🔐 Auth Debug:', {
+        url: config.url,
+        hasToken: !!token,
+        tokenPreview: token ? `${token.substring(0, 20)}...` : 'NO TOKEN',
+        authHeader: config.headers.Authorization ? 'SET' : 'NOT SET',
+      });
     }
 
     // Always add lang parameter
@@ -127,12 +156,13 @@ api.interceptors.response.use(
     return response;
   },
   (error: AxiosError) => {
-    // Only log detailed errors in development mode
-    if (process.env.NODE_ENV === 'development' && error.response) {
-      // Use warn instead of error for non-critical failures
+    // Log detailed error info for debugging
+    if (error.response) {
       console.warn('API Request Failed:', {
         status: error.response.status,
         url: error.config?.url,
+        responseData: error.response.data, // Show actual error message from API
+        requestData: error.config?.data,
       });
     }
     

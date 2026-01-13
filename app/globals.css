@@ -358,6 +358,22 @@ select {
   display: none;
 }
 
+/* Safe Area for notched devices (iPhone X, etc.) */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+.safe-area-all {
+  padding-top: env(safe-area-inset-top, 0);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  padding-left: env(safe-area-inset-left, 0);
+  padding-right: env(safe-area-inset-right, 0);
+}
+
 /* Gradient overlays */
 .gradient-overlay {
   position: relative;
@@ -981,4 +997,522 @@ footer {
 .auth-page .relative:has(input:focus) span svg {
   color: var(--primary) !important;
   opacity: 1 !important;
+}
+
+/* ===== SHOP PAGE STYLES ===== */
+
+/* Shop page hero parallax effect */
+.shop-hero-parallax {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+/* Product card 3D hover effect */
+.product-card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.product-card-3d:hover {
+  transform: translateY(-8px) rotateX(2deg);
+}
+
+/* Floating animation for cart button */
+@keyframes float-cart {
+  0%, 100% {
+    transform: translateY(0) translateX(-50%);
+  }
+  50% {
+    transform: translateY(-6px) translateX(-50%);
+  }
+}
+
+.float-cart {
+  animation: float-cart 3s ease-in-out infinite;
+}
+
+/* Category tab indicator animation */
+@keyframes tab-indicator {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.tab-indicator {
+  animation: tab-indicator 0.3s ease forwards;
+  transform-origin: left;
+}
+
+[dir="rtl"] .tab-indicator {
+  transform-origin: right;
+}
+
+/* Product image zoom on hover */
+.product-image-zoom {
+  transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.product-image-zoom:hover {
+  transform: scale(1.08);
+}
+
+/* Staggered fade in for products */
+@keyframes stagger-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stagger-fade-in {
+  animation: stagger-fade-in 0.4s ease forwards;
+  opacity: 0;
+}
+
+/* Quick add button slide up */
+@keyframes slide-up-appear {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-up-appear {
+  animation: slide-up-appear 0.3s ease forwards;
+}
+
+/* Modal backdrop blur animation */
+@keyframes backdrop-blur-in {
+  from {
+    backdrop-filter: blur(0px);
+    background-color: rgba(0, 0, 0, 0);
+  }
+  to {
+    backdrop-filter: blur(8px);
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+.backdrop-blur-animate {
+  animation: backdrop-blur-in 0.3s ease forwards;
+}
+
+/* Success checkmark animation */
+@keyframes checkmark-pop {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.checkmark-pop {
+  animation: checkmark-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Stat card hover effect */
+.stat-card-hover {
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.stat-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+}
+
+/* Shop logo float animation */
+@keyframes logo-float {
+  0%, 100% {
+    transform: translateY(0);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25);
+  }
+}
+
+.logo-float {
+  animation: logo-float 4s ease-in-out infinite;
+}
+
+/* Sticky header shadow on scroll */
+.sticky-header-shadow {
+  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.1);
+}
+
+/* Badge pulse animation */
+@keyframes badge-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 61, 0, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 8px rgba(255, 61, 0, 0);
+  }
+}
+
+.badge-pulse {
+  animation: badge-pulse 2s ease infinite;
+}
+
+/* Card shine effect on hover */
+.card-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-shine::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.6s ease;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.card-shine:hover::before {
+  left: 100%;
+}
+
+/* Smooth scroll snap for categories */
+.category-scroll-snap {
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+}
+
+.category-scroll-snap > * {
+  scroll-snap-align: start;
+}
+
+/* Price highlight animation */
+@keyframes price-highlight {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+.price-highlight {
+  background: linear-gradient(
+    90deg,
+    var(--primary) 0%,
+    var(--primary-light) 25%,
+    var(--primary) 50%,
+    var(--primary-light) 75%,
+    var(--primary) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: price-highlight 3s linear infinite;
+}
+
+/* Empty state bounce animation */
+@keyframes empty-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.empty-bounce {
+  animation: empty-bounce 2s ease-in-out infinite;
+}
+
+/* View mode toggle effect */
+.view-toggle-active {
+  box-shadow: 0 2px 8px -2px rgba(255, 61, 0, 0.3);
+}
+
+/* Search input focus ring */
+.search-focus-ring:focus-within {
+  box-shadow: 0 0 0 4px rgba(255, 61, 0, 0.1);
+}
+
+/* Gradient border animation */
+@keyframes gradient-border {
+  0% {
+    border-image-source: linear-gradient(0deg, var(--primary), var(--primary-dark));
+  }
+  50% {
+    border-image-source: linear-gradient(180deg, var(--primary), var(--primary-dark));
+  }
+  100% {
+    border-image-source: linear-gradient(360deg, var(--primary), var(--primary-dark));
+  }
+}
+
+.gradient-border-animate {
+  border: 2px solid transparent;
+  border-image-slice: 1;
+  animation: gradient-border 3s linear infinite;
+}
+
+/* ===== ENHANCED SHOP PAGE STYLES - Desktop Optimizations ===== */
+
+/* Hero section parallax depth */
+.shop-hero-depth {
+  transform-style: preserve-3d;
+}
+
+.shop-hero-depth > * {
+  transform: translateZ(0);
+}
+
+/* Enhanced stat cards for desktop */
+@media (min-width: 1024px) {
+  .stat-card-hover {
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .stat-card-hover:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* Product card enhanced interactions */
+@media (min-width: 1024px) {
+  .product-card-enhanced {
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .product-card-enhanced:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* Category pill active state animation */
+@keyframes category-active {
+  0% {
+    transform: scale(0.95);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1.05);
+  }
+}
+
+.category-pill-active {
+  animation: category-active 0.3s ease forwards;
+}
+
+/* Desktop modal overlay */
+@media (min-width: 1024px) {
+  .modal-overlay {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
+/* Enhanced floating cart bar */
+.cart-bar-enhanced {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Desktop grid reveal animation */
+@keyframes grid-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.grid-reveal-item {
+  animation: grid-reveal 0.5s ease forwards;
+  animation-delay: calc(var(--item-index, 0) * 0.05s);
+}
+
+/* Search bar desktop focus state */
+@media (min-width: 1024px) {
+  .search-bar-desktop:focus-within {
+    box-shadow: 0 0 0 4px rgba(255, 61, 0, 0.1), 0 8px 32px rgba(255, 61, 0, 0.15);
+  }
+}
+
+/* View toggle button active state */
+.view-toggle-btn-active {
+  box-shadow: 0 2px 12px -2px rgba(255, 61, 0, 0.25);
+}
+
+/* Product image parallax effect */
+.product-image-parallax {
+  transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.product-image-parallax:hover {
+  transform: scale(1.1) translateY(-2%);
+}
+
+/* Desktop hero background animation */
+@keyframes hero-bg-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.hero-bg-animate {
+  background-size: 200% 200%;
+  animation: hero-bg-shift 15s ease infinite;
+}
+
+/* Enhanced modal content animation */
+@keyframes modal-content-reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-content-reveal {
+  animation: modal-content-reveal 0.4s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+/* Quantity button ripple effect */
+@keyframes qty-ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.qty-btn-ripple::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: currentColor;
+  transform: scale(0);
+  opacity: 0;
+}
+
+.qty-btn-ripple:active::after {
+  animation: qty-ripple 0.4s ease-out;
+}
+
+/* Desktop product modal layout */
+@media (min-width: 1024px) {
+  .product-modal-desktop {
+    max-width: 700px;
+    border-radius: 2rem;
+  }
+}
+
+/* Add to cart button shine effect */
+.add-cart-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.add-cart-shine::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.add-cart-shine:hover::before {
+  left: 150%;
+}
+
+/* Category scroll snap behavior */
+.category-scroll-snap {
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline-start: 1rem;
+}
+
+.category-scroll-snap > button {
+  scroll-snap-align: start;
+}
+
+/* Stats grid responsive layout */
+@media (min-width: 1280px) {
+  .stats-grid-xl {
+    gap: 1.5rem;
+  }
+}
+
+/* Enhanced empty state animation */
+@keyframes empty-float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-15px) rotate(-2deg);
+  }
+  75% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+}
+
+.empty-float {
+  animation: empty-float 4s ease-in-out infinite;
+}
+
+/* Desktop sticky header enhancement */
+@media (min-width: 1024px) {
+  .sticky-header-desktop {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom-width: 2px;
+  }
 }

@@ -32,9 +32,121 @@ export const cartService = {
     return post('/api/v1/dashboard/user/cart/open', { shop_id: shopId });
   },
 
-  // Add product to cart
+  // Add product to cart (handles cart creation automatically)
   addToCart: async (data: CartProductData): Promise<ApiResponse<Cart>> => {
-    return post('/api/v1/dashboard/user/cart/insert-product', data);
+    console.log('🛒 Adding to cart:', data);
+    
+    // Get currency_id (required for both endpoints)
+    let currencyId: number = 2; // Default to 2 (OMR)
+    
+    if (typeof window !== 'undefined') {
+      const storedCurrencyId = localStorage.getItem('currency_id');
+      if (storedCurrencyId) {
+        currencyId = parseInt(storedCurrencyId, 10);
+      }
+    }
+    
+    // Data for INSERT-PRODUCT (existing cart) - requires products[] array + currency_id
+    const insertProductData = {
+      shop_id: data.shop_id,
+      currency_id: currencyId,
+      products: [
+        {
+          stock_id: data.stock_id,
+          quantity: data.quantity,
+          ...(data.addons && { parent_id: data.addons[0]?.stock_id }),
+        },
+      ],
+    };
+    
+    // Data for CREATE CART (new cart) - flat structure, single product
+    const createCartData = {
+      shop_id: data.shop_id,
+      currency_id: currencyId,
+      stock_id: data.stock_id,
+      quantity: data.quantity,
+    };
+    
+    console.log('📤 Insert data:', insertProductData);
+    console.log('📤 Create data:', createCartData);
+    
+    // Try to add to existing cart first using insert-product
+    try {
+      const result = await post<ApiResponse<Cart>>('/api/v1/dashboard/user/cart/insert-product', insertProductData);
+      console.log('✅ Product added to existing cart');
+      console.log('✅ INSERT RESPONSE:', result);
+      console.log('✅ Cart data:', JSON.stringify(result, null, 2));
+      return result;
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { message?: string; statusCode?: string }; status?: number } };
+      const errorMessage = axiosError?.response?.data?.message;
+      const statusCode = axiosError?.response?.data?.statusCode;
+      const httpStatus = axiosError?.response?.status;
+      
+      console.log('❌ Insert-product failed:', { errorMessage, statusCode, httpStatus });
+      
+      // If cart doesn't exist, create new cart
+      if (httpStatus === 404 || statusCode === 'ERROR_404' || errorMessage?.toLowerCase().includes('not found') || errorMessage?.toLowerCase().includes('cart')) {
+        console.log('📦 No cart exists, creating new cart...');
+        return post<ApiResponse<Cart>>('/api/v1/dashboard/user/cart', createCartData);
+      }
+      
+      // If cart exists for different shop, delete and create new
+      if (statusCode === 'ERROR_440' || errorMessage === 'Other shop' || errorMessage?.toLowerCase().includes('other shop')) {
+        console.log('⚠️ Cart exists for different shop, clearing and creating new...');
+        
+        // First, try to get current cart to find its ID
+        try {
+          console.log('📋 Getting current cart info...');
+          const currentCart = await get<ApiResponse<Cart>>('/api/v1/dashboard/user/cart');
+          console.log('📋 Current cart:', currentCart);
+          
+          if (currentCart?.data?.id) {
+            console.log(`🗑️ Deleting cart with ID: ${currentCart.data.id}`);
+            // Try deleting with cart_id parameter
+            await del<ApiResponse<void>>('/api/v1/dashboard/user/cart/delete', { 
+              ids: [currentCart.data.id] 
+            });
+          }
+        } catch (getCartError) {
+          console.log('Could not get cart, trying simple delete...');
+        }
+        
+        // Also try simple delete without params
+        try {
+          console.log('🗑️ Attempting simple delete...');
+          await del<ApiResponse<void>>('/api/v1/dashboard/user/cart/delete');
+          console.log('✅ Delete request sent');
+        } catch (deleteError: unknown) {
+          const delErr = deleteError as { response?: { status?: number } };
+          // 404 means cart is already gone - that's fine
+          if (delErr?.response?.status !== 404) {
+            console.warn('Delete error:', deleteError);
+          }
+        }
+        
+        // Wait for server to process
+        console.log('⏳ Waiting 2 seconds...');
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Create new cart with flat structure
+        console.log('🔄 Creating new cart with data:', createCartData);
+        try {
+          const createResult = await post<ApiResponse<Cart>>('/api/v1/dashboard/user/cart', createCartData);
+          console.log('✅ CREATE CART RESPONSE:', createResult);
+          console.log('✅ Cart data:', JSON.stringify(createResult, null, 2));
+          return createResult;
+        } catch (createErr: unknown) {
+          const createAxiosErr = createErr as { response?: { data?: unknown; status?: number } };
+          console.error('❌ CREATE CART FAILED!');
+          console.error('Response data:', createAxiosErr?.response?.data);
+          throw createErr;
+        }
+      }
+      
+      // Re-throw other errors
+      throw error;
+    }
   },
 
   // Update product quantity in cart

@@ -28,8 +28,9 @@ export const useCartStore = create<CartState>()(
         const { cart } = get();
         if (!cart?.user_carts) return 0;
         return cart.user_carts.reduce((total, userCart) => {
-          if (!userCart.cart_details) return total;
-          return total + userCart.cart_details.reduce((sum, detail) => sum + detail.quantity, 0);
+          const details = userCart.cart_details || userCart.cartDetails;
+          if (!details) return total;
+          return total + details.reduce((sum, detail) => sum + detail.quantity, 0);
         }, 0);
       },
 
