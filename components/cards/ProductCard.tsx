@@ -219,11 +219,14 @@ const ProductCard = ({
             <button
               onClick={handleAddToCart}
               className={clsx(
-                'w-9 h-9 flex items-center justify-center rounded-full',
-                'bg-[var(--primary)] text-white transition-all hover:bg-[var(--primary-hover)] hover:scale-110'
+                'w-11 h-11 flex items-center justify-center rounded-full',
+                'bg-[var(--primary)] text-white transition-all',
+                'hover:bg-[var(--primary-hover)] hover:scale-110 active:scale-95',
+                'shadow-lg shadow-[var(--primary)]/30',
+                'ring-2 ring-white ring-offset-1'
               )}
             >
-              <Plus size={20} />
+              <Plus size={22} strokeWidth={2.5} />
             </button>
           )}
         </div>

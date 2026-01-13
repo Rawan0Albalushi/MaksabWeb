@@ -200,7 +200,12 @@
     "optional": "Optional",
     "addedToCart": "Added to cart",
     "outOfStock": "Out of Stock",
-    "similarProducts": "Similar Products"
+    "similarProducts": "Similar Products",
+    "reviews": "reviews",
+    "minutes": "min",
+    "hours": "hr",
+    "shopOpen": "Open",
+    "shopClosed": "Closed"
   },
   "cart": {
     "title": "Shopping Cart",

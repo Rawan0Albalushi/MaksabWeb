@@ -32,10 +32,10 @@ const Header = () => {
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
 
   const { user, isAuthenticated, logout, _hasHydrated } = useAuthStore();
-  const { getItemCount } = useCartStore();
+  const { getItemCount, _hasHydrated: cartHasHydrated } = useCartStore();
   const { locale, setLocale } = useSettingsStore();
 
-  const cartItemCount = getItemCount();
+  const cartItemCount = cartHasHydrated ? getItemCount() : 0;
 
   useEffect(() => {
     const handleScroll = () => {

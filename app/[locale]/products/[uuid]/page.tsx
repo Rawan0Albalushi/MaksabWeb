@@ -16,6 +16,10 @@ import {
   Plus,
   Star,
   Store,
+  Clock,
+  MapPin,
+  BadgeCheck,
+  ChevronDown,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -309,14 +313,107 @@ const ProductPage = ({ params }: ProductPageProps) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
             >
-              {/* Shop Link */}
+              {/* Shop Info Card */}
               {product.shop && (
                 <Link
                   href={`/shops/${product.shop.uuid}`}
-                  className="inline-flex items-center gap-2 text-sm text-[var(--primary-dark)] hover:underline mb-4"
+                  className="group block mb-6"
                 >
-                  <Store size={16} />
-                  {product.shop.translation?.title}
+                  <div className="relative bg-gradient-to-br from-white to-[var(--main-bg)] rounded-[var(--radius-lg)] border border-[var(--border)] hover:border-[var(--primary)] hover:shadow-lg transition-all duration-300 overflow-hidden">
+                    {/* Decorative accent */}
+                    <div className="absolute top-0 start-0 w-1 h-full bg-[var(--primary)] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    
+                    <div className="p-3 sm:p-4">
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        {/* Shop Logo */}
+                        <div className="relative flex-shrink-0">
+                          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden bg-white shadow-sm border border-[var(--border)]">
+                            {product.shop.logo_img ? (
+                              <Image
+                                src={product.shop.logo_img}
+                                alt={product.shop.translation?.title || ''}
+                                fill
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[var(--primary)]/5 to-[var(--primary)]/10">
+                                <Store className="w-6 h-6 sm:w-7 sm:h-7 text-[var(--primary)]" />
+                              </div>
+                            )}
+                          </div>
+                          {/* Status dot */}
+                          <div className={clsx(
+                            'absolute -bottom-0.5 -end-0.5 w-4 h-4 rounded-full border-[3px] border-white',
+                            product.shop.open ? 'bg-[var(--success)]' : 'bg-[var(--error)]'
+                          )} />
+                        </div>
+
+                        {/* Shop Info */}
+                        <div className="flex-1 min-w-0">
+                          {/* Row 1: Name + Verified */}
+                          <div className="flex items-center gap-1.5 mb-2">
+                            <h3 className="font-bold text-[15px] sm:text-base text-[var(--black)] truncate group-hover:text-[var(--primary)] transition-colors">
+                              {product.shop.translation?.title}
+                            </h3>
+                            {product.shop.verify && (
+                              <BadgeCheck className="w-[18px] h-[18px] flex-shrink-0 text-[var(--primary)]" />
+                            )}
+                          </div>
+
+                          {/* Row 2: Rating + Delivery + Status */}
+                          <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+                            {/* Rating */}
+                            {product.shop.rating_avg !== undefined && product.shop.rating_avg > 0 && (
+                              <div className="flex items-center gap-1">
+                                <Star className="w-3.5 h-3.5 fill-[var(--star)] text-[var(--star)]" />
+                                <span className="font-semibold text-[var(--black)]">{product.shop.rating_avg.toFixed(1)}</span>
+                                {product.shop.reviews_count !== undefined && product.shop.reviews_count > 0 && (
+                                  <span className="text-[var(--text-grey)] text-[11px]">({product.shop.reviews_count})</span>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Separator */}
+                            {product.shop.rating_avg !== undefined && product.shop.rating_avg > 0 && product.shop.delivery_time && (
+                              <span className="w-1 h-1 rounded-full bg-[var(--border)]" />
+                            )}
+
+                            {/* Delivery Time */}
+                            {product.shop.delivery_time && (
+                              <div className="flex items-center gap-1 text-[var(--text-grey)]">
+                                <Clock className="w-3.5 h-3.5" />
+                                <span>{product.shop.delivery_time.from}-{product.shop.delivery_time.to} {product.shop.delivery_time.type === 'minute' ? t('minutes') : t('hours')}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Row 3: Status badge */}
+                          <div className="mt-2">
+                            <span className={clsx(
+                              'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold',
+                              product.shop.open 
+                                ? 'bg-[var(--success)]/15 text-[var(--success)]' 
+                                : 'bg-[var(--error)]/15 text-[var(--error)]'
+                            )}>
+                              <span className={clsx(
+                                'w-1.5 h-1.5 rounded-full animate-pulse',
+                                product.shop.open ? 'bg-[var(--success)]' : 'bg-[var(--error)]'
+                              )} />
+                              {product.shop.open ? t('shopOpen') : t('shopClosed')}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Arrow */}
+                        <div className="flex-shrink-0 w-9 h-9 rounded-full bg-[var(--main-bg)] group-hover:bg-[var(--primary)] flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                          <ChevronLeft className={clsx(
+                            'w-5 h-5 text-[var(--text-grey)] group-hover:text-white transition-colors',
+                            !isRTL && 'rotate-180'
+                          )} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </Link>
               )}
 

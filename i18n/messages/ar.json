@@ -200,7 +200,12 @@
     "optional": "اختياري",
     "addedToCart": "تمت الإضافة للسلة",
     "outOfStock": "نفذت الكمية",
-    "similarProducts": "منتجات مشابهة"
+    "similarProducts": "منتجات مشابهة",
+    "reviews": "تقييم",
+    "minutes": "دقيقة",
+    "hours": "ساعة",
+    "shopOpen": "مفتوح",
+    "shopClosed": "مغلق"
   },
   "cart": {
     "title": "سلة المشتريات",

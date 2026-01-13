@@ -212,22 +212,30 @@ const ProductModal = ({
                   <span className="w-10 text-center font-bold text-xl text-[var(--black)]">{qty}</span>
                   <button
                     onClick={() => setQty(qty + 1)}
-                    className="w-11 h-11 rounded-xl bg-[var(--primary)]/10 text-[var(--primary)] flex items-center justify-center hover:bg-[var(--primary)]/20 transition-all active:scale-95"
+                    style={{
+                      backgroundColor: '#FF3D00',
+                      boxShadow: '0 4px 12px rgba(255, 61, 0, 0.35)',
+                    }}
+                    className="w-11 h-11 rounded-xl text-white flex items-center justify-center transition-all active:scale-95"
                   >
                     <Plus size={18} strokeWidth={2.5} />
                   </button>
                 </div>
               </div>
 
-              <Button
+              <button
                 onClick={handleAdd}
                 disabled={loading || success}
-                className={clsx(
-                  'w-full h-14 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all',
-                  success
-                    ? 'bg-[var(--success)] text-white'
-                    : 'bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)] shadow-[0_4px_20px_rgba(255,61,0,0.35)]'
-                )}
+                style={{
+                  background: success 
+                    ? '#10B981' 
+                    : 'linear-gradient(135deg, #FF3D00 0%, #FF6B3D 50%, #FF5722 100%)',
+                  color: 'white',
+                  boxShadow: success 
+                    ? '0 8px 24px rgba(16, 185, 129, 0.4)' 
+                    : '0 8px 24px rgba(255, 61, 0, 0.4)',
+                }}
+                className="w-full h-14 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all"
               >
                 {success ? (
                   <>
@@ -244,7 +252,7 @@ const ProductModal = ({
                     <span>{(price * qty).toFixed(2)} {tCommon('sar')}</span>
                   </>
                 )}
-              </Button>
+              </button>
             </div>
           </motion.div>
 
@@ -380,7 +388,11 @@ const ProductModal = ({
                       <span className="w-12 text-center font-bold text-xl text-gray-900">{qty}</span>
                       <button
                         onClick={() => setQty(qty + 1)}
-                        className="w-10 h-10 rounded-xl bg-[var(--primary)] text-white flex items-center justify-center hover:bg-[var(--primary-hover)] transition-all active:scale-95 shadow-sm shadow-[var(--primary)]/30"
+                        style={{
+                          backgroundColor: '#FF3D00',
+                          boxShadow: '0 4px 12px rgba(255, 61, 0, 0.35)',
+                        }}
+                        className="w-10 h-10 rounded-xl text-white flex items-center justify-center transition-all active:scale-95"
                       >
                         <Plus size={18} strokeWidth={2} />
                       </button>
@@ -438,7 +450,7 @@ const ProductModal = ({
 };
 
 // ============================================
-// PRODUCT CARD - Consistent Size
+// PRODUCT CARD - Mobile Optimized
 // ============================================
 const ProductCard = ({
   product,
@@ -459,15 +471,15 @@ const ProductCard = ({
     <motion.div variants={scaleIn} className="h-full">
       <div
         className={clsx(
-          'group relative bg-white rounded-2xl overflow-hidden h-full flex flex-col',
+          'group relative bg-white rounded-xl sm:rounded-2xl overflow-hidden h-full flex flex-col',
           'border border-[var(--border)] hover:border-[var(--primary)]/30',
           'shadow-sm hover:shadow-xl',
           'transition-all duration-300 transform hover:-translate-y-1',
           outOfStock && 'opacity-60'
         )}
       >
-        {/* Image - Fixed Aspect Ratio */}
-        <div className="relative aspect-[4/3] overflow-hidden bg-[var(--main-bg)]">
+        {/* Image - Square on mobile, 4:3 on larger screens */}
+        <div className="relative aspect-square sm:aspect-[4/3] overflow-hidden bg-[var(--main-bg)]">
           {product.img ? (
             <Image
               src={product.img}
@@ -478,14 +490,14 @@ const ProductCard = ({
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
-              <ChefHat size={40} className="text-[var(--border)]" />
+              <ChefHat size={32} className="text-[var(--border)] sm:w-10 sm:h-10" />
             </div>
           )}
 
           {/* Discount Badge */}
           {hasDiscount && (
-            <div className="absolute top-2 start-2">
-              <span className="inline-flex items-center px-2 py-1 bg-[var(--error)] text-white text-xs font-bold rounded-lg shadow-md">
+            <div className="absolute top-1.5 start-1.5 sm:top-2 sm:start-2">
+              <span className="inline-flex items-center px-1.5 py-0.5 sm:px-2 sm:py-1 bg-[var(--error)] text-white text-[10px] sm:text-xs font-bold rounded-md sm:rounded-lg shadow-md">
                 -{discountPercent}%
               </span>
             </div>
@@ -494,51 +506,55 @@ const ProductCard = ({
           {/* Out of Stock */}
           {outOfStock && (
             <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center">
-              <span className="bg-[var(--black)] text-white text-xs font-semibold px-4 py-2 rounded-full">
+              <span className="bg-[var(--black)] text-white text-[10px] sm:text-xs font-semibold px-3 py-1.5 sm:px-4 sm:py-2 rounded-full">
                 نفد المخزون
               </span>
             </div>
           )}
-
-          {/* Add Button */}
-          {!outOfStock && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onAdd();
-              }}
-              className={clsx(
-                'absolute bottom-2 end-2',
-                'w-9 h-9 lg:w-10 lg:h-10',
-                'bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)]',
-                'text-white rounded-xl shadow-lg',
-                'flex items-center justify-center',
-                'transform transition-all duration-200',
-                'hover:scale-110 active:scale-95'
-              )}
-            >
-              <Plus size={20} strokeWidth={2.5} />
-            </button>
-          )}
         </div>
 
-        {/* Content - Fixed Height */}
-        <div className="p-3 flex flex-col flex-1">
-          <h3 className="font-bold text-[var(--black)] text-sm line-clamp-1 group-hover:text-[var(--primary)] transition-colors">
-            {product.translation?.title}
-          </h3>
-          <p className="text-[var(--text-grey)] text-xs line-clamp-2 mt-1 flex-1 min-h-[32px]">
+        {/* Content */}
+        <div className="p-2.5 sm:p-3 flex flex-col flex-1">
+          {/* Title with Add Button */}
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="font-bold text-[var(--black)] text-[13px] sm:text-sm line-clamp-1 group-hover:text-[var(--primary)] transition-colors flex-1">
+              {product.translation?.title}
+            </h3>
+            {!outOfStock && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAdd();
+                }}
+                style={{
+                  backgroundColor: '#FF3D00',
+                  boxShadow: '0 4px 12px rgba(255, 61, 0, 0.4)',
+                }}
+                className={clsx(
+                  'flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9',
+                  'text-white rounded-full',
+                  'flex items-center justify-center',
+                  'transform transition-all duration-200',
+                  'hover:scale-110 active:scale-95',
+                  'border-2 border-white'
+                )}
+              >
+                <Plus size={18} strokeWidth={3} className="sm:w-5 sm:h-5" />
+              </button>
+            )}
+          </div>
+          <p className="text-[var(--text-grey)] text-[11px] sm:text-xs line-clamp-1 sm:line-clamp-2 mt-0.5 sm:mt-1 flex-1 min-h-[16px] sm:min-h-[32px]">
             {product.translation?.description || ''}
           </p>
-          <div className="flex items-center justify-between mt-2 pt-2 border-t border-[var(--border-light)]">
-            <div className="flex items-baseline gap-1">
-              <span className="font-bold text-[var(--primary)] text-base">
+          <div className="flex items-center justify-between mt-1.5 sm:mt-2 pt-1.5 sm:pt-2 border-t border-[var(--border-light)]">
+            <div className="flex items-baseline gap-0.5 sm:gap-1">
+              <span className="font-bold text-[var(--primary)] text-[15px] sm:text-base">
                 {price.toFixed(2)}
               </span>
-              <span className="text-[10px] text-[var(--text-grey)]">{tCommon('sar')}</span>
+              <span className="text-[9px] sm:text-[10px] text-[var(--text-grey)]">{tCommon('sar')}</span>
             </div>
             {hasDiscount && (
-              <span className="text-[10px] text-[var(--text-grey)] line-through">
+              <span className="text-[9px] sm:text-[10px] text-[var(--text-grey)] line-through">
                 {oldPrice.toFixed(2)}
               </span>
             )}
@@ -550,7 +566,7 @@ const ProductCard = ({
 };
 
 // ============================================
-// FLOATING CART BAR
+// FLOATING CART BAR - Mobile Optimized
 // ============================================
 const FloatingCartBar = ({ count, total }: { count: number; total: number }) => {
   const tCommon = useTranslations('common');
@@ -565,7 +581,7 @@ const FloatingCartBar = ({ count, total }: { count: number; total: number }) => 
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: 100, opacity: 0 }}
       transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-      className="fixed bottom-0 inset-x-0 z-40 p-4 safe-area-bottom"
+      className="fixed bottom-0 inset-x-0 z-40 p-3 sm:p-4 safe-area-bottom"
     >
       <Link href="/cart" className="block container max-w-3xl mx-auto">
         <motion.div
@@ -574,34 +590,34 @@ const FloatingCartBar = ({ count, total }: { count: number; total: number }) => 
           className={clsx(
             'relative overflow-hidden',
             'bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)]',
-            'text-white rounded-2xl',
-            'p-4',
+            'text-white rounded-xl sm:rounded-2xl',
+            'px-3 py-3 sm:p-4',
             'flex items-center justify-between',
             'shadow-[0_8px_32px_rgba(255,61,0,0.4)]'
           )}
         >
-          <div className="flex items-center gap-3 relative">
+          <div className="flex items-center gap-2.5 sm:gap-3 relative">
             <div className="relative">
-              <div className="w-11 h-11 bg-white/20 rounded-xl flex items-center justify-center">
-                <ShoppingBag size={20} />
+              <div className="w-10 h-10 sm:w-11 sm:h-11 bg-white/20 rounded-lg sm:rounded-xl flex items-center justify-center">
+                <ShoppingBag size={18} className="sm:w-5 sm:h-5" />
               </div>
-              <span className="absolute -top-1.5 -end-1.5 w-5 h-5 bg-white text-[var(--primary)] text-xs font-bold rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -end-1 sm:-top-1.5 sm:-end-1.5 w-4 h-4 sm:w-5 sm:h-5 bg-white text-[var(--primary)] text-[10px] sm:text-xs font-bold rounded-full flex items-center justify-center">
                 {count}
               </span>
             </div>
             <div>
-              <p className="font-bold text-base">عرض السلة</p>
-              <p className="text-white/80 text-xs">{count} منتج</p>
+              <p className="font-bold text-sm sm:text-base">عرض السلة</p>
+              <p className="text-white/80 text-[11px] sm:text-xs">{count} منتج</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 relative">
+          <div className="flex items-center gap-2 sm:gap-3 relative">
             <div className="text-end">
-              <p className="text-white/80 text-xs">المجموع</p>
-              <p className="font-bold text-lg">{total.toFixed(2)} {tCommon('sar')}</p>
+              <p className="text-white/80 text-[10px] sm:text-xs">المجموع</p>
+              <p className="font-bold text-base sm:text-lg">{total.toFixed(2)} {tCommon('sar')}</p>
             </div>
-            <div className="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center">
-              {isRTL ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}
+            <div className="w-8 h-8 sm:w-9 sm:h-9 bg-white/20 rounded-lg flex items-center justify-center">
+              {isRTL ? <ArrowLeft size={16} className="sm:w-[18px] sm:h-[18px]" /> : <ArrowRight size={16} className="sm:w-[18px] sm:h-[18px]" />}
             </div>
           </div>
         </motion.div>
@@ -611,16 +627,15 @@ const FloatingCartBar = ({ count, total }: { count: number; total: number }) => 
 };
 
 // ============================================
-// SKELETON LOADER
+// SKELETON LOADER - Mobile Optimized
 // ============================================
 const ProductSkeleton = () => (
-  <div className="bg-white rounded-2xl overflow-hidden border border-[var(--border)] h-full">
-    <div className="aspect-[4/3] bg-[var(--main-bg)] skeleton" />
-    <div className="p-3 space-y-2">
-      <div className="h-4 bg-[var(--main-bg)] skeleton rounded w-3/4" />
+  <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden border border-[var(--border)] h-full">
+    <div className="aspect-square sm:aspect-[4/3] bg-[var(--main-bg)] skeleton" />
+    <div className="p-2.5 sm:p-3 space-y-1.5 sm:space-y-2">
+      <div className="h-3.5 sm:h-4 bg-[var(--main-bg)] skeleton rounded w-3/4" />
       <div className="h-3 bg-[var(--main-bg)] skeleton rounded w-full" />
-      <div className="h-3 bg-[var(--main-bg)] skeleton rounded w-1/2" />
-      <div className="h-5 bg-[var(--main-bg)] skeleton rounded w-1/3 mt-2" />
+      <div className="h-4 sm:h-5 bg-[var(--main-bg)] skeleton rounded w-1/3 mt-1.5 sm:mt-2" />
     </div>
   </div>
 );
@@ -792,8 +807,8 @@ export default function ShopPage({ params }: ShopPageProps) {
   // ============================================
   return (
     <div className="min-h-screen bg-[var(--main-bg)]">
-      {/* ===== HERO HEADER - More Space ===== */}
-      <header className="relative bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] overflow-hidden pb-24 lg:pb-28">
+      {/* ===== HERO HEADER - Mobile Optimized ===== */}
+      <header className="relative bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] overflow-hidden pb-20 sm:pb-24 lg:pb-28">
         {/* Background Decorations */}
         <div className="absolute inset-0">
           <div className="absolute top-0 start-0 w-72 lg:w-96 h-72 lg:h-96 bg-[var(--primary)]/10 rounded-full blur-3xl" />
@@ -818,41 +833,158 @@ export default function ShopPage({ params }: ShopPageProps) {
           )}
         </div>
 
-        <div className="container relative z-10 py-8 lg:py-12">
-          <div className="flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-10">
-            {/* Back Button & Logo */}
-            <div className="flex items-start gap-4 lg:gap-6">
-              <Link
-                href="/shops"
-                className="w-10 h-10 lg:w-11 lg:h-11 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all shrink-0 mt-2"
-              >
-                {isRTL ? (
-                  <ChevronRight size={22} className="text-white" />
-                ) : (
-                  <ChevronLeft size={22} className="text-white" />
+        <div className="container relative z-10 py-5 sm:py-8 lg:py-12">
+          {/* Back Button - Always at top */}
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <Link
+              href="/shops"
+              className="w-9 h-9 sm:w-10 sm:h-10 lg:w-11 lg:h-11 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all"
+            >
+              {isRTL ? (
+                <ChevronRight size={20} className="text-white sm:w-[22px] sm:h-[22px]" />
+              ) : (
+                <ChevronLeft size={20} className="text-white sm:w-[22px] sm:h-[22px]" />
+              )}
+            </Link>
+            
+            {/* Action Buttons - Mobile: Top right */}
+            <div className="flex items-center gap-2 sm:hidden">
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => toggleFavoriteShop(shop.id)}
+                className={clsx(
+                  'w-9 h-9 rounded-full flex items-center justify-center transition-all',
+                  isFav
+                    ? 'bg-[var(--error)]/20 text-[var(--error)]'
+                    : 'bg-white/10 text-white/70'
                 )}
-              </Link>
-
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="w-24 h-24 lg:w-32 lg:h-32 rounded-2xl lg:rounded-3xl overflow-hidden bg-white/10 backdrop-blur-sm shrink-0 shadow-2xl border-2 border-white/20"
               >
+                <Heart size={18} className={isFav ? 'fill-current' : ''} />
+              </motion.button>
+              {shop.phone && (
+                <a
+                  href={`tel:${shop.phone}`}
+                  className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white/70"
+                >
+                  <Phone size={18} />
+                </a>
+              )}
+              <button className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white/70">
+                <Share2 size={18} />
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Layout: Logo + Info side by side */}
+          <div className="flex items-start gap-4 sm:hidden">
+            {/* Logo */}
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="relative flex-shrink-0"
+            >
+              <div className="w-20 h-20 rounded-2xl overflow-hidden bg-white/10 backdrop-blur-sm shadow-2xl border-2 border-white/20">
                 {shop.logo_img ? (
                   <Image
                     src={shop.logo_img}
                     alt={shop.translation?.title || ''}
-                    width={128}
-                    height={128}
+                    width={80}
+                    height={80}
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-hover)] flex items-center justify-center text-white font-bold text-4xl lg:text-5xl">
+                  <div className="w-full h-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-hover)] flex items-center justify-center text-white font-bold text-3xl">
                     {shop.translation?.title?.charAt(0)}
                   </div>
                 )}
+              </div>
+              {/* Status indicator on logo */}
+              <div className={clsx(
+                'absolute -bottom-1 -end-1 w-5 h-5 rounded-full border-2 border-[#1a3a4a]',
+                shop.open ? 'bg-[var(--success)]' : 'bg-[var(--error)]'
+              )} />
+            </motion.div>
+
+            {/* Info */}
+            <div className="flex-1 min-w-0 text-white">
+              <motion.div
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
+              >
+                {/* Title & Status */}
+                <div className="flex items-center gap-2 mb-1.5">
+                  <h1 className="font-bold text-lg leading-tight truncate">
+                    {shop.translation?.title}
+                  </h1>
+                  <span
+                    className={clsx(
+                      'px-2 py-0.5 text-[10px] font-bold rounded-full flex-shrink-0',
+                      shop.open
+                        ? 'bg-[var(--success)] text-white'
+                        : 'bg-[var(--error)] text-white'
+                    )}
+                  >
+                    {shop.open ? 'مفتوح' : 'مغلق'}
+                  </span>
+                </div>
+
+                {/* Description */}
+                {shop.translation?.description && (
+                  <p className="text-white/60 text-xs line-clamp-1 mb-2">
+                    {shop.translation.description}
+                  </p>
+                )}
+
+                {/* Info badges inline */}
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {shop.rating_avg !== undefined && shop.rating_avg > 0 && (
+                    <div className="flex items-center gap-1 bg-white/10 backdrop-blur-sm px-2 py-1 rounded-lg">
+                      <Star size={12} className="text-[var(--star)] fill-[var(--star)]" />
+                      <span className="font-semibold text-xs">{shop.rating_avg.toFixed(1)}</span>
+                      {shop.reviews_count && (
+                        <span className="text-white/50 text-[10px]">({shop.reviews_count})</span>
+                      )}
+                    </div>
+                  )}
+                  {deliveryTime && (
+                    <div className="flex items-center gap-1 bg-white/10 backdrop-blur-sm px-2 py-1 rounded-lg">
+                      <Bike size={12} />
+                      <span className="text-xs">{deliveryTime} د</span>
+                    </div>
+                  )}
+                  {shop.min_amount !== undefined && shop.min_amount > 0 && (
+                    <div className="bg-white/10 backdrop-blur-sm px-2 py-1 rounded-lg">
+                      <span className="text-xs">الحد: {shop.min_amount}</span>
+                    </div>
+                  )}
+                </div>
               </motion.div>
             </div>
+          </div>
+
+          {/* Desktop/Tablet Layout */}
+          <div className="hidden sm:flex sm:items-start gap-6 lg:gap-10">
+            {/* Logo */}
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="w-24 h-24 lg:w-32 lg:h-32 rounded-2xl lg:rounded-3xl overflow-hidden bg-white/10 backdrop-blur-sm shrink-0 shadow-2xl border-2 border-white/20"
+            >
+              {shop.logo_img ? (
+                <Image
+                  src={shop.logo_img}
+                  alt={shop.translation?.title || ''}
+                  width={128}
+                  height={128}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-hover)] flex items-center justify-center text-white font-bold text-4xl lg:text-5xl">
+                  {shop.translation?.title?.charAt(0)}
+                </div>
+              )}
+            </motion.div>
 
             {/* Shop Info */}
             <div className="flex-1 min-w-0 text-white">
@@ -948,78 +1080,134 @@ export default function ShopPage({ params }: ShopPageProps) {
         </div>
       </header>
 
-      {/* ===== STATS CARDS - Modern Horizontal Design ===== */}
-      <div className="container -mt-16 lg:-mt-20 relative z-20 mb-6">
+      {/* ===== STATS CARDS - Mobile Optimized ===== */}
+      <div className="container -mt-14 sm:-mt-16 lg:-mt-20 relative z-20 mb-4 sm:mb-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-xl border border-[var(--border)] p-4 lg:p-6"
+          className="bg-white rounded-2xl shadow-xl border border-[var(--border)] overflow-hidden"
         >
-          <div className="grid grid-cols-4 divide-x divide-[var(--border)] rtl:divide-x-reverse">
+          {/* Mobile: 2x2 Grid */}
+          <div className="grid grid-cols-2 sm:hidden">
             {/* Rating */}
-            <div className="flex flex-col items-center justify-center px-2 lg:px-4">
-              <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl bg-[var(--star)]/10 flex items-center justify-center mb-2">
-                <Star size={20} className="text-[var(--star)] fill-[var(--star)] lg:w-6 lg:h-6" />
+            <div className="flex items-center gap-3 p-4 border-b border-e border-[var(--border)]">
+              <div className="w-11 h-11 rounded-xl bg-[var(--star)]/10 flex items-center justify-center flex-shrink-0">
+                <Star size={20} className="text-[var(--star)] fill-[var(--star)]" />
               </div>
-              <span className="font-bold text-[var(--black)] text-lg lg:text-2xl">
-                {shop.rating_avg?.toFixed(1) || '0.0'}
-              </span>
-              <span className="text-[var(--text-grey)] text-xs lg:text-sm">التقييم</span>
+              <div>
+                <span className="font-bold text-[var(--black)] text-xl block">
+                  {shop.rating_avg?.toFixed(1) || '0.0'}
+                </span>
+                <span className="text-[var(--text-grey)] text-xs">التقييم</span>
+              </div>
             </div>
 
             {/* Delivery Time */}
-            <div className="flex flex-col items-center justify-center px-2 lg:px-4">
-              <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl bg-[var(--primary-dark)]/10 flex items-center justify-center mb-2">
-                <Bike size={20} className="text-[var(--primary-dark)] lg:w-6 lg:h-6" />
+            <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
+              <div className="w-11 h-11 rounded-xl bg-[var(--primary-dark)]/10 flex items-center justify-center flex-shrink-0">
+                <Bike size={20} className="text-[var(--primary-dark)]" />
               </div>
-              <span className="font-bold text-[var(--black)] text-lg lg:text-2xl">
-                {deliveryTime || '-'}
-              </span>
-              <span className="text-[var(--text-grey)] text-xs lg:text-sm">وقت التوصيل</span>
+              <div>
+                <span className="font-bold text-[var(--black)] text-xl block">
+                  {deliveryTime || '-'}
+                </span>
+                <span className="text-[var(--text-grey)] text-xs">وقت التوصيل</span>
+              </div>
             </div>
 
             {/* Products */}
-            <div className="flex flex-col items-center justify-center px-2 lg:px-4">
-              <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl bg-[var(--primary)]/10 flex items-center justify-center mb-2">
-                <Utensils size={20} className="text-[var(--primary)] lg:w-6 lg:h-6" />
+            <div className="flex items-center gap-3 p-4 border-e border-[var(--border)]">
+              <div className="w-11 h-11 rounded-xl bg-[var(--primary)]/10 flex items-center justify-center flex-shrink-0">
+                <Utensils size={20} className="text-[var(--primary)]" />
               </div>
-              <span className="font-bold text-[var(--black)] text-lg lg:text-2xl">
-                {products.length || '-'}
-              </span>
-              <span className="text-[var(--text-grey)] text-xs lg:text-sm">المنتجات</span>
+              <div>
+                <span className="font-bold text-[var(--black)] text-xl block">
+                  {products.length || '-'}
+                </span>
+                <span className="text-[var(--text-grey)] text-xs">المنتجات</span>
+              </div>
             </div>
 
             {/* Customers */}
-            <div className="flex flex-col items-center justify-center px-2 lg:px-4">
-              <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl bg-[var(--success)]/10 flex items-center justify-center mb-2">
-                <Users size={20} className="text-[var(--success)] lg:w-6 lg:h-6" />
+            <div className="flex items-center gap-3 p-4">
+              <div className="w-11 h-11 rounded-xl bg-[var(--success)]/10 flex items-center justify-center flex-shrink-0">
+                <Users size={20} className="text-[var(--success)]" />
               </div>
-              <span className="font-bold text-[var(--black)] text-lg lg:text-2xl">
+              <div>
+                <span className="font-bold text-[var(--black)] text-xl block">
+                  {shop.reviews_count || '+500'}
+                </span>
+                <span className="text-[var(--text-grey)] text-xs">العملاء</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop: 4 columns */}
+          <div className="hidden sm:grid grid-cols-4 divide-x divide-[var(--border)] rtl:divide-x-reverse p-4 lg:p-6">
+            {/* Rating */}
+            <div className="flex flex-col items-center justify-center px-4">
+              <div className="w-12 h-12 rounded-xl bg-[var(--star)]/10 flex items-center justify-center mb-2">
+                <Star size={24} className="text-[var(--star)] fill-[var(--star)]" />
+              </div>
+              <span className="font-bold text-[var(--black)] text-2xl">
+                {shop.rating_avg?.toFixed(1) || '0.0'}
+              </span>
+              <span className="text-[var(--text-grey)] text-sm">التقييم</span>
+            </div>
+
+            {/* Delivery Time */}
+            <div className="flex flex-col items-center justify-center px-4">
+              <div className="w-12 h-12 rounded-xl bg-[var(--primary-dark)]/10 flex items-center justify-center mb-2">
+                <Bike size={24} className="text-[var(--primary-dark)]" />
+              </div>
+              <span className="font-bold text-[var(--black)] text-2xl">
+                {deliveryTime || '-'}
+              </span>
+              <span className="text-[var(--text-grey)] text-sm">وقت التوصيل</span>
+            </div>
+
+            {/* Products */}
+            <div className="flex flex-col items-center justify-center px-4">
+              <div className="w-12 h-12 rounded-xl bg-[var(--primary)]/10 flex items-center justify-center mb-2">
+                <Utensils size={24} className="text-[var(--primary)]" />
+              </div>
+              <span className="font-bold text-[var(--black)] text-2xl">
+                {products.length || '-'}
+              </span>
+              <span className="text-[var(--text-grey)] text-sm">المنتجات</span>
+            </div>
+
+            {/* Customers */}
+            <div className="flex flex-col items-center justify-center px-4">
+              <div className="w-12 h-12 rounded-xl bg-[var(--success)]/10 flex items-center justify-center mb-2">
+                <Users size={24} className="text-[var(--success)]" />
+              </div>
+              <span className="font-bold text-[var(--black)] text-2xl">
                 {shop.reviews_count || '+500'}
               </span>
-              <span className="text-[var(--text-grey)] text-xs lg:text-sm">العملاء</span>
+              <span className="text-[var(--text-grey)] text-sm">العملاء</span>
             </div>
           </div>
         </motion.div>
       </div>
 
-      {/* ===== SEARCH BAR - Modern Design ===== */}
-      <div className="container mb-4">
+      {/* ===== SEARCH BAR - Mobile Optimized ===== */}
+      <div className="container mb-3 sm:mb-4">
         <div className="relative">
           <div
             className={clsx(
-              'relative flex items-center rounded-2xl transition-all duration-300',
-              'bg-white border-2',
+              'relative flex items-center rounded-xl sm:rounded-2xl transition-all duration-300',
+              'bg-white border',
               searchFocused
                 ? 'border-[var(--primary)] shadow-lg shadow-[var(--primary)]/10'
-                : 'border-[var(--border)] hover:border-[var(--border)]'
+                : 'border-[var(--border)]'
             )}
           >
             <Search
-              size={20}
+              size={18}
               className={clsx(
-                'absolute start-4 transition-colors',
+                'absolute start-3 sm:start-4 transition-colors',
                 searchFocused ? 'text-[var(--primary)]' : 'text-[var(--text-grey)]'
               )}
             />
@@ -1030,12 +1218,12 @@ export default function ShopPage({ params }: ShopPageProps) {
               onChange={(e) => setSearch(e.target.value)}
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
-              className="w-full h-12 lg:h-14 ps-12 pe-4 bg-transparent rounded-2xl text-[var(--black)] text-sm lg:text-base placeholder:text-[var(--text-grey)] focus:outline-none"
+              className="w-full h-11 sm:h-12 lg:h-14 ps-10 sm:ps-12 pe-10 sm:pe-4 bg-transparent rounded-xl sm:rounded-2xl text-[var(--black)] text-sm placeholder:text-[var(--text-grey)] focus:outline-none"
             />
             {search && (
               <button
                 onClick={() => setSearch('')}
-                className="absolute end-4 w-6 h-6 rounded-full bg-[var(--main-bg)] flex items-center justify-center hover:bg-[var(--border)] transition-colors"
+                className="absolute end-3 sm:end-4 w-6 h-6 rounded-full bg-[var(--main-bg)] flex items-center justify-center hover:bg-[var(--border)] transition-colors"
               >
                 <X size={14} className="text-[var(--text-grey)]" />
               </button>
@@ -1044,10 +1232,10 @@ export default function ShopPage({ params }: ShopPageProps) {
         </div>
       </div>
 
-      {/* ===== CATEGORIES BAR - Modern Pills ===== */}
-      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[var(--border)] shadow-sm">
+      {/* ===== CATEGORIES BAR - Mobile Optimized ===== */}
+      <div className="sticky top-0 z-40 bg-white/98 backdrop-blur-md border-b border-[var(--border)]">
         <div className="container">
-          <div className="flex items-center gap-2 py-3 lg:py-4">
+          <div className="flex items-center gap-2 py-2.5 sm:py-3 lg:py-4">
             {/* Scroll Left */}
             <button
               onClick={() => scrollCategories('left')}
@@ -1067,7 +1255,7 @@ export default function ShopPage({ params }: ShopPageProps) {
                     key={cat.id ?? 'all'}
                     onClick={() => setSelectedCat(cat.id)}
                     className={clsx(
-                      'px-4 py-2 lg:px-5 lg:py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200',
+                      'px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-[13px] sm:text-sm font-semibold whitespace-nowrap transition-all duration-200',
                       selectedCat === cat.id
                         ? 'bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/30'
                         : 'bg-[var(--main-bg)] text-[var(--text-grey)] hover:bg-[var(--border)] hover:text-[var(--black)]'
@@ -1096,10 +1284,10 @@ export default function ShopPage({ params }: ShopPageProps) {
         </div>
       </div>
 
-      {/* ===== PRODUCTS GRID - Consistent Cards ===== */}
-      <main className="container py-6 pb-28">
+      {/* ===== PRODUCTS GRID - Mobile Optimized ===== */}
+      <main className="container py-4 sm:py-6 pb-28">
         {productsLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 sm:gap-4">
             {[...Array(10)].map((_, i) => (
               <ProductSkeleton key={i} />
             ))}
@@ -1108,13 +1296,13 @@ export default function ShopPage({ params }: ShopPageProps) {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center justify-center py-20"
+            className="flex flex-col items-center justify-center py-16 sm:py-20"
           >
-            <div className="w-24 h-24 bg-[var(--primary)]/10 rounded-full flex items-center justify-center mb-4">
-              <ChefHat size={40} className="text-[var(--primary)]/40" />
+            <div className="w-20 h-20 sm:w-24 sm:h-24 bg-[var(--primary)]/10 rounded-full flex items-center justify-center mb-4">
+              <ChefHat size={32} className="text-[var(--primary)]/40 sm:w-10 sm:h-10" />
             </div>
-            <p className="text-[var(--black)] font-bold text-lg">لا توجد منتجات</p>
-            <p className="text-[var(--text-grey)] text-sm mt-1 text-center">
+            <p className="text-[var(--black)] font-bold text-base sm:text-lg">لا توجد منتجات</p>
+            <p className="text-[var(--text-grey)] text-sm mt-1 text-center px-4">
               {search ? 'جرب البحث بكلمات مختلفة' : 'لا توجد منتجات في هذا القسم'}
             </p>
             {search && (
@@ -1132,7 +1320,7 @@ export default function ShopPage({ params }: ShopPageProps) {
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 sm:gap-4"
           >
             {filtered.map((product) => (
               <ProductCard

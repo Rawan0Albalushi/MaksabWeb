@@ -5,11 +5,13 @@ import { Cart, CartDetail, Shop } from '@/types';
 interface CartState {
   cart: Cart | null;
   isLoading: boolean;
+  _hasHydrated: boolean;
   setCart: (cart: Cart | null) => void;
   clearCart: () => void;
   setLoading: (loading: boolean) => void;
   getItemCount: () => number;
   getTotalPrice: () => number;
+  setHasHydrated: (state: boolean) => void;
 }
 
 export const useCartStore = create<CartState>()(
@@ -17,12 +19,15 @@ export const useCartStore = create<CartState>()(
     (set, get) => ({
       cart: null,
       isLoading: false,
+      _hasHydrated: false,
 
       setCart: (cart) => set({ cart }),
 
       clearCart: () => set({ cart: null }),
 
       setLoading: (isLoading) => set({ isLoading }),
+
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
 
       getItemCount: () => {
         const { cart } = get();
@@ -42,6 +47,9 @@ export const useCartStore = create<CartState>()(
     {
       name: 'cart-storage',
       partialize: (state) => ({ cart: state.cart }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );
