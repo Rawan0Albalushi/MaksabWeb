@@ -276,14 +276,30 @@
     "tax": "Tax",
     "selectAddressError": "Please select a delivery address",
     "selectPaymentError": "Please select a payment method",
+    "selectCardError": "Please select a card or use a new card",
     "orderError": "Error creating order",
-    "errorLoadingData": "Error loading data"
+    "errorLoadingData": "Error loading data",
+    "thawani": "Thawani",
+    "selectPaymentCard": "Select Payment Card",
+    "useNewCard": "Use a new card",
+    "enterCardDetails": "You will enter card details on the payment page",
+    "noSavedCards": "No saved cards",
+    "otpVerification": "Payment Verification",
+    "enterOtpDescription": "Enter the verification code sent to your phone to confirm",
+    "otpCode": "Verification Code",
+    "enterOtpPlaceholder": "Enter code",
+    "enterOtpCode": "Please enter the verification code",
+    "invalidOtp": "Invalid verification code",
+    "otpVerificationFailed": "Verification failed",
+    "verifyOtp": "Verify",
+    "otpNotReceived": "Didn't receive the code?",
+    "resendOtp": "Resend"
   },
   "orders": {
     "title": "My Orders",
-    "active": "Active Orders",
-    "completed": "Completed Orders",
-    "cancelled": "Cancelled Orders",
+    "active": "Active",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
     "noOrders": "No orders",
     "orderDetails": "Order Details",
     "orderStatus": "Order Status",
@@ -295,7 +311,10 @@
     "accepted": "Accepted",
     "preparing": "Preparing",
     "onTheWay": "On the Way",
-    "delivered": "Delivered"
+    "delivered": "Delivered",
+    "orderNumber": "Order",
+    "items": "items",
+    "errorLoadingOrder": "Error loading order"
   },
   "profile": {
     "title": "Profile",
@@ -350,5 +369,25 @@
     "maxLength": "Must not exceed {count} characters",
     "networkError": "Network error, please try again",
     "serverError": "Server error, please try later"
+  },
+  "payment": {
+    "processingPayment": "Processing payment...",
+    "paymentSuccessTitle": "Payment Successful!",
+    "paymentFailedTitle": "Payment Failed",
+    "paymentPendingTitle": "Payment Pending",
+    "paymentCancelledTitle": "Payment Cancelled",
+    "paymentSuccess": "Your payment was successful and your order has been confirmed",
+    "paymentFailed": "We couldn't process your payment. Please try again",
+    "paymentPending": "Your payment is being reviewed. Your order status will be updated soon",
+    "paymentCancelled": "Your payment was cancelled",
+    "unknownError": "An unexpected error occurred",
+    "processingError": "Error processing payment result",
+    "orderNumber": "Order Number",
+    "transactionId": "Transaction ID",
+    "viewOrder": "View Order",
+    "tryAgain": "Try Again",
+    "backToHome": "Back to Home",
+    "needHelp": "Need help?",
+    "contactSupport": "Contact Support"
   }
 }

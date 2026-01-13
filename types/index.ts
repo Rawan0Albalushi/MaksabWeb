@@ -286,11 +286,9 @@ export interface Wallet {
 export interface Address {
   id: number;
   title?: string;
-  address?: string;
-  location?: {
-    latitude: number;
-    longitude: number;
-  };
+  address?: string | { address?: string; floor?: string; house?: string };
+  // Location can be either [latitude, longitude] array or { latitude, longitude } object
+  location?: [number, number] | { latitude: number; longitude: number };
   active: boolean;
   street_house_number?: string;
   additional_details?: string;
@@ -424,3 +422,35 @@ export interface PriceRange {
   avg: number;
 }
 
+// Saved Payment Card (Thawani)
+export interface SavedCard {
+  id: string;
+  payment_method_id: string;
+  brand: string; // visa, mastercard, etc.
+  last_four: string;
+  exp_month: string;
+  exp_year: string;
+  is_default?: boolean;
+}
+
+// Create Order Response (Thawani integration)
+export interface CreateOrderResponse {
+  id: number;
+  status: OrderStatus;
+  total_price: number;
+  // For new card payment (Checkout Session)
+  payment_url?: string;
+  // For saved card payment (Payment Intent with OTP)
+  otp_verification_url?: string;
+  // Additional order data
+  shop?: Shop;
+  created_at?: string;
+}
+
+// Thawani Payment Result
+export interface ThawaniPaymentResult {
+  order_id: number;
+  status: 'success' | 'failed' | 'pending' | 'cancelled';
+  message?: string;
+  transaction_id?: string;
+}

@@ -28,9 +28,9 @@ import {
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
-import { Button, Card, Input, Badge, EmptyState } from '@/components/ui';
+import { Button, Card, Input, Badge, EmptyState, Modal } from '@/components/ui';
 import { cartService, orderService, userService } from '@/services';
-import { Cart, CartDetail, Address, CalculateResult } from '@/types';
+import { Cart, CartDetail, Address, CalculateResult, SavedCard } from '@/types';
 import { useCartStore, useAuthStore, useSettingsStore } from '@/store';
 
 interface PaymentMethod {
@@ -73,6 +73,20 @@ const CheckoutPage = () => {
   const [deliveryDate, setDeliveryDate] = useState<string>('');
   const [deliveryTime, setDeliveryTime] = useState<string>('');
 
+  // Thawani Payment States
+  const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
+  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+  const [useNewCard, setUseNewCard] = useState(true);
+  const [loadingCards, setLoadingCards] = useState(false);
+  
+  // OTP Verification States
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [otpError, setOtpError] = useState('');
+  const [otpVerifying, setOtpVerifying] = useState(false);
+  const [pendingOrderId, setPendingOrderId] = useState<number | null>(null);
+  const [otpVerificationUrl, setOtpVerificationUrl] = useState<string | null>(null);
+
   // Fetch initial data
   useEffect(() => {
     if (!isAuthenticated) {
@@ -89,13 +103,37 @@ const CheckoutPage = () => {
     }
   }, [selectedAddressId, appliedCoupon, deliveryType]);
 
+  // Fetch saved cards when Thawani payment is selected
+  useEffect(() => {
+    const selectedPayment = paymentMethods.find(p => p.id === selectedPaymentId);
+    if (selectedPayment?.tag === 'thawani') {
+      fetchSavedCards();
+    }
+  }, [selectedPaymentId, paymentMethods]);
+
   const fetchInitialData = async () => {
     setLoading(true);
     try {
-      // Fetch cart if not in state
-      if (!cart) {
+      // Always fetch fresh cart from API to validate it's still valid
+      try {
         const cartResponse = await cartService.getCart();
-        setCart(cartResponse.data);
+        if (cartResponse.data) {
+          setCart(cartResponse.data);
+        } else {
+          // No cart data returned - clear old cart and redirect
+          clearCart();
+          router.push(`/${locale}/cart`);
+          return;
+        }
+      } catch (cartError: any) {
+        // Cart not found (404) or other error - clear old cart
+        if (cartError?.response?.status === 404) {
+          console.log('Cart not found, clearing old cart data');
+          clearCart();
+          router.push(`/${locale}/cart`);
+          return;
+        }
+        throw cartError;
       }
 
       // Fetch addresses
@@ -135,20 +173,69 @@ const CheckoutPage = () => {
 
   const calculatePrices = async () => {
     if (!cart?.id) return;
+    
+    // Skip calculation if no address selected for delivery
+    if (deliveryType === 'delivery' && !selectedAddressId) return;
 
     setCalculateLoading(true);
     try {
       const selectedAddress = addresses.find(a => a.id === selectedAddressId);
-      const response = await cartService.calculateCart(cart.id, {
+      
+      // Format location - handle both array and object formats from API
+      let formattedLocation: { latitude: number; longitude: number } | undefined;
+      if (selectedAddress?.location) {
+        if (Array.isArray(selectedAddress.location)) {
+          // API returns location as [latitude, longitude] array
+          formattedLocation = {
+            latitude: selectedAddress.location[0],
+            longitude: selectedAddress.location[1],
+          };
+        } else if (typeof selectedAddress.location === 'object') {
+          // Location is already an object
+          formattedLocation = selectedAddress.location as { latitude: number; longitude: number };
+        }
+      }
+      
+      const calculateData = {
         delivery_type: deliveryType,
         coupon: appliedCoupon || undefined,
-        location: selectedAddress?.location,
-      });
+        location: formattedLocation,
+      };
+      console.log('📊 Calculating prices with data:', JSON.stringify(calculateData, null, 2));
+      
+      const response = await cartService.calculateCart(cart.id, calculateData);
       setCalculatedPrices(response.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error calculating prices:', error);
+      console.error('Calculate error response:', error?.response?.data);
+      console.error('Calculate error params:', error?.response?.data?.params);
+      // Reset calculated prices on error
+      setCalculatedPrices(null);
     } finally {
       setCalculateLoading(false);
+    }
+  };
+
+  const fetchSavedCards = async () => {
+    setLoadingCards(true);
+    try {
+      const response = await orderService.getSavedCards();
+      setSavedCards(response.data || []);
+      // Auto-select default card if available
+      const defaultCard = response.data?.find(c => c.is_default);
+      if (defaultCard) {
+        setSelectedCardId(defaultCard.id);
+        setUseNewCard(false);
+      }
+    } catch (error: any) {
+      // 404 means the endpoint doesn't exist - that's okay, just show no saved cards
+      if (error?.response?.status !== 404) {
+        console.error('Error fetching saved cards:', error);
+      }
+      setSavedCards([]);
+      setUseNewCard(true); // Default to new card
+    } finally {
+      setLoadingCards(false);
     }
   };
 
@@ -192,14 +279,48 @@ const CheckoutPage = () => {
       return;
     }
 
+    // For Thawani with saved card, validate card selection
+    const selectedPayment = paymentMethods.find(p => p.id === selectedPaymentId);
+    if (selectedPayment?.tag === 'thawani' && !useNewCard && !selectedCardId) {
+      setError(t('selectCardError'));
+      return;
+    }
+
     setSubmitting(true);
     setError('');
 
     try {
       const selectedAddress = addresses.find(a => a.id === selectedAddressId);
       
-      // Create order
-      const orderResponse = await orderService.createOrder({
+      // Format location - handle both array and object formats from API
+      let formattedLocation: { latitude: number; longitude: number } | undefined;
+      if (selectedAddress?.location) {
+        if (Array.isArray(selectedAddress.location)) {
+          // API returns location as [latitude, longitude] array
+          formattedLocation = {
+            latitude: selectedAddress.location[0],
+            longitude: selectedAddress.location[1],
+          };
+        } else {
+          // Location is already an object
+          formattedLocation = selectedAddress.location;
+        }
+      }
+      
+      // Build order data
+      const orderData: {
+        cart_id: number;
+        delivery_type: 'delivery' | 'pickup';
+        address_id?: number;
+        delivery_date?: string;
+        delivery_time?: string;
+        note?: string;
+        coupon?: string;
+        payment_id: number;
+        payment_method_id?: string;
+        shop_id?: number;
+        location?: { latitude: number; longitude: number };
+      } = {
         cart_id: cart.id,
         delivery_type: deliveryType,
         address_id: deliveryType === 'delivery' ? selectedAddressId! : undefined,
@@ -208,22 +329,69 @@ const CheckoutPage = () => {
         note: orderNote || undefined,
         coupon: appliedCoupon || undefined,
         payment_id: selectedPaymentId!,
-        location: selectedAddress?.location,
-      });
+        shop_id: cart.shop_id,
+        location: formattedLocation,
+      };
 
-      const orderId = orderResponse.data.id;
+      // Add payment_method_id for saved card
+      if (selectedPayment?.tag === 'thawani' && !useNewCard && selectedCardId) {
+        orderData.payment_method_id = selectedCardId;
+      }
 
-      // Create payment transaction
-      const selectedPayment = paymentMethods.find(p => p.id === selectedPaymentId);
-      
-      if (selectedPayment?.tag !== 'cash') {
-        // For non-cash payments, create transaction and get payment URL
+      // Debug: Log order data being sent
+      console.log('📤 Creating order with data:', JSON.stringify(orderData, null, 2));
+
+      // Create order - API returns payment_url or otp_verification_url
+      const orderResponse = await orderService.createOrder(orderData);
+      const { id: orderId, payment_url, otp_verification_url } = orderResponse.data;
+
+      // Handle different payment scenarios
+      if (selectedPayment?.tag === 'cash' || selectedPayment?.tag === 'wallet') {
+        // Cash or wallet payment - redirect to order success
+        clearCart();
+        router.push(`/orders/${orderId}?success=true`);
+        return;
+      }
+
+      if (selectedPayment?.tag === 'thawani') {
+        // Scenario A: New card - redirect to Thawani payment page
+        if (useNewCard && payment_url) {
+          // Save pending order ID for when user returns from payment
+          localStorage.setItem('pending_order_id', orderId.toString());
+          localStorage.setItem('pending_order_time', Date.now().toString());
+          window.location.href = payment_url;
+          return;
+        }
+
+        // Scenario B: Saved card - show OTP verification
+        if (!useNewCard && otp_verification_url) {
+          setPendingOrderId(orderId);
+          setOtpVerificationUrl(otp_verification_url);
+          setShowOtpModal(true);
+          setSubmitting(false);
+          return;
+        }
+
+        // Fallback: If payment_url exists, redirect to it
+        if (payment_url) {
+          window.location.href = payment_url;
+          return;
+        }
+      }
+
+      // For other payment methods (stripe, paypal, etc.)
+      if (payment_url) {
+        window.location.href = payment_url;
+        return;
+      }
+
+      // If no payment URL, try the old flow
+      if (selectedPayment?.tag && selectedPayment.tag !== 'cash') {
         await orderService.createTransaction(orderId, {
           payment_sys_id: selectedPaymentId!,
         });
 
-        // Process payment (redirect to payment gateway)
-        const paymentResponse = await orderService.processPayment(selectedPayment!.tag, orderId);
+        const paymentResponse = await orderService.processPayment(selectedPayment.tag, orderId);
         if (paymentResponse.data?.payment_url) {
           window.location.href = paymentResponse.data.payment_url;
           return;
@@ -235,10 +403,77 @@ const CheckoutPage = () => {
       router.push(`/orders/${orderId}?success=true`);
     } catch (error: any) {
       console.error('Error placing order:', error);
-      setError(error.response?.data?.message || t('orderError'));
+      console.error('Error response:', error?.response?.data);
+      console.error('Error params:', error?.response?.data?.params);
+      console.error('Full error data:', JSON.stringify(error?.response?.data, null, 2));
+      
+      // Extract error message from API response
+      const apiMessage = error?.response?.data?.message;
+      const apiErrors = error?.response?.data?.errors || error?.response?.data?.params;
+      
+      let errorMessage = t('orderError');
+      if (apiMessage) {
+        errorMessage = apiMessage;
+      } else if (apiErrors && typeof apiErrors === 'object') {
+        // Handle validation errors
+        const firstError = Object.values(apiErrors)[0];
+        if (Array.isArray(firstError)) {
+          errorMessage = firstError[0] as string;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  // Handle OTP verification for saved card payment
+  const handleVerifyOtp = async () => {
+    if (!pendingOrderId || !otpCode.trim()) {
+      setOtpError(t('enterOtpCode'));
+      return;
+    }
+
+    setOtpVerifying(true);
+    setOtpError('');
+
+    try {
+      // If we have an OTP verification URL, redirect to it with OTP
+      if (otpVerificationUrl) {
+        // The OTP verification might be handled via redirect
+        const verificationUrl = new URL(otpVerificationUrl);
+        verificationUrl.searchParams.set('otp', otpCode);
+        window.location.href = verificationUrl.toString();
+        return;
+      }
+
+      // Otherwise, verify via API
+      const response = await orderService.verifyPaymentOTP(pendingOrderId, otpCode);
+      
+      if (response.data?.status) {
+        // OTP verified successfully
+        setShowOtpModal(false);
+        clearCart();
+        router.push(`/orders/${pendingOrderId}?success=true`);
+      } else {
+        setOtpError(response.data?.message || t('invalidOtp'));
+      }
+    } catch (error: any) {
+      console.error('OTP verification error:', error);
+      setOtpError(error.response?.data?.message || t('otpVerificationFailed'));
+    } finally {
+      setOtpVerifying(false);
+    }
+  };
+
+  // Close OTP modal and cancel payment
+  const handleCancelOtpVerification = () => {
+    setShowOtpModal(false);
+    setOtpCode('');
+    setOtpError('');
+    setPendingOrderId(null);
+    setOtpVerificationUrl(null);
   };
 
   const getPaymentName = (tag: string): string => {
@@ -247,6 +482,8 @@ const CheckoutPage = () => {
         return t('cash');
       case 'wallet':
         return t('wallet');
+      case 'thawani':
+        return t('thawani');
       case 'stripe':
       case 'paypal':
       case 'card':
@@ -262,9 +499,50 @@ const CheckoutPage = () => {
         return <Banknote size={24} />;
       case 'wallet':
         return <Wallet size={24} />;
+      case 'thawani':
+        return <CreditCard size={24} />;
       default:
         return <CreditCard size={24} />;
     }
+  };
+
+  // Check if current payment method is Thawani
+  const isThawaniPayment = (): boolean => {
+    const selectedPayment = paymentMethods.find(p => p.id === selectedPaymentId);
+    return selectedPayment?.tag === 'thawani';
+  };
+
+  // Get card brand icon
+  const getCardBrandIcon = (brand: string): string => {
+    switch (brand.toLowerCase()) {
+      case 'visa':
+        return '💳 Visa';
+      case 'mastercard':
+        return '💳 Mastercard';
+      case 'amex':
+        return '💳 Amex';
+      default:
+        return '💳 ' + brand;
+    }
+  };
+
+  // Format address for display - handles both string and object formats
+  const formatAddress = (addr: Address): string => {
+    if (!addr.address) return '';
+    
+    // If address is a string, return it directly
+    if (typeof addr.address === 'string') {
+      return addr.address;
+    }
+    
+    // If address is an object with {address, floor, house}
+    const addressObj = addr.address as { address?: string; floor?: string; house?: string };
+    const parts: string[] = [];
+    if (addressObj.address) parts.push(addressObj.address);
+    if (addressObj.house) parts.push(addressObj.house);
+    if (addressObj.floor) parts.push(addressObj.floor);
+    
+    return parts.join(' - ') || '';
   };
 
   // Get cart items
@@ -488,7 +766,7 @@ const CheckoutPage = () => {
                             )}
                           </div>
                           <p className="text-sm text-[var(--text-grey)] mt-1 line-clamp-2">
-                            {address.address}
+                            {formatAddress(address)}
                           </p>
                         </div>
                         {selectedAddressId === address.id && (
@@ -590,6 +868,105 @@ const CheckoutPage = () => {
                 ))}
               </div>
             </Card>
+
+            {/* Saved Cards Section (Thawani) */}
+            {isThawaniPayment() && (
+              <Card>
+                <h2 className="text-lg font-bold text-[var(--black)] mb-4">{t('selectPaymentCard')}</h2>
+                
+                {loadingCards ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 size={24} className="animate-spin text-[var(--primary)]" />
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {/* Use New Card Option */}
+                    <button
+                      onClick={() => {
+                        setUseNewCard(true);
+                        setSelectedCardId(null);
+                      }}
+                      className={clsx(
+                        'w-full flex items-center gap-4 p-4 rounded-[var(--radius-lg)] border-2 transition-all',
+                        useNewCard
+                          ? 'border-[var(--primary)] bg-[var(--primary)]/5'
+                          : 'border-[var(--border)] hover:border-[var(--primary)]/50'
+                      )}
+                    >
+                      <div className={clsx(
+                        'w-12 h-12 rounded-xl flex items-center justify-center',
+                        useNewCard ? 'bg-[var(--primary)]/20 text-[var(--primary)]' : 'bg-[var(--main-bg)] text-[var(--text-grey)]'
+                      )}>
+                        <Plus size={24} />
+                      </div>
+                      <div className="text-start">
+                        <span className={clsx(
+                          'font-bold',
+                          useNewCard ? 'text-[var(--primary)]' : 'text-[var(--black)]'
+                        )}>
+                          {t('useNewCard')}
+                        </span>
+                        <p className="text-sm text-[var(--text-grey)]">{t('enterCardDetails')}</p>
+                      </div>
+                      {useNewCard && (
+                        <div className="ms-auto w-6 h-6 rounded-full bg-[var(--primary)] flex items-center justify-center">
+                          <Check size={14} className="text-white" />
+                        </div>
+                      )}
+                    </button>
+
+                    {/* Saved Cards */}
+                    {savedCards.map((card) => (
+                      <button
+                        key={card.id}
+                        onClick={() => {
+                          setUseNewCard(false);
+                          setSelectedCardId(card.id);
+                        }}
+                        className={clsx(
+                          'w-full flex items-center gap-4 p-4 rounded-[var(--radius-lg)] border-2 transition-all',
+                          !useNewCard && selectedCardId === card.id
+                            ? 'border-[var(--primary)] bg-[var(--primary)]/5'
+                            : 'border-[var(--border)] hover:border-[var(--primary)]/50'
+                        )}
+                      >
+                        <div className={clsx(
+                          'w-12 h-12 rounded-xl flex items-center justify-center',
+                          !useNewCard && selectedCardId === card.id ? 'bg-[var(--primary)]/20 text-[var(--primary)]' : 'bg-[var(--main-bg)] text-[var(--text-grey)]'
+                        )}>
+                          <CreditCard size={24} />
+                        </div>
+                        <div className="text-start flex-1">
+                          <span className={clsx(
+                            'font-bold',
+                            !useNewCard && selectedCardId === card.id ? 'text-[var(--primary)]' : 'text-[var(--black)]'
+                          )}>
+                            {getCardBrandIcon(card.brand)}
+                          </span>
+                          <p className="text-sm text-[var(--text-grey)]">
+                            •••• •••• •••• {card.last_four} | {card.exp_month}/{card.exp_year}
+                          </p>
+                        </div>
+                        {card.is_default && (
+                          <Badge variant="primary" size="sm">{tCommon('default')}</Badge>
+                        )}
+                        {!useNewCard && selectedCardId === card.id && (
+                          <div className="w-6 h-6 rounded-full bg-[var(--primary)] flex items-center justify-center">
+                            <Check size={14} className="text-white" />
+                          </div>
+                        )}
+                      </button>
+                    ))}
+
+                    {savedCards.length === 0 && (
+                      <p className="text-center text-sm text-[var(--text-grey)] py-4">
+                        {t('noSavedCards')}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </Card>
+            )}
 
             {/* Order Notes */}
             <Card>
@@ -771,6 +1148,65 @@ const CheckoutPage = () => {
           </div>
         </div>
       </div>
+
+      {/* OTP Verification Modal */}
+      <Modal
+        isOpen={showOtpModal}
+        onClose={handleCancelOtpVerification}
+        title={t('otpVerification')}
+      >
+        <div className="space-y-6">
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto mb-4 bg-[var(--primary)]/10 rounded-full flex items-center justify-center">
+              <CreditCard size={32} className="text-[var(--primary)]" />
+            </div>
+            <p className="text-[var(--text-grey)]">{t('enterOtpDescription')}</p>
+          </div>
+
+          <div>
+            <Input
+              label={t('otpCode')}
+              placeholder={t('enterOtpPlaceholder')}
+              value={otpCode}
+              onChange={(e) => {
+                setOtpCode(e.target.value);
+                setOtpError('');
+              }}
+              error={otpError}
+              maxLength={6}
+              className="text-center text-2xl tracking-widest"
+              inputMode="numeric"
+              pattern="[0-9]*"
+            />
+          </div>
+
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              fullWidth
+              onClick={handleCancelOtpVerification}
+              disabled={otpVerifying}
+            >
+              {tCommon('cancel')}
+            </Button>
+            <Button
+              fullWidth
+              onClick={handleVerifyOtp}
+              isLoading={otpVerifying}
+              disabled={!otpCode.trim() || otpCode.length < 4}
+            >
+              {t('verifyOtp')}
+            </Button>
+          </div>
+
+          <p className="text-center text-sm text-[var(--text-grey)]">
+            {t('otpNotReceived')}{' '}
+            <button className="text-[var(--primary)] font-medium hover:underline">
+              {t('resendOtp')}
+            </button>
+          </p>
+        </div>
+      </Modal>
     </div>
   );
 };

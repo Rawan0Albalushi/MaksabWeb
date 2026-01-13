@@ -299,8 +299,12 @@ const CartPage = () => {
     try {
       const response = await cartService.getCart();
       setCart(response.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching cart:', error);
+      // If cart not found (404), clear old cart from state
+      if (error?.response?.status === 404) {
+        clearCart();
+      }
     } finally {
       setLoading(false);
     }
@@ -633,7 +637,7 @@ const CartPage = () => {
                 fullWidth
                 size="lg"
                 onClick={handleCheckout}
-                className="h-14 text-base font-semibold shadow-lg shadow-[var(--primary)]/20"
+                className="h-14 text-base font-semibold !bg-orange-500 hover:!bg-orange-600 shadow-lg shadow-orange-500/30"
               >
                 {t('checkout')}
                 <ArrowIcon size={20} className="ms-2" />
