@@ -212,24 +212,25 @@ const Header = () => {
                 {/* Language Dropdown */}
                 <div 
                   className={clsx(
-                    'absolute top-full end-0 mt-2 w-40 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl shadow-black/10 border border-white/50 overflow-hidden z-50 transition-all duration-300 origin-top',
+                    'absolute top-full end-0 mt-2 min-w-[160px] bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl shadow-black/10 border border-white/50 overflow-hidden z-50 transition-all duration-300 origin-top',
                     isLangDropdownOpen
                       ? 'opacity-100 scale-100 translate-y-0'
                       : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
                   )}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <div className="p-1.5">
+                  <div className="py-2 px-2">
                     <button
                       onClick={() => handleLanguageChange('ar')}
                       className={clsx(
-                        'w-full px-3.5 py-2.5 rounded-xl text-sm transition-all duration-200 flex items-center justify-between',
+                        'w-full rounded-xl text-sm transition-all duration-200 flex items-center justify-between',
                         locale === 'ar' 
                           ? 'text-[var(--primary)] bg-[var(--primary)]/8 font-semibold' 
                           : 'text-[var(--black)] hover:bg-[var(--main-bg)]'
                       )}
+                      style={{ padding: '12px 20px' }}
                     >
-                      العربية
+                      <span>العربية</span>
                       {locale === 'ar' && (
                         <span className="w-2 h-2 bg-[var(--primary)] rounded-full animate-pulse" />
                       )}
@@ -237,13 +238,14 @@ const Header = () => {
                     <button
                       onClick={() => handleLanguageChange('en')}
                       className={clsx(
-                        'w-full px-3.5 py-2.5 rounded-xl text-sm transition-all duration-200 flex items-center justify-between',
+                        'w-full rounded-xl text-sm transition-all duration-200 flex items-center justify-between',
                         locale === 'en' 
                           ? 'text-[var(--primary)] bg-[var(--primary)]/8 font-semibold' 
                           : 'text-[var(--black)] hover:bg-[var(--main-bg)]'
                       )}
+                      style={{ padding: '12px 20px' }}
                     >
-                      English
+                      <span>English</span>
                       {locale === 'en' && (
                         <span className="w-2 h-2 bg-[var(--primary)] rounded-full animate-pulse" />
                       )}
@@ -388,7 +390,8 @@ const Header = () => {
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className="rounded-full text-[13px] px-4 h-9 hover:bg-[var(--main-bg)]/70"
+                      className="rounded-full text-[13px] h-9 hover:bg-[var(--main-bg)]/70"
+                      style={{ padding: '8px 20px' }}
                     >
                       {t('login')}
                     </Button>
@@ -396,7 +399,8 @@ const Header = () => {
                   <Link href="/auth/register">
                     <Button 
                       size="sm" 
-                      className="rounded-full text-[13px] px-4 h-9 shadow-md shadow-[var(--primary)]/20 !bg-[var(--primary)] !text-white hover:!bg-[var(--primary-hover)]"
+                      className="rounded-full text-[13px] h-9 shadow-md shadow-[var(--primary)]/20 !bg-[var(--primary)] !text-white hover:!bg-[var(--primary-hover)]"
+                      style={{ padding: '8px 20px' }}
                     >
                       {t('register')}
                     </Button>
@@ -466,7 +470,7 @@ const Header = () => {
           <div className="overflow-y-auto max-h-[calc(100vh-110px)] sm:max-h-[calc(100vh-120px)] overscroll-contain p-5 sm:p-6">
             
             {/* Menu Header */}
-            <div className="pb-4 flex items-center justify-between">
+            <div className="pb-4 flex items-center justify-between" style={{ padding: '0 4px 16px 4px' }}>
               <h3 className="text-lg font-bold text-[var(--black)]">
                 {locale === 'ar' ? 'القائمة' : 'Menu'}
               </h3>
@@ -493,12 +497,13 @@ const Header = () => {
                     href={link.href}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={clsx(
-                      'flex items-center gap-4 px-4 py-4 rounded-2xl font-semibold text-[15px] transition-all duration-200',
+                      'flex items-center gap-4 rounded-2xl font-semibold text-[15px] transition-all duration-200',
                       isActive
                         ? 'text-white bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] shadow-lg shadow-[var(--primary)]/30'
                         : 'text-[var(--black)] bg-[var(--main-bg)]/50 hover:bg-[var(--main-bg)] active:scale-[0.98]'
                     )}
                     style={{ 
+                      padding: '16px 20px',
                       animationDelay: `${index * 60}ms`,
                       animation: isMobileMenuOpen ? `fadeInUp 0.35s ease ${index * 60}ms forwards` : 'none',
                       opacity: isMobileMenuOpen ? 1 : 0
@@ -512,7 +517,7 @@ const Header = () => {
                     )}>
                       <Icon size={20} className={isActive ? 'text-white' : 'text-[var(--primary)]'} />
                     </span>
-                    {link.label}
+                    <span>{link.label}</span>
                   </Link>
                 );
               })}
@@ -521,12 +526,13 @@ const Header = () => {
               <Link
                 href="/favorites"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-4 px-4 py-4 rounded-2xl text-[var(--black)] bg-[var(--main-bg)]/50 hover:bg-[var(--main-bg)] font-semibold text-[15px] transition-all duration-200 active:scale-[0.98]"
+                className="flex items-center gap-4 rounded-2xl text-[var(--black)] bg-[var(--main-bg)]/50 hover:bg-[var(--main-bg)] font-semibold text-[15px] transition-all duration-200 active:scale-[0.98]"
+                style={{ padding: '16px 20px' }}
               >
                 <span className="w-10 h-10 flex items-center justify-center rounded-xl bg-white shadow-sm">
                   <Heart size={20} className="text-[var(--primary)]" />
                 </span>
-                {locale === 'ar' ? 'المفضلة' : 'Favorites'}
+                <span>{locale === 'ar' ? 'المفضلة' : 'Favorites'}</span>
               </Link>
             </nav>
 
@@ -546,7 +552,8 @@ const Header = () => {
                   <Link
                     href="/profile"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-br from-[var(--primary)]/10 via-[var(--primary)]/5 to-transparent border border-[var(--primary)]/10 hover:border-[var(--primary)]/20 transition-all active:scale-[0.99]"
+                    className="flex items-center gap-4 rounded-2xl bg-gradient-to-br from-[var(--primary)]/10 via-[var(--primary)]/5 to-transparent border border-[var(--primary)]/10 hover:border-[var(--primary)]/20 transition-all active:scale-[0.99]"
+                    style={{ padding: '16px 20px' }}
                   >
                     <Avatar src={user?.img} fallback={user?.firstname} size="lg" />
                     <div className="flex-1 min-w-0">
@@ -565,18 +572,20 @@ const Header = () => {
                     <Link
                       href="/orders"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-2xl bg-[var(--main-bg)] hover:bg-[var(--border)]/50 transition-colors font-semibold text-[14px]"
+                      className="flex items-center justify-center gap-2.5 rounded-2xl bg-[var(--main-bg)] hover:bg-[var(--border)]/50 transition-colors font-semibold text-[14px]"
+                      style={{ padding: '14px 20px' }}
                     >
                       <Package size={18} className="text-[var(--primary)]" />
-                      {t('orders')}
+                      <span>{t('orders')}</span>
                     </Link>
                     <Link
                       href="/settings"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-2xl bg-[var(--main-bg)] hover:bg-[var(--border)]/50 transition-colors font-semibold text-[14px]"
+                      className="flex items-center justify-center gap-2.5 rounded-2xl bg-[var(--main-bg)] hover:bg-[var(--border)]/50 transition-colors font-semibold text-[14px]"
+                      style={{ padding: '14px 20px' }}
                     >
                       <Settings size={18} className="text-[var(--primary)]" />
-                      {t('settings')}
+                      <span>{t('settings')}</span>
                     </Link>
                   </div>
                   
@@ -587,6 +596,7 @@ const Header = () => {
                     onClick={handleLogout}
                     leftIcon={<LogOut size={18} />}
                     className="rounded-2xl h-13 py-3.5 border-2 border-[var(--error)]/20 text-[var(--error)] hover:bg-[var(--error)]/8 font-semibold"
+                    style={{ padding: '14px 20px' }}
                   >
                     {t('logout')}
                   </Button>
@@ -598,12 +608,12 @@ const Header = () => {
                   </p>
                   <div className="flex gap-3">
                     <Link href="/auth/login" className="flex-1" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Button variant="outline" fullWidth className="rounded-2xl h-13 py-3.5 border-2 font-semibold">
+                      <Button variant="outline" fullWidth className="rounded-2xl h-13 py-3.5 border-2 font-semibold" style={{ padding: '14px 20px' }}>
                         {t('login')}
                       </Button>
                     </Link>
                     <Link href="/auth/register" className="flex-1" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Button fullWidth className="rounded-2xl h-13 py-3.5 shadow-lg shadow-[var(--primary)]/25 font-semibold !bg-[var(--primary)] !text-white hover:!bg-[var(--primary-hover)]">
+                      <Button fullWidth className="rounded-2xl h-13 py-3.5 shadow-lg shadow-[var(--primary)]/25 font-semibold !bg-[var(--primary)] !text-white hover:!bg-[var(--primary-hover)]" style={{ padding: '14px 20px' }}>
                         {t('register')}
                       </Button>
                     </Link>
@@ -617,7 +627,7 @@ const Header = () => {
 
             {/* Language Selector - Mobile */}
             <div className="py-4">
-              <p className="text-xs text-[var(--text-grey)] uppercase tracking-widest mb-4 font-bold flex items-center gap-2">
+              <p className="text-xs text-[var(--text-grey)] uppercase tracking-widest mb-4 font-bold flex items-center gap-2" style={{ paddingInlineStart: '4px' }}>
                 <Globe size={14} />
                 {t('language')}
               </p>
@@ -625,24 +635,26 @@ const Header = () => {
                 <button
                   onClick={() => handleLanguageChange('ar')}
                   className={clsx(
-                    'flex-1 py-4 rounded-2xl text-[15px] font-bold transition-all duration-300',
+                    'flex-1 rounded-2xl text-[15px] font-bold transition-all duration-300',
                     locale === 'ar'
                       ? 'bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] text-white shadow-lg shadow-[var(--primary)]/30'
                       : 'bg-[var(--main-bg)] text-[var(--black)] hover:bg-[var(--border)]/50 active:scale-[0.98]'
                   )}
+                  style={{ padding: '16px 20px' }}
                 >
-                  العربية
+                  <span>العربية</span>
                 </button>
                 <button
                   onClick={() => handleLanguageChange('en')}
                   className={clsx(
-                    'flex-1 py-4 rounded-2xl text-[15px] font-bold transition-all duration-300',
+                    'flex-1 rounded-2xl text-[15px] font-bold transition-all duration-300',
                     locale === 'en'
                       ? 'bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] text-white shadow-lg shadow-[var(--primary)]/30'
                       : 'bg-[var(--main-bg)] text-[var(--black)] hover:bg-[var(--border)]/50 active:scale-[0.98]'
                   )}
+                  style={{ padding: '16px 20px' }}
                 >
-                  English
+                  <span>English</span>
                 </button>
               </div>
             </div>

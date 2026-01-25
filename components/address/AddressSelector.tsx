@@ -259,22 +259,22 @@ export const AddressSelector = ({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={clsx(
-          "flex items-center gap-2 sm:gap-3 px-3 sm:px-5 py-3.5 sm:py-5 border-e border-white/10 transition-all duration-200 rounded-s-xl group",
+          "flex items-center gap-1.5 sm:gap-3 px-2 sm:px-5 py-2.5 sm:py-5 border-e border-white/10 transition-all duration-200 rounded-s-xl group",
           isOpen ? "bg-white/10" : "hover:bg-white/[0.06]"
         )}
       >
         <div className="relative flex-shrink-0">
           <div className={clsx(
-            "w-9 h-9 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center transition-all duration-300",
+            "w-7 h-7 sm:w-11 sm:h-11 rounded-md sm:rounded-xl flex items-center justify-center transition-all duration-300",
             selectedAddress
               ? "bg-gradient-to-br from-green-500/20 to-emerald-500/10"
               : "bg-gradient-to-br from-[var(--primary)]/20 to-[var(--primary-light)]/10 group-hover:from-[var(--primary)]/30 group-hover:to-[var(--primary-light)]/20"
           )}>
-            <MapPin size={18} className={clsx("sm:hidden", selectedAddress ? "text-green-400" : "text-[var(--primary-light)]")} />
+            <MapPin size={14} className={clsx("sm:hidden", selectedAddress ? "text-green-400" : "text-[var(--primary-light)]")} />
             <MapPin size={20} className={clsx("hidden sm:block", selectedAddress ? "text-green-400" : "text-[var(--primary-light)]")} />
           </div>
           {selectedAddress && (
-            <span className="absolute -top-0.5 -end-0.5 w-2.5 sm:w-3 h-2.5 sm:h-3 bg-green-500 rounded-full border-2 border-[#1a3a4a] animate-pulse" />
+            <span className="absolute -top-0.5 -end-0.5 w-2 sm:w-3 h-2 sm:h-3 bg-green-500 rounded-full border border-[#1a3a4a] sm:border-2 animate-pulse" />
           )}
         </div>
         <div className="hidden sm:block text-start min-w-[100px] max-w-[140px]">

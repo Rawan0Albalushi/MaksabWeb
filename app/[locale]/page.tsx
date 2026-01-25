@@ -169,11 +169,11 @@ const HomePage = () => {
   return (
     <div className="min-h-screen overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative min-h-[auto] sm:min-h-[520px] lg:min-h-[580px] flex items-center overflow-hidden">
+      <section className="relative min-h-[auto] sm:min-h-[520px] lg:min-h-[580px] flex items-start sm:items-center overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] overflow-hidden">
-          <div className="absolute top-10 sm:top-20 start-5 sm:start-10 w-48 sm:w-72 h-48 sm:h-72 bg-[var(--primary)]/20 rounded-full blur-3xl animate-pulse pointer-events-none" />
-          <div className="absolute bottom-20 sm:bottom-24 end-5 sm:end-10 w-48 sm:w-72 h-48 sm:h-72 bg-[var(--primary-dark)]/30 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-10 sm:top-20 start-5 sm:start-10 w-32 sm:w-72 h-32 sm:h-72 bg-[var(--primary)]/20 rounded-full blur-3xl animate-pulse pointer-events-none" />
+          <div className="absolute bottom-20 sm:bottom-24 end-5 sm:end-10 w-32 sm:w-72 h-32 sm:h-72 bg-[var(--primary-dark)]/30 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDelay: '1s' }} />
           
           <div
             className="absolute inset-0 opacity-5 pointer-events-none"
@@ -184,17 +184,17 @@ const HomePage = () => {
           />
         </div>
 
-        <div className="container relative z-10 pt-8 pb-20 sm:py-10 lg:py-14">
+        <div className="container relative z-10 sm:pt-10 sm:pb-10 lg:py-14" style={{ paddingTop: '80px', paddingBottom: '60px' }}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
             {/* Hero Content */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: 'easeOut' }}
-              className="text-white text-center lg:text-start"
+              className="text-white text-center lg:text-start flex flex-col items-center lg:items-start gap-2 sm:gap-0"
             >
 
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.15] sm:leading-[1.2]">
+              <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.2] sm:leading-[1.2]">
                 <span className="block mb-0.5 sm:mb-1">{t('heroTitle')}</span>
                 <span className="block bg-gradient-to-r from-[var(--primary)] via-[#ff6b3d] to-[var(--primary-light)] bg-clip-text text-transparent">
                   {t('heroTitleHighlight')}
@@ -202,31 +202,31 @@ const HomePage = () => {
               </h1>
 
               {/* Spacer after Title */}
-              <div className="h-3 sm:h-5" aria-hidden="true" />
+              <div className="h-2 sm:h-5" aria-hidden="true" />
               
-              <p className="text-sm sm:text-base md:text-lg text-white/70 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+              <p className="text-xs sm:text-base md:text-lg text-white/70 max-w-lg mx-auto lg:mx-0 leading-relaxed px-2 sm:px-0">
                 {t('heroSubtitle')}
               </p>
 
               {/* Spacer after Description */}
-              <div className="h-4 sm:h-6" aria-hidden="true" />
+              <div className="h-3 sm:h-6" aria-hidden="true" />
 
               {/* Search Bar with Location Picker */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="relative max-w-xl mx-auto lg:mx-0 z-20"
+                className="relative max-w-xl mx-auto lg:mx-0 z-20 w-full px-1 sm:px-0"
               >
                 <form onSubmit={handleSearch}>
                   {/* Outer glow effect */}
                   <div className={clsx(
-                    "absolute -inset-1 rounded-2xl sm:rounded-3xl transition-all duration-500 blur-lg opacity-0",
+                    "absolute -inset-1 rounded-xl sm:rounded-3xl transition-all duration-500 blur-lg opacity-0",
                     searchFocused && "opacity-100 bg-gradient-to-r from-[var(--primary)]/40 via-[#ff6b3d]/30 to-[var(--primary-light)]/40"
                   )} />
                   
                   <div className={clsx(
-                    "relative flex items-center rounded-xl sm:rounded-2xl border-2 transition-all duration-300",
+                    "relative flex items-center rounded-xl sm:rounded-2xl border transition-all duration-300",
                     "bg-gradient-to-r from-white/[0.08] to-white/[0.04] backdrop-blur-xl",
                     searchFocused 
                       ? "border-[var(--primary)]/60 shadow-[0_8px_32px_rgba(255,61,0,0.25),inset_0_1px_0_rgba(255,255,255,0.1)]" 
@@ -236,18 +236,18 @@ const HomePage = () => {
                     <AddressSelector variant="hero" />
 
                     {/* Divider */}
-                    <div className="w-px h-8 sm:h-10 bg-gradient-to-b from-transparent via-white/20 to-transparent mx-0.5 sm:mx-1" />
+                    <div className="w-px h-6 sm:h-10 bg-gradient-to-b from-transparent via-white/20 to-transparent mx-0.5 sm:mx-1" />
 
                     {/* Search Input */}
-                    <div className="flex-1 relative min-w-0 px-1.5 sm:px-3">
+                    <div className="flex-1 relative min-w-0 px-1 sm:px-3">
                       <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder={tCommon('searchPlaceholder')}
                         className={clsx(
-                          "w-full px-2 sm:px-4 py-3.5 sm:py-5 bg-transparent text-white placeholder:text-white/40 focus:outline-none",
-                          "text-sm sm:text-[15px] font-medium"
+                          "w-full px-1.5 sm:px-4 py-2.5 sm:py-5 bg-transparent text-white placeholder:text-white/40 focus:outline-none",
+                          "text-xs sm:text-[15px] font-medium"
                         )}
                         onFocus={() => setSearchFocused(true)}
                         onBlur={() => setSearchFocused(false)}
@@ -255,18 +255,18 @@ const HomePage = () => {
                     </div>
 
                     {/* Search Button */}
-                    <div className="p-1.5 sm:p-2.5 ps-0.5 sm:ps-1">
+                    <div className="p-1 sm:p-2.5 ps-0.5 sm:ps-1">
                       <Button 
                         type="submit" 
                         className={clsx(
-                          "rounded-lg sm:rounded-xl px-3 sm:px-8 py-2.5 sm:py-3.5 font-semibold transition-all duration-300",
+                          "rounded-lg sm:rounded-xl px-2.5 sm:px-8 py-2 sm:py-3.5 font-semibold transition-all duration-300",
                           "bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)] hover:from-[var(--primary-hover)] hover:to-[var(--primary)]",
                           "shadow-[0_4px_20px_rgba(255,61,0,0.35)] hover:shadow-[0_6px_25px_rgba(255,61,0,0.45)]",
                           "hover:scale-[1.02] active:scale-[0.98]"
                         )}
                       >
                         <span className="hidden sm:inline">{tCommon('search')}</span>
-                        <Search size={18} className="sm:hidden" />
+                        <Search size={16} className="sm:hidden" />
                       </Button>
                     </div>
                   </div>
@@ -277,10 +277,10 @@ const HomePage = () => {
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="sm:hidden mt-3 flex items-center justify-center gap-2 text-white/70"
+                    className="sm:hidden mt-2 flex items-center justify-center gap-2 text-white/70"
                   >
-                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                    <span className="text-xs truncate max-w-[200px]">
+                    <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+                    <span className="text-[10px] truncate max-w-[180px]">
                       {selectedAddress.title || selectedAddress.address?.split(',')[0] || tCommon('locationSet')}
                     </span>
                   </motion.div>
@@ -288,14 +288,14 @@ const HomePage = () => {
               </motion.div>
 
               {/* Spacer before Stats */}
-              <div className="h-5 sm:h-8" aria-hidden="true" />
+              <div className="h-4 sm:h-8" aria-hidden="true" />
 
               {/* Stats */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className="flex items-center justify-center lg:justify-start gap-6 sm:gap-10"
+                className="flex items-center justify-center lg:justify-start gap-4 sm:gap-10"
               >
                 {[
                   { value: '500+', label: t('stats.shops') },
@@ -304,12 +304,12 @@ const HomePage = () => {
                 ].map((stat, index) => (
                   <div key={index} className="relative text-center lg:text-start">
                     {index > 0 && (
-                      <div className="absolute -start-3 sm:-start-5 top-0 h-full w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
+                      <div className="absolute -start-2 sm:-start-5 top-0 h-full w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
                     )}
-                    <p className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent mb-0.5">
+                    <p className="text-base sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent mb-0.5">
                       {stat.value}
                     </p>
-                    <p className="text-white/50 text-[10px] sm:text-xs">{stat.label}</p>
+                    <p className="text-white/50 text-[9px] sm:text-xs">{stat.label}</p>
                   </div>
                 ))}
               </motion.div>
@@ -320,7 +320,7 @@ const HomePage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="relative mt-2 lg:mt-0 overflow-hidden rounded-xl sm:rounded-2xl lg:rounded-3xl"
+              className="relative mt-4 lg:mt-0 overflow-hidden rounded-lg sm:rounded-2xl lg:rounded-3xl"
             >
               {loading ? (
                 <BannerSkeleton />

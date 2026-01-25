@@ -1689,3 +1689,41 @@ footer {
 .lang-selector-hover:hover::after {
   width: 80%;
 }
+
+/* ===== HERO SECTION MOBILE OPTIMIZATIONS ===== */
+
+/* Ensure hero content doesn't overflow on mobile */
+@media (max-width: 639px) {
+  .hero-mobile-optimized {
+    padding-top: 1.5rem;
+    padding-bottom: 3rem;
+  }
+  
+  /* Smaller search bar on very small screens */
+  .hero-search-compact input {
+    font-size: 12px !important;
+    padding-top: 0.625rem !important;
+    padding-bottom: 0.625rem !important;
+  }
+  
+  /* Stats compact on mobile */
+  .hero-stats-compact .stat-value {
+    font-size: 1rem !important;
+  }
+  
+  .hero-stats-compact .stat-label {
+    font-size: 9px !important;
+  }
+}
+
+/* Extra small screens (below 360px) */
+@media (max-width: 359px) {
+  .hero-xs-compact h1 {
+    font-size: 1.125rem !important;
+    line-height: 1.3 !important;
+  }
+  
+  .hero-xs-compact p {
+    font-size: 0.6875rem !important;
+  }
+}
