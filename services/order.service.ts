@@ -3,6 +3,8 @@ import { ApiResponse, PaginatedResponse, Order, OrderStatus, SavedCard, CreateOr
 
 interface CreateOrderData {
   cart_id: number;
+  currency_id: number; // Required - usually 1 for OMR
+  rate: number; // Required - currency rate, usually 1
   delivery_type: 'delivery' | 'pickup';
   address_id?: number;
   delivery_date?: string;
@@ -16,6 +18,7 @@ interface CreateOrderData {
     latitude: number;
     longitude: number;
   };
+  phone?: string;
 }
 
 interface TransactionData {

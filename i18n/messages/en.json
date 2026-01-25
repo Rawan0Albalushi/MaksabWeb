@@ -239,7 +239,17 @@
     "removeItem": "Remove Item",
     "quantity": "Quantity",
     "pricePerItem": "Price per item",
-    "from": "From"
+    "from": "From",
+    "secureCheckout": "Secure Checkout",
+    "fastDelivery": "Fast Delivery",
+    "whyShopWithUs": "Why shop with us?",
+    "offers": "Offers",
+    "delivery": "Delivery",
+    "secure": "Secure",
+    "securePayment": "Secure & Encrypted Payment",
+    "deliveryTime": "Within an hour",
+    "guarantee": "Quality Guarantee",
+    "moneyBack": "Money Back"
   },
   "checkout": {
     "title": "Checkout",

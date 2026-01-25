@@ -25,12 +25,16 @@ import {
   Loader2,
   ArrowRight,
   ArrowLeft,
+  Shield,
+  Package,
+  Sparkles,
+  FileText,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
 import { Button, Card, Input, Badge, EmptyState, Modal } from '@/components/ui';
-import { cartService, orderService, userService } from '@/services';
-import { Cart, CartDetail, Address, CalculateResult, SavedCard } from '@/types';
+import { cartService, orderService, userService, settingsService } from '@/services';
+import { Cart, CartDetail, Address, CalculateResult, SavedCard, Currency } from '@/types';
 import { useCartStore, useAuthStore, useSettingsStore } from '@/store';
 
 interface PaymentMethod {
@@ -41,16 +45,27 @@ interface PaymentMethod {
   input?: number;
 }
 
+// Checkout Steps
+const CHECKOUT_STEPS = [
+  { id: 'delivery', icon: Truck },
+  { id: 'address', icon: MapPin },
+  { id: 'payment', icon: CreditCard },
+  { id: 'confirm', icon: Check },
+];
+
 const CheckoutPage = () => {
   const t = useTranslations('checkout');
   const tCart = useTranslations('cart');
   const tCommon = useTranslations('common');
   const router = useRouter();
-  const { locale } = useSettingsStore();
+  const { locale, currency, currencies, setCurrency, setCurrencies } = useSettingsStore();
   const isRTL = locale === 'ar';
 
   const { user, isAuthenticated } = useAuthStore();
   const { cart, setCart, clearCart } = useCartStore();
+
+  // Currency state
+  const [activeCurrency, setActiveCurrency] = useState<Currency | null>(null);
 
   // States
   const [loading, setLoading] = useState(true);
@@ -162,6 +177,27 @@ const CheckoutPage = () => {
       // Auto-select first payment method
       if (methods.length > 0) {
         setSelectedPaymentId(methods[0].id);
+      }
+
+      // Fetch currencies if not already loaded
+      if (!currency || currencies.length === 0) {
+        try {
+          const currencyResponse = await settingsService.getCurrencies();
+          console.log('💰 Fetched currencies:', currencyResponse.data);
+          if (currencyResponse.data && currencyResponse.data.length > 0) {
+            setCurrencies(currencyResponse.data);
+            // Find default currency or use first one
+            const defaultCurrency = currencyResponse.data.find(c => c.is_default) || currencyResponse.data[0];
+            console.log('💰 Using default currency:', defaultCurrency);
+            setCurrency(defaultCurrency);
+            setActiveCurrency(defaultCurrency);
+          }
+        } catch (currencyError) {
+          console.error('Error fetching currencies:', currencyError);
+        }
+      } else {
+        console.log('💰 Using existing currency from store:', currency);
+        setActiveCurrency(currency);
       }
     } catch (error) {
       console.error('Error fetching checkout data:', error);
@@ -310,6 +346,8 @@ const CheckoutPage = () => {
       // Build order data
       const orderData: {
         cart_id: number;
+        currency_id: number;
+        rate: number;
         delivery_type: 'delivery' | 'pickup';
         address_id?: number;
         delivery_date?: string;
@@ -320,8 +358,11 @@ const CheckoutPage = () => {
         payment_method_id?: string;
         shop_id?: number;
         location?: { latitude: number; longitude: number };
+        phone?: string;
       } = {
         cart_id: cart.id,
+        currency_id: activeCurrency?.id || currency?.id || 1, // Use active currency from API
+        rate: activeCurrency?.rate || currency?.rate || 1, // Use currency rate from API
         delivery_type: deliveryType,
         address_id: deliveryType === 'delivery' ? selectedAddressId! : undefined,
         delivery_date: deliveryDate || undefined,
@@ -331,6 +372,7 @@ const CheckoutPage = () => {
         payment_id: selectedPaymentId!,
         shop_id: cart.shop_id,
         location: formattedLocation,
+        phone: user?.phone || undefined,
       };
 
       // Add payment_method_id for saved card
@@ -339,6 +381,8 @@ const CheckoutPage = () => {
       }
 
       // Debug: Log order data being sent
+      console.log('💰 Active currency:', activeCurrency);
+      console.log('💰 Store currency:', currency);
       console.log('📤 Creating order with data:', JSON.stringify(orderData, null, 2));
 
       // Create order - API returns payment_url or otp_verification_url
@@ -576,18 +620,87 @@ const CheckoutPage = () => {
     return times;
   };
 
+  // Calculate current step - shows which step user is currently on
+  const getCurrentStep = () => {
+    // Step 0: Delivery Type - always accessible
+    // Step 1: Address - only if delivery type is 'delivery'
+    // Step 2: Payment Method
+    // Step 3: Review/Confirm - reached when all required info is filled
+    
+    if (!deliveryType) return 0;
+    
+    if (deliveryType === 'delivery') {
+      if (!selectedAddressId) return 1;
+    }
+    
+    if (!selectedPaymentId) return 2;
+    
+    // All required fields filled - show confirm step as active, not completed
+    return 3;
+  };
+
+  // Check if a step is completed
+  const isStepCompleted = (stepIndex: number) => {
+    switch (stepIndex) {
+      case 0: // Delivery Type
+        return !!deliveryType;
+      case 1: // Address
+        return deliveryType === 'pickup' || !!selectedAddressId;
+      case 2: // Payment
+        return !!selectedPaymentId;
+      case 3: // Confirm - never completed until order is placed
+        return false;
+      default:
+        return false;
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 py-10 px-4">
-        <div className="container max-w-5xl mx-auto">
-          <div className="animate-pulse space-y-8">
-            <div className="h-10 w-56 bg-gradient-to-r from-slate-200 to-slate-100 rounded-xl" />
-            {[1, 2, 3].map(i => (
-              <div key={i} className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100">
-                <div className="h-6 w-44 bg-gradient-to-r from-slate-200 to-slate-100 rounded-lg mb-5" />
-                <div className="h-24 w-full bg-gradient-to-r from-slate-100 to-slate-50 rounded-xl" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+        {/* Loading Header Skeleton */}
+        <div className="bg-gradient-to-r from-[#0a1628] via-[#1a3a4a] to-[#0d2233] py-8 sm:py-12 px-4">
+          <div className="container max-w-6xl mx-auto">
+            <div className="animate-pulse flex items-center gap-4">
+              <div className="w-12 h-12 bg-white/10 rounded-xl" />
+              <div>
+                <div className="h-7 w-40 bg-white/10 rounded-lg mb-2" />
+                <div className="h-4 w-56 bg-white/10 rounded-lg" />
               </div>
-            ))}
+            </div>
+          </div>
+        </div>
+        
+        <div className="container max-w-6xl mx-auto px-4 py-8">
+          <div className="animate-pulse space-y-6">
+            {/* Steps Skeleton */}
+            <div className="flex justify-center gap-4 mb-8">
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="flex items-center gap-2">
+                  <div className="w-10 h-10 bg-slate-200 rounded-xl" />
+                  {i < 4 && <div className="w-12 h-1 bg-slate-200 rounded-full hidden sm:block" />}
+                </div>
+              ))}
+            </div>
+            
+            <div className="grid lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                    <div className="h-6 w-44 bg-slate-200 rounded-lg mb-5" />
+                    <div className="h-32 w-full bg-slate-100 rounded-xl" />
+                  </div>
+                ))}
+              </div>
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 h-fit">
+                <div className="h-6 w-32 bg-slate-200 rounded-lg mb-5" />
+                <div className="space-y-4">
+                  {[1, 2, 3, 4].map(i => (
+                    <div key={i} className="h-5 w-full bg-slate-100 rounded-lg" />
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -614,29 +727,80 @@ const CheckoutPage = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 py-10 px-4">
-      <div className="container max-w-5xl mx-auto">
-        {/* Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-5 mb-10"
-        >
-          <button
-            onClick={() => router.back()}
-            className="w-12 h-12 rounded-2xl bg-white shadow-sm border border-slate-200/80 flex items-center justify-center hover:bg-slate-50 hover:shadow-md transition-all duration-200"
-          >
-            {isRTL ? <ChevronRight size={22} className="text-slate-600" /> : <ChevronLeft size={22} className="text-slate-600" />}
-          </button>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">{t('title')}</h1>
-            <p className="text-sm text-slate-500 mt-1">
-              {itemCount} {tCart('items')} • {cart.shop?.translation?.title}
-            </p>
-          </div>
-        </motion.div>
+  const currentStep = getCurrentStep();
 
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100/80">
+      {/* Header Section with Gradient Background */}
+      <div className="relative bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] overflow-hidden">
+        {/* Decorative Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 start-1/4 w-72 h-72 bg-[var(--primary)]/10 rounded-full blur-[100px]" />
+          <div className="absolute bottom-0 end-1/4 w-96 h-96 bg-[var(--primary-dark)]/15 rounded-full blur-[120px]" />
+        </div>
+        
+        <div className="container max-w-6xl mx-auto px-4 py-6 sm:py-10 relative z-10">
+          {/* Back Button & Title */}
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-4 mb-6 sm:mb-8"
+          >
+            <button
+              onClick={() => router.back()}
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white/20 transition-all duration-200 group"
+            >
+              {isRTL ? <ChevronRight size={20} className="text-white group-hover:scale-110 transition-transform" /> : <ChevronLeft size={20} className="text-white group-hover:scale-110 transition-transform" />}
+            </button>
+            <div>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">{t('title')}</h1>
+              <p className="text-xs sm:text-sm text-white/60 mt-0.5">
+                {itemCount} {tCart('items')} • {cart.shop?.translation?.title}
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Checkout Steps Indicator - Simple numbered steps */}
+          <div className="flex items-center justify-center gap-0">
+            {[1, 2, 3, 4].map((stepNum, index) => {
+              const isActive = index === currentStep;
+              const isPast = index < currentStep;
+              
+              return (
+                <div key={stepNum} className="flex items-center">
+                  <div
+                    className={clsx(
+                      'w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold transition-all',
+                      isPast && 'bg-[var(--primary)] text-white',
+                      isActive && 'bg-white text-[var(--primary)]',
+                      !isPast && !isActive && 'bg-white/20 text-white/50'
+                    )}
+                  >
+                    {isPast ? <Check size={16} /> : stepNum}
+                  </div>
+                  
+                  {index < 3 && (
+                    <div className={clsx(
+                      'w-8 sm:w-12 h-1 transition-colors',
+                      index < currentStep ? 'bg-[var(--primary)]' : 'bg-white/20'
+                    )} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        
+        {/* Wave Decoration */}
+        <div className="absolute bottom-0 left-0 right-0 z-10">
+          <svg viewBox="0 0 1440 50" fill="none" className="w-full h-6 sm:h-10" preserveAspectRatio="none">
+            <path d="M0 50L60 46C120 42 240 34 360 30C480 26 600 26 720 28C840 30 960 34 1080 36C1200 38 1320 38 1380 38L1440 38V50H0Z" fill="#f8fafc" />
+          </svg>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="container max-w-6xl mx-auto px-4 py-6 sm:py-10 -mt-2">
         {/* Error Message */}
         <AnimatePresence>
           {error && (
@@ -644,189 +808,151 @@ const CheckoutPage = () => {
               initial={{ opacity: 0, y: -10, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.98 }}
-              className="mb-8 px-5 py-4 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-4 shadow-sm"
+              className="mb-6 px-4 sm:px-5 py-4 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-3 sm:gap-4 shadow-sm"
             >
               <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
                 <AlertCircle size={20} className="text-red-500" />
               </div>
-              <p className="text-red-600 font-medium">{error}</p>
+              <p className="text-red-600 font-medium text-sm sm:text-base flex-1">{error}</p>
+              <button 
+                onClick={() => setError('')}
+                className="text-red-400 hover:text-red-600 transition-colors p-1"
+              >
+                <ChevronRight size={18} className={isRTL ? '' : 'rotate-180'} />
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <div className="grid lg:grid-cols-5 gap-8">
-          {/* Main Content */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="lg:col-span-3 space-y-6"
-          >
-            {/* Delivery Type */}
-            <Card variant="elevated">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] flex items-center justify-center">
-                  <Truck size={20} className="text-white" />
-                </div>
-                <h2 className="text-lg font-bold text-slate-800">{t('deliveryType')}</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Main Content - Takes 8 columns on large screens */}
+          <div className="lg:col-span-8 space-y-4">
+            {/* Delivery Type Card */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="px-4 py-3 bg-slate-50 border-b border-slate-200">
+                <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                  <Truck size={18} className="text-[var(--primary)]" />
+                  {t('deliveryType')}
+                </h3>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  onClick={() => setDeliveryType('delivery')}
-                  className={clsx(
-                    'flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-200',
-                    deliveryType === 'delivery'
-                      ? 'border-[var(--primary)] bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/5 shadow-md shadow-[var(--primary)]/10'
-                      : 'border-slate-200 hover:border-[var(--primary)]/40 hover:bg-slate-50'
-                  )}
-                >
-                  <div className={clsx(
-                    'w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 transition-all',
-                    deliveryType === 'delivery' ? 'bg-[var(--primary)]/20' : 'bg-slate-100'
-                  )}>
-                    <Truck size={26} className={deliveryType === 'delivery' ? 'text-[var(--primary)]' : 'text-slate-400'} />
-                  </div>
-                  <div className="text-start flex-1 min-w-0">
-                    <p className={clsx(
-                      'font-bold text-base',
-                      deliveryType === 'delivery' ? 'text-[var(--primary)]' : 'text-slate-700'
-                    )}>
+              <div className="p-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => setDeliveryType('delivery')}
+                    className={clsx(
+                      'p-4 rounded-lg border-2 text-center transition-all',
+                      deliveryType === 'delivery'
+                        ? 'border-[var(--primary)] bg-[var(--primary)]/5'
+                        : 'border-slate-200 hover:border-slate-300'
+                    )}
+                  >
+                    <Truck size={24} className={clsx('mx-auto mb-2', deliveryType === 'delivery' ? 'text-[var(--primary)]' : 'text-slate-400')} />
+                    <p className={clsx('font-semibold text-sm', deliveryType === 'delivery' ? 'text-[var(--primary)]' : 'text-slate-700')}>
                       {t('homeDelivery')}
                     </p>
-                    <p className="text-sm text-slate-500 mt-0.5">{t('deliverToYou')}</p>
-                  </div>
-                  {deliveryType === 'delivery' && (
-                    <div className="w-7 h-7 rounded-full bg-[var(--primary)] flex items-center justify-center shadow-md shadow-[var(--primary)]/30 shrink-0">
-                      <Check size={16} className="text-white" />
-                    </div>
-                  )}
-                </button>
+                    {deliveryType === 'delivery' && (
+                      <div className="w-5 h-5 rounded-full bg-[var(--primary)] mx-auto mt-2 flex items-center justify-center">
+                        <Check size={12} className="text-white" />
+                      </div>
+                    )}
+                  </button>
 
-                <button
-                  onClick={() => setDeliveryType('pickup')}
-                  className={clsx(
-                    'flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-200',
-                    deliveryType === 'pickup'
-                      ? 'border-[var(--primary)] bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/5 shadow-md shadow-[var(--primary)]/10'
-                      : 'border-slate-200 hover:border-[var(--primary)]/40 hover:bg-slate-50'
-                  )}
-                >
-                  <div className={clsx(
-                    'w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 transition-all',
-                    deliveryType === 'pickup' ? 'bg-[var(--primary)]/20' : 'bg-slate-100'
-                  )}>
-                    <Store size={26} className={deliveryType === 'pickup' ? 'text-[var(--primary)]' : 'text-slate-400'} />
-                  </div>
-                  <div className="text-start flex-1 min-w-0">
-                    <p className={clsx(
-                      'font-bold text-base',
-                      deliveryType === 'pickup' ? 'text-[var(--primary)]' : 'text-slate-700'
-                    )}>
+                  <button
+                    onClick={() => setDeliveryType('pickup')}
+                    className={clsx(
+                      'p-4 rounded-lg border-2 text-center transition-all',
+                      deliveryType === 'pickup'
+                        ? 'border-[var(--primary)] bg-[var(--primary)]/5'
+                        : 'border-slate-200 hover:border-slate-300'
+                    )}
+                  >
+                    <Store size={24} className={clsx('mx-auto mb-2', deliveryType === 'pickup' ? 'text-[var(--primary)]' : 'text-slate-400')} />
+                    <p className={clsx('font-semibold text-sm', deliveryType === 'pickup' ? 'text-[var(--primary)]' : 'text-slate-700')}>
                       {t('pickup')}
                     </p>
-                    <p className="text-sm text-slate-500 mt-0.5">{t('pickupFromStore')}</p>
-                  </div>
-                  {deliveryType === 'pickup' && (
-                    <div className="w-7 h-7 rounded-full bg-[var(--primary)] flex items-center justify-center shadow-md shadow-[var(--primary)]/30 shrink-0">
-                      <Check size={16} className="text-white" />
-                    </div>
-                  )}
-                </button>
+                    {deliveryType === 'pickup' && (
+                      <div className="w-5 h-5 rounded-full bg-[var(--primary)] mx-auto mt-2 flex items-center justify-center">
+                        <Check size={12} className="text-white" />
+                      </div>
+                    )}
+                  </button>
+                </div>
               </div>
-            </Card>
+            </div>
 
             {/* Delivery Address - Only show for delivery type */}
             {deliveryType === 'delivery' && (
-              <Card variant="elevated">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-                    <MapPin size={20} className="text-white" />
-                  </div>
-                  <h2 className="text-lg font-bold text-slate-800">{t('deliveryAddress')}</h2>
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="px-4 py-3 bg-slate-50 border-b border-slate-200">
+                  <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                    <MapPin size={18} className="text-emerald-500" />
+                    {t('deliveryAddress')}
+                  </h3>
                 </div>
-                
-                {addresses.length === 0 ? (
-                  <div className="text-center py-10 px-6">
-                    <div className="w-20 h-20 mx-auto mb-5 bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl flex items-center justify-center">
-                      <MapPin size={36} className="text-slate-400" />
+                <div className="p-4">
+                  {addresses.length === 0 ? (
+                    <div className="text-center py-6 bg-slate-50 rounded-lg border-2 border-dashed border-slate-200">
+                      <MapPin size={24} className="text-slate-400 mx-auto mb-2" />
+                      <p className="text-slate-500 mb-3 text-sm">{t('noAddresses')}</p>
+                      <Button variant="outline" leftIcon={<Plus size={16} />} size="sm">
+                        {t('addAddress')}
+                      </Button>
                     </div>
-                    <p className="text-slate-500 mb-5">{t('noAddresses')}</p>
-                    <Button variant="outline" leftIcon={<Plus size={18} />}>
-                      {t('addAddress')}
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {addresses.map((address) => (
-                      <button
-                        key={address.id}
-                        onClick={() => setSelectedAddressId(address.id)}
-                        className={clsx(
-                          'w-full flex items-start gap-4 p-5 rounded-2xl border-2 transition-all duration-200 text-start',
-                          selectedAddressId === address.id
-                            ? 'border-[var(--primary)] bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/5 shadow-md shadow-[var(--primary)]/10'
-                            : 'border-slate-200 hover:border-[var(--primary)]/40 hover:bg-slate-50'
-                        )}
-                      >
-                        <div className={clsx(
-                          'w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all',
-                          selectedAddressId === address.id ? 'bg-[var(--primary)]/20' : 'bg-slate-100'
-                        )}>
-                          <MapPin size={22} className={selectedAddressId === address.id ? 'text-[var(--primary)]' : 'text-slate-400'} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <p className={clsx(
-                              'font-bold text-base',
-                              selectedAddressId === address.id ? 'text-[var(--primary)]' : 'text-slate-700'
-                            )}>
-                              {address.title || t('address')}
-                            </p>
-                            {address.active && (
-                              <Badge variant="primary" size="sm">{tCommon('default')}</Badge>
+                  ) : (
+                    <div className="space-y-2">
+                      {addresses.map((address) => (
+                        <button
+                          key={address.id}
+                          onClick={() => setSelectedAddressId(address.id)}
+                          className={clsx(
+                            'w-full p-3 rounded-lg border-2 text-start transition-all',
+                            selectedAddressId === address.id
+                              ? 'border-[var(--primary)] bg-[var(--primary)]/5'
+                              : 'border-slate-200 hover:border-slate-300'
+                          )}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className={clsx('font-semibold text-sm', selectedAddressId === address.id ? 'text-[var(--primary)]' : 'text-slate-700')}>
+                                {address.title || t('address')}
+                              </span>
+                              {address.active && <Badge variant="primary" size="sm">{tCommon('default')}</Badge>}
+                            </div>
+                            {selectedAddressId === address.id && (
+                              <div className="w-5 h-5 rounded-full bg-[var(--primary)] flex items-center justify-center">
+                                <Check size={12} className="text-white" />
+                              </div>
                             )}
                           </div>
-                          <p className="text-sm text-slate-500 mt-1.5 line-clamp-2 leading-relaxed">
-                            {formatAddress(address)}
-                          </p>
-                        </div>
-                        {selectedAddressId === address.id && (
-                          <div className="w-7 h-7 rounded-full bg-[var(--primary)] flex items-center justify-center shrink-0 shadow-md shadow-[var(--primary)]/30">
-                            <Check size={16} className="text-white" />
-                          </div>
-                        )}
+                          <p className="text-xs text-slate-500 mt-1 line-clamp-1">{formatAddress(address)}</p>
+                        </button>
+                      ))}
+                      <button className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 hover:border-[var(--primary)] hover:text-[var(--primary)] transition-all flex items-center justify-center gap-2">
+                        <Plus size={16} />
+                        <span className="text-sm font-medium">{t('addAddress')}</span>
                       </button>
-                    ))}
-                    
-                    {/* Add New Address Button */}
-                    <button className="w-full flex items-center justify-center gap-3 p-5 border-2 border-dashed border-slate-300 rounded-2xl text-slate-500 hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all duration-200">
-                      <Plus size={22} />
-                      <span className="font-semibold">{t('addAddress')}</span>
-                    </button>
-                  </div>
-                )}
-              </Card>
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
 
-            {/* Delivery Time (Optional) */}
-            <Card variant="elevated">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-                  <Clock size={20} className="text-white" />
-                </div>
-                <h2 className="text-lg font-bold text-slate-800">{t('deliveryTime')}</h2>
+            {/* Delivery Time */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="px-4 py-3 bg-slate-50 border-b border-slate-200">
+                <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                  <Clock size={18} className="text-violet-500" />
+                  {t('deliveryTime')}
+                </h3>
               </div>
-              <div className="grid sm:grid-cols-2 gap-5">
-                <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-3 block">
-                    {t('selectDate')}
-                  </label>
-                  <div className="relative">
-                    <Calendar size={20} className="absolute start-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              <div className="p-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-medium text-slate-600 mb-1.5 block">{t('selectDate')}</label>
                     <select
                       value={deliveryDate}
                       onChange={(e) => setDeliveryDate(e.target.value)}
-                      className="w-full ps-12 pe-5 py-4 border-2 border-slate-200 rounded-xl bg-white appearance-none cursor-pointer focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--primary)]/10 outline-none transition-all text-slate-700 font-medium"
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-white text-sm focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none"
                     >
                       <option value="">{t('asap')}</option>
                       {getAvailableDates().map(date => (
@@ -834,19 +960,13 @@ const CheckoutPage = () => {
                       ))}
                     </select>
                   </div>
-                </div>
-
-                <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-3 block">
-                    {t('selectTime')}
-                  </label>
-                  <div className="relative">
-                    <Clock size={20} className="absolute start-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  <div>
+                    <label className="text-xs font-medium text-slate-600 mb-1.5 block">{t('selectTime')}</label>
                     <select
                       value={deliveryTime}
                       onChange={(e) => setDeliveryTime(e.target.value)}
-                      className="w-full ps-12 pe-5 py-4 border-2 border-slate-200 rounded-xl bg-white appearance-none cursor-pointer focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--primary)]/10 outline-none transition-all text-slate-700 font-medium disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed"
                       disabled={!deliveryDate}
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-white text-sm focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none disabled:bg-slate-100 disabled:text-slate-400"
                     >
                       <option value="">{deliveryDate ? t('selectTimeSlot') : t('selectDateFirst')}</option>
                       {deliveryDate && getAvailableTimes().map(time => (
@@ -856,356 +976,337 @@ const CheckoutPage = () => {
                   </div>
                 </div>
               </div>
-            </Card>
+            </div>
 
             {/* Payment Method */}
-            <Card variant="elevated">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
-                  <CreditCard size={20} className="text-white" />
-                </div>
-                <h2 className="text-lg font-bold text-slate-800">{t('paymentMethod')}</h2>
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="px-4 py-3 bg-slate-50 border-b border-slate-200">
+                <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                  <CreditCard size={18} className="text-amber-500" />
+                  {t('paymentMethod')}
+                </h3>
               </div>
-              <div className="space-y-4">
-                {paymentMethods.map((method) => (
-                  <button
-                    key={method.id}
-                    onClick={() => setSelectedPaymentId(method.id)}
-                    className={clsx(
-                      'w-full flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-200',
-                      selectedPaymentId === method.id
-                        ? 'border-[var(--primary)] bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/5 shadow-md shadow-[var(--primary)]/10'
-                        : 'border-slate-200 hover:border-[var(--primary)]/40 hover:bg-slate-50'
-                    )}
-                  >
-                    <div className={clsx(
-                      'w-14 h-14 rounded-2xl flex items-center justify-center transition-all',
-                      selectedPaymentId === method.id ? 'bg-[var(--primary)]/20 text-[var(--primary)]' : 'bg-slate-100 text-slate-400'
-                    )}>
-                      {method.icon}
-                    </div>
-                    <span className={clsx(
-                      'font-bold text-base',
-                      selectedPaymentId === method.id ? 'text-[var(--primary)]' : 'text-slate-700'
-                    )}>
-                      {method.name}
-                    </span>
-                    {selectedPaymentId === method.id && (
-                      <div className="ms-auto w-7 h-7 rounded-full bg-[var(--primary)] flex items-center justify-center shadow-md shadow-[var(--primary)]/30">
-                        <Check size={16} className="text-white" />
+              <div className="p-4">
+                <div className="grid grid-cols-2 gap-2">
+                  {paymentMethods.map((method) => (
+                    <button
+                      key={method.id}
+                      onClick={() => setSelectedPaymentId(method.id)}
+                      className={clsx(
+                        'p-3 rounded-lg border-2 text-center transition-all',
+                        selectedPaymentId === method.id
+                          ? 'border-[var(--primary)] bg-[var(--primary)]/5'
+                          : 'border-slate-200 hover:border-slate-300'
+                      )}
+                    >
+                      <div className={clsx('mx-auto mb-1', selectedPaymentId === method.id ? 'text-[var(--primary)]' : 'text-slate-400')}>
+                        {method.icon}
                       </div>
-                    )}
-                  </button>
-                ))}
+                      <span className={clsx('text-sm font-medium', selectedPaymentId === method.id ? 'text-[var(--primary)]' : 'text-slate-700')}>
+                        {method.name}
+                      </span>
+                      {selectedPaymentId === method.id && (
+                        <div className="w-4 h-4 rounded-full bg-[var(--primary)] mx-auto mt-1.5 flex items-center justify-center">
+                          <Check size={10} className="text-white" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </Card>
+            </div>
 
             {/* Saved Cards Section (Thawani) */}
             {isThawaniPayment() && (
-              <Card variant="elevated">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                    <Wallet size={20} className="text-white" />
-                  </div>
-                  <h2 className="text-lg font-bold text-slate-800">{t('selectPaymentCard')}</h2>
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="px-4 py-3 bg-slate-50 border-b border-slate-200">
+                  <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                    <Wallet size={18} className="text-blue-500" />
+                    {t('selectPaymentCard')}
+                  </h3>
                 </div>
-                
-                {loadingCards ? (
-                  <div className="flex items-center justify-center py-10">
-                    <Loader2 size={28} className="animate-spin text-[var(--primary)]" />
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {/* Use New Card Option */}
-                    <button
-                      onClick={() => {
-                        setUseNewCard(true);
-                        setSelectedCardId(null);
-                      }}
-                      className={clsx(
-                        'w-full flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-200',
-                        useNewCard
-                          ? 'border-[var(--primary)] bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/5 shadow-md shadow-[var(--primary)]/10'
-                          : 'border-slate-200 hover:border-[var(--primary)]/40 hover:bg-slate-50'
-                      )}
-                    >
-                      <div className={clsx(
-                        'w-14 h-14 rounded-2xl flex items-center justify-center transition-all',
-                        useNewCard ? 'bg-[var(--primary)]/20 text-[var(--primary)]' : 'bg-slate-100 text-slate-400'
-                      )}>
-                        <Plus size={26} />
-                      </div>
-                      <div className="text-start flex-1 min-w-0">
-                        <span className={clsx(
-                          'font-bold text-base block',
-                          useNewCard ? 'text-[var(--primary)]' : 'text-slate-700'
-                        )}>
-                          {t('useNewCard')}
-                        </span>
-                        <p className="text-sm text-slate-500 mt-0.5">{t('enterCardDetails')}</p>
-                      </div>
-                      {useNewCard && (
-                        <div className="ms-auto w-7 h-7 rounded-full bg-[var(--primary)] flex items-center justify-center shadow-md shadow-[var(--primary)]/30">
-                          <Check size={16} className="text-white" />
-                        </div>
-                      )}
-                    </button>
-
-                    {/* Saved Cards */}
-                    {savedCards.map((card) => (
+                <div className="p-4">
+                  {loadingCards ? (
+                    <div className="flex items-center justify-center py-6">
+                      <Loader2 size={24} className="animate-spin text-[var(--primary)]" />
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
                       <button
-                        key={card.id}
-                        onClick={() => {
-                          setUseNewCard(false);
-                          setSelectedCardId(card.id);
-                        }}
+                        onClick={() => { setUseNewCard(true); setSelectedCardId(null); }}
                         className={clsx(
-                          'w-full flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-200',
-                          !useNewCard && selectedCardId === card.id
-                            ? 'border-[var(--primary)] bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/5 shadow-md shadow-[var(--primary)]/10'
-                            : 'border-slate-200 hover:border-[var(--primary)]/40 hover:bg-slate-50'
+                          'w-full p-3 rounded-lg border-2 text-start transition-all',
+                          useNewCard ? 'border-[var(--primary)] bg-[var(--primary)]/5' : 'border-slate-200 hover:border-slate-300'
                         )}
                       >
-                        <div className={clsx(
-                          'w-14 h-14 rounded-2xl flex items-center justify-center transition-all',
-                          !useNewCard && selectedCardId === card.id ? 'bg-[var(--primary)]/20 text-[var(--primary)]' : 'bg-slate-100 text-slate-400'
-                        )}>
-                          <CreditCard size={26} />
-                        </div>
-                        <div className="text-start flex-1 min-w-0">
-                          <span className={clsx(
-                            'font-bold text-base block',
-                            !useNewCard && selectedCardId === card.id ? 'text-[var(--primary)]' : 'text-slate-700'
-                          )}>
-                            {getCardBrandIcon(card.brand)}
-                          </span>
-                          <p className="text-sm text-slate-500 mt-0.5 font-mono">
-                            •••• •••• •••• {card.last_four} | {card.exp_month}/{card.exp_year}
-                          </p>
-                        </div>
-                        {card.is_default && (
-                          <Badge variant="primary" size="sm">{tCommon('default')}</Badge>
-                        )}
-                        {!useNewCard && selectedCardId === card.id && (
-                          <div className="w-7 h-7 rounded-full bg-[var(--primary)] flex items-center justify-center shadow-md shadow-[var(--primary)]/30">
-                            <Check size={16} className="text-white" />
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Plus size={18} className={useNewCard ? 'text-[var(--primary)]' : 'text-slate-400'} />
+                            <span className={clsx('font-medium text-sm', useNewCard ? 'text-[var(--primary)]' : 'text-slate-700')}>
+                              {t('useNewCard')}
+                            </span>
                           </div>
-                        )}
+                          {useNewCard && (
+                            <div className="w-4 h-4 rounded-full bg-[var(--primary)] flex items-center justify-center">
+                              <Check size={10} className="text-white" />
+                            </div>
+                          )}
+                        </div>
                       </button>
-                    ))}
 
-                    {savedCards.length === 0 && (
-                      <p className="text-center text-sm text-slate-400 py-6 bg-slate-50 rounded-xl">
-                        {t('noSavedCards')}
-                      </p>
-                    )}
-                  </div>
-                )}
-              </Card>
+                      {savedCards.map((card) => (
+                        <button
+                          key={card.id}
+                          onClick={() => { setUseNewCard(false); setSelectedCardId(card.id); }}
+                          className={clsx(
+                            'w-full p-3 rounded-lg border-2 text-start transition-all',
+                            !useNewCard && selectedCardId === card.id ? 'border-[var(--primary)] bg-[var(--primary)]/5' : 'border-slate-200 hover:border-slate-300'
+                          )}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <span className={clsx('font-medium text-sm', !useNewCard && selectedCardId === card.id ? 'text-[var(--primary)]' : 'text-slate-700')}>
+                                {getCardBrandIcon(card.brand)}
+                              </span>
+                              <p className="text-xs text-slate-500 font-mono mt-0.5">•••• {card.last_four}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {card.is_default && <Badge variant="primary" size="sm">{tCommon('default')}</Badge>}
+                              {!useNewCard && selectedCardId === card.id && (
+                                <div className="w-4 h-4 rounded-full bg-[var(--primary)] flex items-center justify-center">
+                                  <Check size={10} className="text-white" />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+
+                      {savedCards.length === 0 && (
+                        <p className="text-center text-xs text-slate-400 py-4 bg-slate-50 rounded-lg">{t('noSavedCards')}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
 
             {/* Order Notes */}
-            <Card variant="elevated">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center">
-                  <ShoppingBag size={20} className="text-white" />
-                </div>
-                <h2 className="text-lg font-bold text-slate-800">{t('orderNotes')}</h2>
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="px-4 py-3 bg-slate-50 border-b border-slate-200">
+                <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                  <FileText size={18} className="text-rose-500" />
+                  {t('orderNotes')}
+                </h3>
               </div>
-              <textarea
-                value={orderNote}
-                onChange={(e) => setOrderNote(e.target.value)}
-                placeholder={t('orderNotesPlaceholder')}
-                rows={4}
-                className="w-full px-5 py-4 border-2 border-slate-200 rounded-xl bg-white resize-none focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--primary)]/10 outline-none transition-all text-slate-700 placeholder:text-slate-400"
-              />
-            </Card>
-          </motion.div>
-
-          {/* Order Summary */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="lg:col-span-2"
-          >
-            <Card variant="elevated" className="sticky top-24">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
-                  <ShoppingBag size={20} className="text-white" />
-                </div>
-                <h2 className="text-lg font-bold text-slate-800">{t('orderSummary')}</h2>
+              <div className="p-4">
+                <textarea
+                  value={orderNote}
+                  onChange={(e) => setOrderNote(e.target.value)}
+                  placeholder={t('orderNotesPlaceholder')}
+                  rows={3}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-white resize-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none text-sm"
+                />
               </div>
+            </div>
+          </div>
 
-              {/* Shop Info */}
-              {cart.shop && (
-                <div className="flex items-center gap-4 p-4 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-xl mb-5">
-                  {cart.shop.logo_img && (
-                    <Image
-                      src={cart.shop.logo_img}
-                      alt={cart.shop.translation?.title || ''}
-                      width={56}
-                      height={56}
-                      className="rounded-xl shadow-sm"
-                    />
-                  )}
-                  <div>
-                    <p className="font-bold text-slate-800">{cart.shop.translation?.title}</p>
-                    <p className="text-sm text-slate-500 mt-0.5">{itemCount} {tCart('items')}</p>
-                  </div>
+          {/* Order Summary Sidebar - Takes 4 columns on large screens */}
+          <div className="lg:col-span-4">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden lg:sticky lg:top-24">
+              {/* Header */}
+              <div className="bg-[var(--primary)] text-white px-4 py-4">
+                <div className="flex items-center gap-3">
+                  <ShoppingBag size={20} />
+                  <h2 className="font-bold">{t('orderSummary')}</h2>
                 </div>
-              )}
-
-              {/* Cart Items Preview */}
-              <div className="py-5 border-y border-slate-200 space-y-3 max-h-52 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200">
-                {cartItems.slice(0, 5).map((item) => (
-                  <div key={item.id} className="flex items-center justify-between text-sm px-1">
-                    <span className="text-slate-500">
-                      <span className="inline-flex items-center justify-center w-6 h-6 bg-slate-100 rounded-md text-xs font-bold text-slate-600 me-2">
-                        {item.quantity}
-                      </span>
-                      {t('item')} #{item.stock?.id}
-                    </span>
-                    <span className="text-slate-700 font-semibold">
-                      {tCommon('sar')} {(item.price * item.quantity).toFixed(2)}
-                    </span>
+                {cart.shop && (
+                  <div className="flex items-center gap-3 mt-3 pt-3 border-t border-white/20">
+                    {cart.shop.logo_img && (
+                      <Image
+                        src={cart.shop.logo_img}
+                        alt={cart.shop.translation?.title || ''}
+                        width={40}
+                        height={40}
+                        className="rounded-lg w-10 h-10 object-cover bg-white"
+                      />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{cart.shop.translation?.title}</p>
+                      <p className="text-xs text-white/70">{itemCount} {tCart('items')}</p>
+                    </div>
                   </div>
-                ))}
-                {cartItems.length > 5 && (
-                  <p className="text-sm text-slate-400 text-center pt-2">
-                    +{cartItems.length - 5} {t('moreItems')}
-                  </p>
                 )}
               </div>
 
-              {/* Coupon */}
-              <div className="py-5 border-b border-slate-200">
-                {appliedCoupon ? (
-                  <div className="flex items-center justify-between p-4 bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border border-emerald-200">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
-                        <Ticket size={18} className="text-emerald-600" />
-                      </div>
-                      <span className="text-sm font-semibold text-emerald-700">
-                        {tCart('couponApplied')}: {appliedCoupon}
+              <div className="p-5">
+                {/* Cart Items */}
+                <div className="space-y-2 mb-4 max-h-32 overflow-y-auto">
+                  {cartItems.slice(0, 3).map((item) => (
+                    <div key={item.id} className="flex items-center justify-between text-sm">
+                      <span className="text-slate-600 flex items-center gap-2">
+                        <span className="w-5 h-5 bg-slate-100 rounded text-xs font-semibold flex items-center justify-center">
+                          {item.quantity}
+                        </span>
+                        <span className="truncate max-w-[120px]">{t('item')} #{item.stock?.id}</span>
+                      </span>
+                      <span className="text-slate-800 font-medium">
+                        {tCommon('sar')} {(item.price * item.quantity).toFixed(2)}
                       </span>
                     </div>
-                    <button
-                      onClick={handleRemoveCoupon}
-                      className="text-sm font-medium text-red-500 hover:text-red-600 hover:underline transition-colors"
-                    >
-                      {tCommon('delete')}
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex gap-3">
-                    <Input
-                      placeholder={tCart('couponCode')}
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
-                      leftIcon={<Ticket size={18} />}
-                      error={couponError}
-                      containerClassName="flex-1"
-                    />
-                    <Button
-                      variant="outline"
-                      onClick={handleApplyCoupon}
-                      isLoading={couponLoading}
-                      className="shrink-0"
-                    >
-                      {tCart('apply')}
-                    </Button>
-                  </div>
-                )}
-              </div>
-
-              {/* Price Breakdown */}
-              <div className="py-5 space-y-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-500">{tCart('subtotal')}</span>
-                  <span className="text-slate-700 font-medium">
-                    {tCommon('sar')} {subtotal.toFixed(2)}
-                  </span>
+                  ))}
+                  {cartItems.length > 3 && (
+                    <p className="text-xs text-slate-400 text-center">+{cartItems.length - 3} {t('moreItems')}</p>
+                  )}
                 </div>
 
-                {deliveryType === 'delivery' && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">{tCart('deliveryFee')}</span>
-                    <span className="text-slate-700 font-medium">
-                      {calculateLoading ? (
-                        <Loader2 size={14} className="animate-spin text-[var(--primary)]" />
-                      ) : calculatedPrices?.delivery_fee ? (
-                        `${tCommon('sar')} ${calculatedPrices.delivery_fee.toFixed(2)}`
-                      ) : (
-                        <span className="text-slate-400 italic">{t('calculated')}</span>
-                      )}
-                    </span>
-                  </div>
-                )}
+                {/* Coupon */}
+                <div className="py-4 border-y border-slate-100">
+                  {appliedCoupon ? (
+                    <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <Ticket size={16} className="text-emerald-600" />
+                        <span className="text-sm font-medium text-emerald-700">{appliedCoupon}</span>
+                      </div>
+                      <button onClick={handleRemoveCoupon} className="text-xs text-red-500 hover:text-red-600">
+                        {tCommon('delete')}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder={tCart('couponCode')}
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                        leftIcon={<Ticket size={14} />}
+                        error={couponError}
+                        containerClassName="flex-1"
+                        className="text-sm py-2"
+                      />
+                      <Button
+                        variant="outline"
+                        onClick={handleApplyCoupon}
+                        isLoading={couponLoading}
+                        className="shrink-0 text-sm px-3"
+                      >
+                        {tCart('apply')}
+                      </Button>
+                    </div>
+                  )}
+                </div>
 
-                {calculatedPrices?.service_fee && calculatedPrices.service_fee > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">{tCart('serviceFee')}</span>
-                    <span className="text-slate-700 font-medium">
-                      {tCommon('sar')} {calculatedPrices.service_fee.toFixed(2)}
-                    </span>
+                {/* Price Breakdown */}
+                <div className="py-4 space-y-2.5 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">{tCart('subtotal')}</span>
+                    <span className="text-slate-700 font-medium">{tCommon('sar')} {subtotal.toFixed(2)}</span>
                   </div>
-                )}
 
-                {calculatedPrices?.tax && calculatedPrices.tax > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">{t('tax')}</span>
-                    <span className="text-slate-700 font-medium">
-                      {tCommon('sar')} {calculatedPrices.tax.toFixed(2)}
-                    </span>
-                  </div>
-                )}
+                  {deliveryType === 'delivery' && (
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">{tCart('deliveryFee')}</span>
+                      <span className="text-slate-700 font-medium">
+                        {calculateLoading ? (
+                          <Loader2 size={14} className="animate-spin text-[var(--primary)]" />
+                        ) : calculatedPrices?.delivery_fee ? (
+                          `${tCommon('sar')} ${calculatedPrices.delivery_fee.toFixed(2)}`
+                        ) : (
+                          <span className="text-slate-400 text-xs">{t('calculated')}</span>
+                        )}
+                      </span>
+                    </div>
+                  )}
 
-                {(calculatedPrices?.discount || calculatedPrices?.coupon_price) && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-emerald-600">{tCart('discount')}</span>
-                    <span className="text-emerald-600 font-semibold">
-                      -{tCommon('sar')} {((calculatedPrices.discount || 0) + (calculatedPrices.coupon_price || 0)).toFixed(2)}
-                    </span>
-                  </div>
-                )}
+                  {(calculatedPrices?.discount || calculatedPrices?.coupon_price) && (
+                    <div className="flex justify-between text-emerald-600">
+                      <span>{tCart('discount')}</span>
+                      <span className="font-semibold">
+                        -{tCommon('sar')} {((calculatedPrices.discount || 0) + (calculatedPrices.coupon_price || 0)).toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Total */}
+                <div className="flex justify-between items-center py-4 border-t-2 border-slate-200 bg-slate-50 -mx-5 px-5">
+                  <span className="text-base font-bold text-slate-800">{tCart('total')}</span>
+                  <span className="text-2xl font-black text-[var(--primary)]">
+                    {(calculatedPrices?.total_price || cart.total_price || subtotal).toFixed(2)} {tCommon('sar')}
+                  </span>
+                </div>
               </div>
 
-              {/* Total */}
-              <div className="flex justify-between py-5 border-t-2 border-slate-200 mb-6">
-                <span className="text-xl font-bold text-slate-800">{tCart('total')}</span>
-                <span className="text-xl font-bold text-[var(--primary)]">
-                  {tCommon('sar')} {(calculatedPrices?.total_price || cart.total_price || subtotal).toFixed(2)}
-                </span>
+              {/* Place Order Button - FIXED AT BOTTOM */}
+              <div className="p-4 border-t border-slate-200" style={{ backgroundColor: '#f97316' }}>
+                <button
+                  onClick={handlePlaceOrder}
+                  disabled={
+                    (deliveryType === 'delivery' && !selectedAddressId) ||
+                    !selectedPaymentId ||
+                    submitting
+                  }
+                  style={{
+                    backgroundColor: (submitting || (deliveryType === 'delivery' && !selectedAddressId) || !selectedPaymentId) ? '#cbd5e1' : '#ea580c',
+                    color: (submitting || (deliveryType === 'delivery' && !selectedAddressId) || !selectedPaymentId) ? '#64748b' : '#ffffff',
+                  }}
+                  className="w-full py-5 rounded-xl font-black text-lg flex items-center justify-center gap-3 transition-all shadow-xl hover:opacity-90 active:scale-[0.98]"
+                >
+                  {submitting ? (
+                    <Loader2 size={24} className="animate-spin" />
+                  ) : (
+                    <>
+                      <ShoppingBag size={22} />
+                      <span>{t('placeOrder')}</span>
+                      {isRTL ? <ArrowLeft size={20} /> : <ArrowRight size={20} />}
+                    </>
+                  )}
+                </button>
+                
+                {/* Security Badge */}
+                <div className="mt-3 flex items-center justify-center gap-2 text-xs text-white">
+                  <Shield size={14} />
+                  <span>دفع آمن ومشفر 100%</span>
+                </div>
               </div>
-
-              {/* Place Order Button */}
-              <Button
-                fullWidth
-                size="lg"
-                onClick={handlePlaceOrder}
-                isLoading={submitting}
-                disabled={
-                  (deliveryType === 'delivery' && !selectedAddressId) ||
-                  !selectedPaymentId ||
-                  submitting
-                }
-                rightIcon={isRTL ? <ArrowLeft size={20} /> : <ArrowRight size={20} />}
-                className="shadow-lg shadow-[var(--primary)]/30 hover:shadow-xl hover:shadow-[var(--primary)]/40 transition-all"
-              >
-                {t('placeOrder')}
-              </Button>
-
-              {/* Back to Cart */}
-              <Link href="/cart" className="block mt-4">
-                <Button variant="ghost" fullWidth className="text-slate-500 hover:text-slate-700">
-                  {tCommon('back')} {tCommon('cart')}
-                </Button>
-              </Link>
-            </Card>
-          </motion.div>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Fixed Bottom Bar for Mobile */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 lg:hidden z-50 shadow-2xl" style={{ backgroundColor: '#ea580c' }}>
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm text-white/80">{tCart('total')}</span>
+          <span className="text-xl font-black text-white">
+            {(calculatedPrices?.total_price || cart.total_price || subtotal).toFixed(2)} {tCommon('sar')}
+          </span>
+        </div>
+        <button
+          onClick={handlePlaceOrder}
+          disabled={
+            (deliveryType === 'delivery' && !selectedAddressId) ||
+            !selectedPaymentId ||
+            submitting
+          }
+          style={{
+            backgroundColor: (submitting || (deliveryType === 'delivery' && !selectedAddressId) || !selectedPaymentId) ? '#cbd5e1' : '#ffffff',
+            color: (submitting || (deliveryType === 'delivery' && !selectedAddressId) || !selectedPaymentId) ? '#64748b' : '#ea580c',
+          }}
+          className="w-full py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-all shadow-lg"
+        >
+          {submitting ? (
+            <Loader2 size={20} className="animate-spin" />
+          ) : (
+            <>
+              <ShoppingBag size={20} />
+              <span>{t('placeOrder')}</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Spacer for fixed bottom bar on mobile */}
+      <div className="h-32 lg:hidden" />
 
       {/* OTP Verification Modal */}
       <Modal
@@ -1213,12 +1314,12 @@ const CheckoutPage = () => {
         onClose={handleCancelOtpVerification}
         title={t('otpVerification')}
       >
-        <div className="space-y-8 p-2">
+        <div className="space-y-6 sm:space-y-8 p-1 sm:p-2">
           <div className="text-center">
-            <div className="w-20 h-20 mx-auto mb-5 bg-gradient-to-br from-[var(--primary)]/20 to-[var(--primary)]/10 rounded-2xl flex items-center justify-center">
-              <CreditCard size={36} className="text-[var(--primary)]" />
+            <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-5 bg-gradient-to-br from-[var(--primary)]/20 to-[var(--primary)]/10 rounded-2xl flex items-center justify-center">
+              <CreditCard size={32} className="text-[var(--primary)]" />
             </div>
-            <p className="text-slate-500 leading-relaxed">{t('enterOtpDescription')}</p>
+            <p className="text-sm sm:text-base text-slate-500 leading-relaxed px-2">{t('enterOtpDescription')}</p>
           </div>
 
           <div>
@@ -1232,19 +1333,19 @@ const CheckoutPage = () => {
               }}
               error={otpError}
               maxLength={6}
-              className="text-center text-2xl tracking-[0.5em] font-bold"
+              className="text-center text-xl sm:text-2xl tracking-[0.4em] sm:tracking-[0.5em] font-bold"
               inputMode="numeric"
               pattern="[0-9]*"
             />
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-3 sm:gap-4">
             <Button
               variant="outline"
               fullWidth
               onClick={handleCancelOtpVerification}
               disabled={otpVerifying}
-              className="border-2"
+              className="border-2 text-sm sm:text-base"
             >
               {tCommon('cancel')}
             </Button>
@@ -1253,13 +1354,13 @@ const CheckoutPage = () => {
               onClick={handleVerifyOtp}
               isLoading={otpVerifying}
               disabled={!otpCode.trim() || otpCode.length < 4}
-              className="shadow-lg shadow-[var(--primary)]/30"
+              className="shadow-lg shadow-[var(--primary)]/30 text-sm sm:text-base"
             >
               {t('verifyOtp')}
             </Button>
           </div>
 
-          <p className="text-center text-sm text-slate-500">
+          <p className="text-center text-xs sm:text-sm text-slate-500">
             {t('otpNotReceived')}{' '}
             <button className="text-[var(--primary)] font-semibold hover:underline transition-all">
               {t('resendOtp')}

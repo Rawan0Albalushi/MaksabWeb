@@ -239,7 +239,17 @@
     "removeItem": "حذف المنتج",
     "quantity": "الكمية",
     "pricePerItem": "سعر الوحدة",
-    "from": "من"
+    "from": "من",
+    "secureCheckout": "دفع آمن",
+    "fastDelivery": "توصيل سريع",
+    "whyShopWithUs": "لماذا تتسوق معنا؟",
+    "offers": "عروض",
+    "delivery": "توصيل",
+    "secure": "آمن",
+    "securePayment": "دفع آمن ومشفر",
+    "deliveryTime": "خلال ساعة",
+    "guarantee": "ضمان الجودة",
+    "moneyBack": "استرجاع المبلغ"
   },
   "checkout": {
     "title": "إتمام الطلب",
