@@ -32,7 +32,6 @@ import { AddressSelector } from '@/components/address';
 import { shopService } from '@/services';
 import { Banner, Category, Shop, Story } from '@/types';
 import { useSettingsStore, useLocationStore, useAuthStore } from '@/store';
-import { demoBanners } from '@/utils/demoData';
 
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -64,7 +63,7 @@ const HomePage = () => {
     try {
       const results = await Promise.allSettled([
         shopService.getBanners({ perPage: 10 }),
-        shopService.getCategories({ perPage: 12 }),
+        shopService.getCategories(), // Gets parent categories only (no pagination)
         shopService.getStories({ perPage: 20 }),
       ]);
 
@@ -73,13 +72,19 @@ const HomePage = () => {
       // Banners
       if (bannersRes.status === 'fulfilled' && bannersRes.value.data?.length > 0) {
         setBanners(bannersRes.value.data);
-      } else {
-        setBanners(demoBanners);
       }
 
-      // Categories
-      if (categoriesRes.status === 'fulfilled' && categoriesRes.value.data?.length > 0) {
-        setCategories(categoriesRes.value.data);
+      // Categories - Debug logging
+      console.log('Categories Response:', categoriesRes);
+      if (categoriesRes.status === 'fulfilled') {
+        console.log('Categories Data:', categoriesRes.value);
+        if (categoriesRes.value.data?.length > 0) {
+          setCategories(categoriesRes.value.data);
+        } else {
+          console.warn('Categories API returned empty data');
+        }
+      } else {
+        console.error('Categories API failed:', categoriesRes.reason);
       }
 
       // Stories
@@ -88,7 +93,6 @@ const HomePage = () => {
       }
     } catch (error) {
       console.error('Error fetching static data:', error);
-      setBanners(demoBanners);
     }
   }, []);
 
@@ -490,13 +494,7 @@ const HomePage = () => {
       {/* Categories Section */}
       <section className="pt-6 pb-8 sm:pt-12 sm:pb-16 lg:pt-16 lg:pb-20 bg-[var(--main-bg)]">
         <div className="container">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-50px' }}
-            variants={fadeInUp}
-            className="flex items-center justify-between mb-5 sm:mb-10"
-          >
+          <div className="flex items-center justify-between mb-5 sm:mb-10">
             <div>
               <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[var(--black)] mb-1 sm:mb-2">
                 {t('categories')}
@@ -511,28 +509,24 @@ const HomePage = () => {
               {isRTL ? <ChevronLeft size={14} className="sm:hidden" /> : <ChevronRight size={14} className="sm:hidden" />}
               {isRTL ? <ChevronLeft size={16} className="hidden sm:block" /> : <ChevronRight size={16} className="hidden sm:block" />}
             </Link>
-          </motion.div>
+          </div>
 
           {loading ? (
-            <div className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 sm:gap-4 lg:gap-6">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 sm:gap-4 lg:gap-6">
               {Array.from({ length: 10 }).map((_, i) => (
                 <CategorySkeleton key={i} />
               ))}
             </div>
+          ) : categories.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-[var(--text-grey)]">لا توجد تصنيفات متاحة</p>
+            </div>
           ) : (
-            <motion.div
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 sm:gap-4 lg:gap-6"
-            >
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 sm:gap-4 lg:gap-6">
               {categories.map((category) => (
-                <motion.div key={category.id} variants={scaleIn}>
-                  <CategoryCard category={category} />
-                </motion.div>
+                <CategoryCard key={category.id} category={category} />
               ))}
-            </motion.div>
+            </div>
           )}
         </div>
       </section>

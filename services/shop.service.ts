@@ -46,13 +46,30 @@ const formatParams = (params?: { page?: number; perPage?: number }) => {
 };
 
 export const shopService = {
-  // Get main categories with children (subcategories)
-  getCategories: async (params?: { page?: number; perPage?: number }): Promise<PaginatedResponse<Category>> => {
+  // Get main/parent categories only (parent_id = null)
+  getCategories: async (): Promise<PaginatedResponse<Category>> => {
+    return get('/api/v1/rest/categories/parent', { type: 'main' });
+  },
+
+  // Get categories with pagination and type filter
+  getCategoriesPaginate: async (params?: { page?: number; perPage?: number; type?: string }): Promise<PaginatedResponse<Category>> => {
     const apiParams = {
       ...formatParams(params),
-      type: 'main',
+      type: params?.type || 'main',
     };
     return get('/api/v1/rest/categories/paginate', apiParams);
+  },
+
+  // Get children categories for a specific parent
+  getChildCategories: async (parentId: number): Promise<PaginatedResponse<Category>> => {
+    return get(`/api/v1/rest/categories/children/${parentId}`);
+  },
+
+  // Search categories
+  searchCategories: async (search: string, type?: string): Promise<PaginatedResponse<Category>> => {
+    const params: Record<string, unknown> = { search };
+    if (type) params.type = type;
+    return get('/api/v1/rest/categories/search', params);
   },
 
   // Get shops with pagination and filters

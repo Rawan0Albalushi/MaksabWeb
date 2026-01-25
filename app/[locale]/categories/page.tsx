@@ -2,14 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
 import { Search } from 'lucide-react';
 
 import { CategorySkeleton } from '@/components/ui';
 import { CategoryCard } from '@/components/cards';
 import { shopService } from '@/services';
 import { Category } from '@/types';
-import { demoCategories } from '@/utils/demoData';
 
 const CategoriesPage = () => {
   const t = useTranslations('common');
@@ -25,19 +23,17 @@ const CategoriesPage = () => {
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const response = await shopService.getCategories({ perPage: 50 });
+      console.log('Fetching categories...');
+      const response = await shopService.getCategories(); // Gets parent categories only
+      console.log('Categories response:', response);
       if (response.data && response.data.length > 0) {
         setCategories(response.data);
+        console.log('Categories set:', response.data.length);
       } else {
-        // Use demo data if API returns empty
-        setCategories(demoCategories);
+        console.warn('No categories returned from API');
       }
     } catch (error) {
-      // Use demo data as fallback when API fails
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('Using demo data for categories - API failed:', error);
-      }
-      setCategories(demoCategories);
+      console.error('Error fetching categories:', error);
     } finally {
       setLoading(false);
     }
@@ -46,19 +42,6 @@ const CategoriesPage = () => {
   const filteredCategories = categories.filter((cat) =>
     cat.translation?.title?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: { opacity: 1, scale: 1 },
-  };
 
   return (
     <div className="min-h-screen bg-[var(--main-bg)] py-8">
@@ -92,7 +75,7 @@ const CategoriesPage = () => {
 
         {/* Categories Grid */}
         {loading ? (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4 md:gap-6">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-4 md:gap-6">
             {Array.from({ length: 16 }).map((_, i) => (
               <CategorySkeleton key={i} />
             ))}
@@ -102,18 +85,11 @@ const CategoriesPage = () => {
             <p className="text-[var(--text-grey)]">لا توجد تصنيفات مطابقة</p>
           </div>
         ) : (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4 md:gap-6"
-          >
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-4 md:gap-6">
             {filteredCategories.map((category) => (
-              <motion.div key={category.id} variants={itemVariants}>
-                <CategoryCard category={category} />
-              </motion.div>
+              <CategoryCard key={category.id} category={category} />
             ))}
-          </motion.div>
+          </div>
         )}
 
         {/* Featured Categories - Large Cards */}
