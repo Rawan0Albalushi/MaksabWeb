@@ -1,0 +1,1917 @@
+{
+	"info": {
+		"_postman_id": "maksab-api-collection-v1",
+		"name": "Maksab Backend API",
+		"description": "Complete API collection for Maksab Backend - Food Delivery & E-commerce Platform",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "{{base_url}}/api/v1"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"description": "User authentication endpoints - Register, Login, Verify, Password Reset",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstname\": \"John\",\n    \"lastname\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"phone\": \"+968123456789\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"gender\": \"male\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "register"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "Created",
+							"code": 201,
+							"body": "{\n    \"status\": true,\n    \"message\": \"Successfully registered\",\n    \"data\": {\n        \"access_token\": \"1|abc123...\",\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": 1,\n            \"uuid\": \"abc-123-def\",\n            \"firstname\": \"John\",\n            \"lastname\": \"Doe\",\n            \"email\": \"john.doe@example.com\"\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Register with Phone",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"+968123456789\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register/phone",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "register", "phone"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": true,\n    \"message\": \"OTP sent successfully\",\n    \"data\": {\n        \"verifyId\": \"verification_id_here\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Verify Phone OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"+968123456789\",\n    \"otp\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/verify/phone/otp",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "verify", "phone", "otp"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": true,\n    \"message\": \"Successfully logged in\",\n    \"data\": {\n        \"access_token\": \"1|abc123...\",\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": 1,\n            \"uuid\": \"abc-123-def\",\n            \"firstname\": \"John\",\n            \"lastname\": \"Doe\",\n            \"email\": \"john.doe@example.com\",\n            \"role\": \"user\"\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Check Phone",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"+968123456789\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/check/phone",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "check", "phone"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/logout",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "logout"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Phone",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"+968123456789\",\n    \"verifyId\": \"verification_id_here\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/verify/phone",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "verify", "phone"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Resend Verify",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john.doe@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/resend-verify",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "resend-verify"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Resend OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"+968123456789\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/resend-otp",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "resend-otp"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"+968123456789\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/forgot/password",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "forgot", "password"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password Confirm",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"+968123456789\",\n    \"verifyId\": \"verification_id\",\n    \"password\": \"newpassword123\",\n    \"password_confirmation\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/forgot/password/confirm",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "forgot", "password", "confirm"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john.doe@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/forgot/email-password",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "forgot", "email-password"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Social Login Callback",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"social_provider_token\",\n    \"id\": \"social_user_id\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/google/callback",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "google", "callback"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST - Settings & Config",
+			"description": "Public endpoints for app settings and configuration",
+			"item": [
+				{
+					"name": "Get Settings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/rest/settings",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "settings"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": true,\n    \"data\": {\n        \"title\": \"Maksab\",\n        \"currency\": \"OMR\",\n        \"default_lang\": \"en\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Project Version",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/project/version",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "project", "version"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Timezone",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/timezone",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "timezone"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Translations",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/translations/paginate?lang=en",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "translations", "paginate"],
+							"query": [{"key": "lang", "value": "en"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Referral Info",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/referral",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "referral"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get System Information",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/system/information",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "system", "information"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST - Languages",
+			"description": "Language management endpoints",
+			"item": [
+				{
+					"name": "Get All Languages",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/languages",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "languages"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": true,\n    \"data\": [\n        {\"id\": 1, \"title\": \"English\", \"locale\": \"en\", \"default\": true},\n        {\"id\": 2, \"title\": \"Arabic\", \"locale\": \"ar\", \"default\": false}\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Active Languages",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/languages/active",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "languages", "active"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Default Language",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/languages/default",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "languages", "default"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Language by ID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/languages/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "languages", "1"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST - Currencies",
+			"description": "Currency management endpoints",
+			"item": [
+				{
+					"name": "Get All Currencies",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/currencies",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "currencies"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": true,\n    \"data\": [\n        {\"id\": 1, \"title\": \"Omani Rial\", \"symbol\": \"OMR\", \"rate\": 1}\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Active Currencies",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/currencies/active",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "currencies", "active"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST - Products",
+			"description": "Product catalog endpoints",
+			"item": [
+				{
+					"name": "Get Products Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/products/paginate?perPage=15&page=1&lang=en",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "products", "paginate"],
+							"query": [
+								{"key": "perPage", "value": "15"},
+								{"key": "page", "value": "1"},
+								{"key": "lang", "value": "en"}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": true,\n    \"data\": [\n        {\n            \"id\": 1,\n            \"uuid\": \"abc-123\",\n            \"shop_id\": 1,\n            \"category_id\": 1,\n            \"brand_id\": null,\n            \"min_price\": 5.00,\n            \"max_price\": 10.00,\n            \"translation\": {\n                \"title\": \"Product Name\",\n                \"description\": \"Product description\"\n            }\n        }\n    ],\n    \"meta\": {\n        \"current_page\": 1,\n        \"per_page\": 15,\n        \"total\": 100\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Product by UUID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/products/:uuid?lang=en",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "products", ":uuid"],
+							"variable": [{"key": "uuid", "value": "product-uuid-here"}],
+							"query": [{"key": "lang", "value": "en"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product by Slug",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/products/slug/:slug",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "products", "slug", ":slug"],
+							"variable": [{"key": "slug", "value": "product-slug"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Products",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/products/search?search=burger&lang=en",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "products", "search"],
+							"query": [
+								{"key": "search", "value": "burger"},
+								{"key": "lang", "value": "en"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Products by Shop",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/products/shop/:uuid?lang=en",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "products", "shop", ":uuid"],
+							"variable": [{"key": "uuid", "value": "shop-uuid"}],
+							"query": [{"key": "lang", "value": "en"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Products by Category",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/products/category/:uuid?lang=en",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "products", "category", ":uuid"],
+							"variable": [{"key": "uuid", "value": "category-uuid"}],
+							"query": [{"key": "lang", "value": "en"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Products by Brand",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/products/brand/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "products", "brand", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Most Sold Products",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/products/most-sold?lang=en",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "products", "most-sold"],
+							"query": [{"key": "lang", "value": "en"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Discount Products",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/products/discount?lang=en",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "products", "discount"],
+							"query": [{"key": "lang", "value": "en"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product Reviews",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/products/reviews/:uuid",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "products", "reviews", ":uuid"],
+							"variable": [{"key": "uuid", "value": "product-uuid"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Product Review",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 5,\n    \"comment\": \"Great product!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/rest/products/review/:uuid",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "products", "review", ":uuid"],
+							"variable": [{"key": "uuid", "value": "product-uuid"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Calculate Order Stocks",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/order/products/calculate",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "order", "products", "calculate"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST - Categories",
+			"description": "Category management endpoints",
+			"item": [
+				{
+					"name": "Get Categories Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/categories/paginate?perPage=15&lang=en",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "categories", "paginate"],
+							"query": [
+								{"key": "perPage", "value": "15"},
+								{"key": "lang", "value": "en"}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": true,\n    \"data\": [\n        {\n            \"id\": 1,\n            \"uuid\": \"cat-123\",\n            \"type\": \"main\",\n            \"translation\": {\n                \"title\": \"Food\"\n            }\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Category Types",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/categories/types",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "categories", "types"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Parent Categories",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/categories/parent?lang=en",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "categories", "parent"],
+							"query": [{"key": "lang", "value": "en"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Children Categories",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/categories/children/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "categories", "children", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Category by UUID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/categories/:uuid",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "categories", ":uuid"],
+							"variable": [{"key": "uuid", "value": "category-uuid"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Categories",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/categories/search?search=food",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "categories", "search"],
+							"query": [{"key": "search", "value": "food"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shop Categories",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/categories/shop/paginate?shop_id=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "categories", "shop", "paginate"],
+							"query": [{"key": "shop_id", "value": "1"}]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST - Shops",
+			"description": "Shop/Restaurant endpoints",
+			"item": [
+				{
+					"name": "Get Shops Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/shops/paginate?perPage=15&lang=en",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "shops", "paginate"],
+							"query": [
+								{"key": "perPage", "value": "15"},
+								{"key": "lang", "value": "en"}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": true,\n    \"data\": [\n        {\n            \"id\": 1,\n            \"uuid\": \"shop-123\",\n            \"status\": \"approved\",\n            \"open\": true,\n            \"translation\": {\n                \"title\": \"Restaurant Name\",\n                \"description\": \"Description\"\n            },\n            \"location\": {\n                \"latitude\": 23.5880,\n                \"longitude\": 58.3829\n            }\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Shop by UUID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/shops/:uuid?lang=en",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "shops", ":uuid"],
+							"variable": [{"key": "uuid", "value": "shop-uuid"}],
+							"query": [{"key": "lang", "value": "en"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Shops",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/shops/search?search=restaurant",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "shops", "search"],
+							"query": [{"key": "search", "value": "restaurant"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Recommended Shops",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/shops/recommended",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "shops", "recommended"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shop Categories",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/shops/:id/categories",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "shops", ":id", "categories"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shop Products",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/shops/:id/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "shops", ":id", "products"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shop Products Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/shops/:id/products/paginate?perPage=15",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "shops", ":id", "products", "paginate"],
+							"variable": [{"key": "id", "value": "1"}],
+							"query": [{"key": "perPage", "value": "15"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shop Reviews",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/shops/:id/reviews",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "shops", ":id", "reviews"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Shop Review",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 5,\n    \"comment\": \"Great restaurant!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/rest/shops/review/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "shops", "review", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shop Galleries",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/shops/:id/galleries",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "shops", ":id", "galleries"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shop Payments",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/shop-payments/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "shop-payments", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Shop Working",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/shop-working-check/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "shop-working-check", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST - Brands",
+			"description": "Brand endpoints",
+			"item": [
+				{
+					"name": "Get Brands Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/brands/paginate?perPage=15",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "brands", "paginate"],
+							"query": [{"key": "perPage", "value": "15"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Brand by ID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/brands/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "brands", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST - Banners",
+			"description": "Banner/Advertising endpoints",
+			"item": [
+				{
+					"name": "Get Banners Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/banners/paginate?perPage=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "banners", "paginate"],
+							"query": [{"key": "perPage", "value": "10"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Banner by ID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/banners/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "banners", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Like Banner",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/rest/banners/:id/liked",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "banners", ":id", "liked"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST - Coupons",
+			"description": "Coupon/Discount endpoints",
+			"item": [
+				{
+					"name": "Get Coupons",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/coupons",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "coupons"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Coupon",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"coupon\": \"DISCOUNT10\",\n    \"shop_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/rest/coupons/check",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "coupons", "check"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": true,\n    \"data\": {\n        \"id\": 1,\n        \"name\": \"DISCOUNT10\",\n        \"type\": \"percent\",\n        \"price\": 10\n    }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "REST - Cart",
+			"description": "Shopping cart endpoints",
+			"item": [
+				{
+					"name": "Create Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"shop_id\": 1,\n    \"currency_id\": 1,\n    \"rate\": 1,\n    \"products\": [\n        {\n            \"stock_id\": 1,\n            \"quantity\": 2\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/rest/cart",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "cart"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cart",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/cart/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "cart", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insert Products to Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cart_id\": 1,\n    \"products\": [\n        {\n            \"stock_id\": 2,\n            \"quantity\": 1\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/rest/cart/insert-product",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "cart", "insert-product"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Open Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cart_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/rest/cart/open",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "cart", "open"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Cart Product",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/cart/product/delete?ids[]=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "cart", "product", "delete"],
+							"query": [{"key": "ids[]", "value": "1"}]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST - Orders",
+			"description": "Order management endpoints",
+			"item": [
+				{
+					"name": "Get Orders",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "orders"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cart_id\": 1,\n    \"currency_id\": 1,\n    \"rate\": 1,\n    \"shop_id\": 1,\n    \"delivery_type\": \"delivery\",\n    \"delivery_date\": \"2024-01-15\",\n    \"delivery_time\": \"14:00\",\n    \"payment_id\": 1,\n    \"location\": {\n        \"latitude\": 23.5880,\n        \"longitude\": 58.3829,\n        \"address\": \"123 Main Street\"\n    },\n    \"phone\": \"+968123456789\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/rest/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "orders"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "Created",
+							"code": 201,
+							"body": "{\n    \"status\": true,\n    \"message\": \"Order created successfully\",\n    \"data\": {\n        \"id\": 1,\n        \"user_id\": 1,\n        \"total_price\": 25.50,\n        \"status\": \"new\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/orders/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "orders", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order Tips",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tips\": 2.00\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/rest/orders/update-tips/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "orders", "update-tips", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Order Review",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 5,\n    \"comment\": \"Great service!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/rest/orders/review/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "orders", "review", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Order Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"accepted\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/rest/orders/:id/status/change",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "orders", ":id", "status", "change"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order Statuses",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/order-statuses",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "order-statuses"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST - Parcel Orders",
+			"description": "Parcel delivery order endpoints",
+			"item": [
+				{
+					"name": "Get Parcel Order Types",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/parcel-order/types",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "parcel-order", "types"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Parcel Order Type by ID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/parcel-order/type/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "parcel-order", "type", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Calculate Parcel Price",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/parcel-order/calculate-price?type_id=1&from[latitude]=23.5880&from[longitude]=58.3829&to[latitude]=23.6000&to[longitude]=58.4000",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "parcel-order", "calculate-price"],
+							"query": [
+								{"key": "type_id", "value": "1"},
+								{"key": "from[latitude]", "value": "23.5880"},
+								{"key": "from[longitude]", "value": "58.3829"},
+								{"key": "to[latitude]", "value": "23.6000"},
+								{"key": "to[longitude]", "value": "58.4000"}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST - Payments",
+			"description": "Payment methods endpoints",
+			"item": [
+				{
+					"name": "Get Payments",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/payments",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "payments"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": true,\n    \"data\": [\n        {\"id\": 1, \"tag\": \"cash\", \"active\": true},\n        {\"id\": 2, \"tag\": \"wallet\", \"active\": true}\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Payment by ID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/payments/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "payments", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST - FAQ & Pages",
+			"description": "FAQ, Terms, Privacy Policy endpoints",
+			"item": [
+				{
+					"name": "Get FAQs",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/faqs/paginate",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "faqs", "paginate"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Terms",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/term",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "term"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Privacy Policy",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/policy",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "policy"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pages Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/pages/paginate",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "pages", "paginate"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST - Blogs",
+			"description": "Blog posts endpoints",
+			"item": [
+				{
+					"name": "Get Blogs Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/blogs/paginate",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "blogs", "paginate"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Blog by UUID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/blogs/:uuid",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "blogs", ":uuid"],
+							"variable": [{"key": "uuid", "value": "blog-uuid"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Last Blog",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/last-blog/show",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "last-blog", "show"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST - Stories & Branches",
+			"description": "Stories and branch endpoints",
+			"item": [
+				{
+					"name": "Get Stories Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/stories/paginate",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "stories", "paginate"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Branches",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/branches/paginate",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "branches", "paginate"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Branch by ID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/branches/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "branches", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST - Delivery Zones",
+			"description": "Delivery zone calculation endpoints",
+			"item": [
+				{
+					"name": "Get Shop Delivery Zones",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/shop/delivery-zone/:shopId",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "shop", "delivery-zone", ":shopId"],
+							"variable": [{"key": "shopId", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Calculate Delivery Price",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/shop/delivery-zone/calculate/price/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "shop", "delivery-zone", "calculate", "price", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Calculate Distance",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/shop/delivery-zone/calculate/distance?origin[latitude]=23.5880&origin[longitude]=58.3829&destination[latitude]=23.6000&destination[longitude]=58.4000",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "shop", "delivery-zone", "calculate", "distance"],
+							"query": [
+								{"key": "origin[latitude]", "value": "23.5880"},
+								{"key": "origin[longitude]", "value": "58.3829"},
+								{"key": "destination[latitude]", "value": "23.6000"},
+								{"key": "destination[longitude]", "value": "58.4000"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Distance",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {
+							"raw": "{{baseUrl}}/rest/shop/delivery-zone/check/distance",
+							"host": ["{{baseUrl}}"],
+							"path": ["rest", "shop", "delivery-zone", "check", "distance"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Payments - Transactions",
+			"description": "Payment transaction endpoints",
+			"item": [
+				{
+					"name": "Create Transaction",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"payment_sys_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/payments/:type/:id/transactions",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "payments", ":type", ":id", "transactions"],
+							"variable": [
+								{"key": "type", "value": "order"},
+								{"key": "id", "value": "1"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Transaction Status",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"paid\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/payments/:type/:id/transactions",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "payments", ":type", ":id", "transactions"],
+							"variable": [
+								{"key": "type", "value": "order"},
+								{"key": "id", "value": "1"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Wallet Top Up",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"price\": 50.00,\n    \"currency_id\": 1,\n    \"payment_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/payments/wallet/payment/top-up",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "payments", "wallet", "payment", "top-up"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Dashboard - Galleries",
+			"description": "Gallery/Media management endpoints",
+			"item": [
+				{
+					"name": "Get Galleries Paginate",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/galleries/paginate",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "galleries", "paginate"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Gallery",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{"key": "image", "type": "file", "src": ""},
+								{"key": "type", "value": "products", "type": "text"}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/galleries",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "galleries"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Multiple Galleries",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{"key": "images[]", "type": "file", "src": ""},
+								{"key": "type", "value": "products", "type": "text"}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/galleries/store-many",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "galleries", "store-many"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Storage Files",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/galleries/storage/files",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "galleries", "storage", "files"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Dashboard - Notifications",
+			"description": "Push notification endpoints",
+			"item": [
+				{
+					"name": "Get Notifications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/notifications",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "notifications"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Notification by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/notifications/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "notifications", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Notification as Read",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/notifications/:id/read-at",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "notifications", ":id", "read-at"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark All Notifications as Read",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/notifications/read-all",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "notifications", "read-all"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
+

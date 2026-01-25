@@ -169,14 +169,14 @@ const HomePage = () => {
   return (
     <div className="min-h-screen overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative min-h-[520px] sm:min-h-[480px] lg:min-h-[540px] flex items-center overflow-x-hidden">
+      <section className="relative min-h-[auto] sm:min-h-[520px] lg:min-h-[580px] flex items-center overflow-hidden">
         {/* Animated Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233]">
-          <div className="absolute top-10 sm:top-20 start-5 sm:start-10 w-48 sm:w-72 h-48 sm:h-72 bg-[var(--primary)]/20 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-10 sm:bottom-20 end-5 sm:end-10 w-64 sm:w-96 h-64 sm:h-96 bg-[var(--primary-dark)]/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] overflow-hidden">
+          <div className="absolute top-10 sm:top-20 start-5 sm:start-10 w-48 sm:w-72 h-48 sm:h-72 bg-[var(--primary)]/20 rounded-full blur-3xl animate-pulse pointer-events-none" />
+          <div className="absolute bottom-20 sm:bottom-24 end-5 sm:end-10 w-48 sm:w-72 h-48 sm:h-72 bg-[var(--primary-dark)]/30 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDelay: '1s' }} />
           
           <div
-            className="absolute inset-0 opacity-5"
+            className="absolute inset-0 opacity-5 pointer-events-none"
             style={{
               backgroundImage: `linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)`,
               backgroundSize: '40px 40px',
@@ -184,14 +184,14 @@ const HomePage = () => {
           />
         </div>
 
-        <div className="container relative z-10 py-6 sm:py-10 lg:py-12">
-          <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
+        <div className="container relative z-10 pt-8 pb-20 sm:py-10 lg:py-14">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
             {/* Hero Content */}
             <motion.div
-              initial={{ opacity: 0, x: isRTL ? 40 : -40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, ease: 'easeOut' }}
-              className="text-white"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+              className="text-white text-center lg:text-start"
             >
 
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.15] sm:leading-[1.2]">
@@ -202,21 +202,21 @@ const HomePage = () => {
               </h1>
 
               {/* Spacer after Title */}
-              <div className="h-5 sm:h-6" aria-hidden="true" />
+              <div className="h-3 sm:h-5" aria-hidden="true" />
               
-              <p className="text-sm sm:text-base md:text-lg text-white/70 max-w-lg leading-relaxed">
+              <p className="text-sm sm:text-base md:text-lg text-white/70 max-w-lg mx-auto lg:mx-0 leading-relaxed">
                 {t('heroSubtitle')}
               </p>
 
               {/* Spacer after Description */}
-              <div className="h-6 sm:h-8" aria-hidden="true" />
+              <div className="h-4 sm:h-6" aria-hidden="true" />
 
               {/* Search Bar with Location Picker */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="relative max-w-xl z-20"
+                className="relative max-w-xl mx-auto lg:mx-0 z-20"
               >
                 <form onSubmit={handleSearch}>
                   {/* Outer glow effect */}
@@ -277,10 +277,10 @@ const HomePage = () => {
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="sm:hidden mt-3 flex items-center gap-2 text-white/70"
+                    className="sm:hidden mt-3 flex items-center justify-center gap-2 text-white/70"
                   >
                     <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                    <span className="text-xs truncate">
+                    <span className="text-xs truncate max-w-[200px]">
                       {selectedAddress.title || selectedAddress.address?.split(',')[0] || tCommon('locationSet')}
                     </span>
                   </motion.div>
@@ -288,23 +288,23 @@ const HomePage = () => {
               </motion.div>
 
               {/* Spacer before Stats */}
-              <div className="h-8 sm:h-10" aria-hidden="true" />
+              <div className="h-5 sm:h-8" aria-hidden="true" />
 
               {/* Stats */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className="flex items-center justify-between sm:justify-start gap-4 sm:gap-10 px-2 sm:px-0"
+                className="flex items-center justify-center lg:justify-start gap-6 sm:gap-10"
               >
                 {[
                   { value: '500+', label: t('stats.shops') },
                   { value: '50K+', label: t('stats.happyCustomers') },
                   { value: '100K+', label: t('stats.successfulOrders') },
                 ].map((stat, index) => (
-                  <div key={index} className="relative text-center sm:text-start">
+                  <div key={index} className="relative text-center lg:text-start">
                     {index > 0 && (
-                      <div className="absolute -start-2 sm:-start-5 top-0 h-full w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
+                      <div className="absolute -start-3 sm:-start-5 top-0 h-full w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
                     )}
                     <p className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent mb-0.5">
                       {stat.value}
@@ -317,15 +317,15 @@ const HomePage = () => {
 
             {/* Hero Banner Slider */}
             <motion.div
-              initial={{ opacity: 0, x: isRTL ? -40 : 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className="relative hidden sm:block"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="relative mt-2 lg:mt-0 overflow-hidden rounded-xl sm:rounded-2xl lg:rounded-3xl"
             >
               {loading ? (
                 <BannerSkeleton />
               ) : banners.length > 0 ? (
-                <div className="relative">
+                <div className="relative overflow-hidden">
                   <Swiper
                     modules={[Autoplay, Pagination, Navigation, EffectFade]}
                     spaceBetween={0}
@@ -334,19 +334,19 @@ const HomePage = () => {
                     autoplay={{ delay: 4000, disableOnInteraction: false }}
                     pagination={{ 
                       clickable: true,
-                      bulletClass: 'swiper-pagination-bullet !bg-white/30 !w-2 !h-2',
-                      bulletActiveClass: '!bg-[var(--primary)] !w-6',
+                      bulletClass: 'swiper-pagination-bullet !bg-white/30 !w-1.5 !h-1.5 sm:!w-2 sm:!h-2',
+                      bulletActiveClass: '!bg-[var(--primary)] !w-4 sm:!w-6',
                     }}
                     navigation={{
                       prevEl: '.hero-prev',
                       nextEl: '.hero-next',
                     }}
                     loop
-                    className="rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl"
+                    className="overflow-hidden shadow-xl sm:shadow-2xl"
                   >
                     {banners.map((banner) => (
                       <SwiperSlide key={banner.id}>
-                        <Link href={banner.url || '#'} className="block aspect-[4/3] sm:aspect-[16/10] relative group">
+                        <Link href={banner.url || '#'} className="block aspect-[16/9] sm:aspect-[16/10] relative group">
                           <Image
                             src={banner.img}
                             alt={banner.translation?.title || 'Banner'}
@@ -354,10 +354,10 @@ const HomePage = () => {
                             className="object-cover transition-transform duration-700 group-hover:scale-105"
                             priority
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
                           {banner.translation?.title && (
-                            <div className="absolute bottom-4 sm:bottom-6 start-4 sm:start-6 end-4 sm:end-6">
-                              <p className="text-white text-base sm:text-xl font-bold drop-shadow-lg">
+                            <div className="absolute bottom-3 sm:bottom-4 lg:bottom-6 start-3 sm:start-4 lg:start-6 end-3 sm:end-4 lg:end-6">
+                              <p className="text-white text-sm sm:text-base lg:text-xl font-bold drop-shadow-lg line-clamp-2">
                                 {banner.translation.title}
                               </p>
                             </div>
@@ -367,20 +367,22 @@ const HomePage = () => {
                     ))}
                   </Swiper>
 
-                  {/* Custom Navigation - Hidden on small screens */}
-                  <button className="hero-prev hidden sm:flex absolute start-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 lg:w-12 lg:h-12 items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-xl hover:bg-white hover:scale-110 transition-all">
-                    {isRTL ? <ChevronRight size={20} className="lg:hidden" /> : <ChevronLeft size={20} className="lg:hidden" />}
+                  {/* Custom Navigation - Hidden on mobile */}
+                  <button className="hero-prev hidden sm:flex absolute start-2 sm:start-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-xl hover:bg-white hover:scale-110 transition-all">
+                    {isRTL ? <ChevronRight size={16} className="sm:hidden" /> : <ChevronLeft size={16} className="sm:hidden" />}
+                    {isRTL ? <ChevronRight size={20} className="hidden sm:block lg:hidden" /> : <ChevronLeft size={20} className="hidden sm:block lg:hidden" />}
                     {isRTL ? <ChevronRight size={24} className="hidden lg:block" /> : <ChevronLeft size={24} className="hidden lg:block" />}
                   </button>
-                  <button className="hero-next hidden sm:flex absolute end-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 lg:w-12 lg:h-12 items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-xl hover:bg-white hover:scale-110 transition-all">
-                    {isRTL ? <ChevronLeft size={20} className="lg:hidden" /> : <ChevronRight size={20} className="lg:hidden" />}
+                  <button className="hero-next hidden sm:flex absolute end-2 sm:end-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-xl hover:bg-white hover:scale-110 transition-all">
+                    {isRTL ? <ChevronLeft size={16} className="sm:hidden" /> : <ChevronRight size={16} className="sm:hidden" />}
+                    {isRTL ? <ChevronLeft size={20} className="hidden sm:block lg:hidden" /> : <ChevronRight size={20} className="hidden sm:block lg:hidden" />}
                     {isRTL ? <ChevronLeft size={24} className="hidden lg:block" /> : <ChevronRight size={24} className="hidden lg:block" />}
                   </button>
 
                 </div>
               ) : (
-                <div className="aspect-[16/10] bg-white/10 backdrop-blur-sm rounded-2xl sm:rounded-3xl flex items-center justify-center border border-white/20">
-                  <p className="text-white/50">{t('noBanners')}</p>
+                <div className="aspect-[16/9] sm:aspect-[16/10] bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">
+                  <p className="text-white/50 text-sm sm:text-base">{t('noBanners')}</p>
                 </div>
               )}
             </motion.div>
@@ -388,16 +390,16 @@ const HomePage = () => {
         </div>
 
         {/* Wave Decoration */}
-        <div className="absolute bottom-0 inset-x-0">
+        <div className="absolute bottom-0 left-0 right-0 z-10 pointer-events-none">
           <svg
-            viewBox="0 0 1440 100"
+            viewBox="0 0 1440 50"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="w-full h-auto"
+            className="w-full h-6 sm:h-10 lg:h-[50px]"
             preserveAspectRatio="none"
           >
             <path
-              d="M0 100L60 92C120 84 240 68 360 60C480 52 600 52 720 56C840 60 960 68 1080 72C1200 76 1320 76 1380 76L1440 76V100H1380C1320 100 1200 100 1080 100C960 100 840 100 720 100C600 100 480 100 360 100C240 100 120 100 60 100H0Z"
+              d="M0 50L60 46C120 42 240 34 360 30C480 26 600 26 720 28C840 30 960 34 1080 36C1200 38 1320 38 1380 38L1440 38V50H1380C1320 50 1200 50 1080 50C960 50 840 50 720 50C600 50 480 50 360 50C240 50 120 50 60 50H0Z"
               fill="var(--main-bg)"
             />
           </svg>

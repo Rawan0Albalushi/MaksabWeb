@@ -1,0 +1,509 @@
+{
+	"info": {
+		"_postman_id": "voucher-token-collection",
+		"name": "Voucher Token APIs",
+		"description": "Collection of APIs for Voucher Token functionality - Admin and User endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Admin Endpoints",
+			"item": [
+				{
+					"name": "List Voucher Tokens",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/dashboard/admin/voucher-tokens?perPage=15&status=active&amount_from=10&amount_to=1000&created_by=1&used_by=2&sort=desc&column=created_at",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "dashboard", "admin", "voucher-tokens"],
+							"query": [
+								{
+									"key": "perPage",
+									"value": "15",
+									"description": "Number of items per page"
+								},
+								{
+									"key": "status",
+									"value": "active",
+									"description": "Filter by status: active, used, expired"
+								},
+								{
+									"key": "amount_from",
+									"value": "10",
+									"description": "Minimum amount filter"
+								},
+								{
+									"key": "amount_to",
+									"value": "1000",
+									"description": "Maximum amount filter"
+								},
+								{
+									"key": "created_by",
+									"value": "1",
+									"description": "Filter by creator ID"
+								},
+								{
+									"key": "used_by",
+									"value": "2",
+									"description": "Filter by user who used the token"
+								},
+								{
+									"key": "sort",
+									"value": "desc",
+									"description": "Sort order: asc, desc"
+								},
+								{
+									"key": "column",
+									"value": "created_at",
+									"description": "Sort column: id, amount, created_at, expires_at, etc."
+								}
+							]
+						},
+						"description": "Get paginated list of voucher tokens with filtering options"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Single Voucher Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 100.00,\n    \"expires_at\": \"2025-12-31 23:59:59\",\n    \"note\": \"Welcome bonus token\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/dashboard/admin/voucher-tokens",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "dashboard", "admin", "voucher-tokens"]
+						},
+						"description": "Create a single voucher token"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Multiple Voucher Tokens",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 50.00,\n    \"quantity\": 10,\n    \"expires_at\": \"2025-12-31 23:59:59\",\n    \"note\": \"Promotional campaign tokens\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/dashboard/admin/voucher-tokens",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "dashboard", "admin", "voucher-tokens"]
+						},
+						"description": "Create multiple voucher tokens at once"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Voucher Token Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/dashboard/admin/voucher-tokens/statistics",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "dashboard", "admin", "voucher-tokens", "statistics"]
+						},
+						"description": "Get statistics about voucher tokens (total, active, used, expired, total amount, etc.)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Active Voucher Tokens",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/dashboard/admin/voucher-tokens/active?perPage=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "dashboard", "admin", "voucher-tokens", "active"],
+							"query": [
+								{
+									"key": "perPage",
+									"value": "15",
+									"description": "Number of items per page"
+								}
+							]
+						},
+						"description": "Get list of active (unused and non-expired) voucher tokens"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Used Voucher Tokens",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/dashboard/admin/voucher-tokens/used?perPage=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "dashboard", "admin", "voucher-tokens", "used"],
+							"query": [
+								{
+									"key": "perPage",
+									"value": "15",
+									"description": "Number of items per page"
+								}
+							]
+						},
+						"description": "Get list of used voucher tokens"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Expired Voucher Tokens",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/dashboard/admin/voucher-tokens/expired?perPage=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "dashboard", "admin", "voucher-tokens", "expired"],
+							"query": [
+								{
+									"key": "perPage",
+									"value": "15",
+									"description": "Number of items per page"
+								}
+							]
+						},
+						"description": "Get list of expired voucher tokens"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Voucher Token by UUID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/dashboard/admin/voucher-tokens/{{voucher_token_uuid}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "dashboard", "admin", "voucher-tokens", "{{voucher_token_uuid}}"]
+						},
+						"description": "Get specific voucher token details by UUID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Voucher Token",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 150.00,\n    \"expires_at\": \"2025-12-31 23:59:59\",\n    \"note\": \"Updated promotional token\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/dashboard/admin/voucher-tokens/{{voucher_token_uuid}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "dashboard", "admin", "voucher-tokens", "{{voucher_token_uuid}}"]
+						},
+						"description": "Update voucher token details (only for unused tokens)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Voucher Token",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/dashboard/admin/voucher-tokens/{{voucher_token_uuid}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "dashboard", "admin", "voucher-tokens", "{{voucher_token_uuid}}"]
+						},
+						"description": "Delete a voucher token (only for unused tokens)"
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Delete Voucher Tokens",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ids\": [1, 2, 3, 4, 5]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/dashboard/admin/voucher-tokens/delete",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "dashboard", "admin", "voucher-tokens", "delete"]
+						},
+						"description": "Delete multiple voucher tokens at once"
+					},
+					"response": []
+				},
+				{
+					"name": "Expire Old Voucher Tokens",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/dashboard/admin/voucher-tokens/expire-old",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "dashboard", "admin", "voucher-tokens", "expire-old"]
+						},
+						"description": "Manually expire old voucher tokens (alternative to scheduled command)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User Endpoints",
+			"item": [
+				{
+					"name": "Redeem Voucher Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{user_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"1234567890123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/dashboard/user/voucher-tokens/redeem",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "dashboard", "user", "voucher-tokens", "redeem"]
+						},
+						"description": "Redeem a voucher token to add amount to user's wallet"
+					},
+					"response": []
+				},
+				{
+					"name": "Check Voucher Token Validity",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{user_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"1234567890123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/dashboard/user/voucher-tokens/check",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "dashboard", "user", "voucher-tokens", "check"]
+						},
+						"description": "Check if a voucher token is valid without redeeming it"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User's Redeemed Tokens",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{user_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/dashboard/user/voucher-tokens/my-tokens?perPage=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "dashboard", "user", "voucher-tokens", "my-tokens"],
+							"query": [
+								{
+									"key": "perPage",
+									"value": "15",
+									"description": "Number of items per page"
+								}
+							]
+						},
+						"description": "Get list of voucher tokens redeemed by the authenticated user"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string",
+			"description": "Base URL for the API"
+		},
+		{
+			"key": "admin_token",
+			"value": "your-admin-auth-token",
+			"type": "string",
+			"description": "Admin authentication token"
+		},
+		{
+			"key": "user_token",
+			"value": "your-user-auth-token",
+			"type": "string",
+			"description": "User authentication token"
+		},
+		{
+			"key": "voucher_token_uuid",
+			"value": "voucher-token-uuid-here",
+			"type": "string",
+			"description": "UUID of a specific voucher token"
+		}
+	]
+} 

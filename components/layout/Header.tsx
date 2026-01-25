@@ -9,14 +9,15 @@ import { useTranslations } from 'next-intl';
 import {
   ShoppingCart,
   User,
-  Menu,
-  X,
   Heart,
   Package,
   LogOut,
   Settings,
   ChevronDown,
   Globe,
+  Home,
+  Store,
+  Grid3X3,
 } from 'lucide-react';
 import { Button, Avatar } from '@/components/ui';
 import { useAuthStore, useCartStore, useSettingsStore } from '@/store';
@@ -39,7 +40,7 @@ const Header = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 10);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -59,9 +60,34 @@ const Header = () => {
     }
   }, [isProfileDropdownOpen, isLangDropdownOpen]);
 
+  // Close mobile menu on resize to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024 && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isMobileMenuOpen]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
   const handleLogout = async () => {
     logout();
     setIsProfileDropdownOpen(false);
+    setIsMobileMenuOpen(false);
   };
 
   const handleLanguageChange = (newLocale: Locale) => {
@@ -87,65 +113,78 @@ const Header = () => {
   };
 
   const navLinks = [
-    { href: '/', label: t('home') },
-    { href: '/shops', label: t('shops') },
-    { href: '/categories', label: t('categories') },
+    { href: '/', label: t('home'), icon: Home },
+    { href: '/shops', label: t('shops'), icon: Store },
+    { href: '/categories', label: t('categories'), icon: Grid3X3 },
+    // Show orders link only when authenticated
+    ...(isAuthenticated ? [{ href: '/orders', label: t('orders'), icon: Package }] : []),
   ];
 
   return (
     <>
       <header
         className={clsx(
-          'fixed top-0 inset-x-0 z-40 transition-all duration-300 border-b',
+          'fixed top-0 inset-x-0 z-40 transition-all duration-500 ease-out',
           isScrolled
-            ? 'bg-white/98 backdrop-blur-lg shadow-sm border-transparent'
-            : 'bg-white border-[var(--border)]'
+            ? 'bg-white/80 backdrop-blur-xl shadow-[0_2px_20px_-4px_rgba(0,0,0,0.1)] border-b border-white/50'
+            : 'bg-white/60 backdrop-blur-md border-b border-transparent'
         )}
       >
-        <div className="container">
-          <div className="flex items-center justify-between h-[70px] lg:h-[88px]">
+        {/* Subtle gradient overlay for glass effect */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
+        
+        <div className="container relative">
+          <div className="flex items-center justify-between h-16 sm:h-[68px] lg:h-[76px]">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 shrink-0 group">
+            <Link 
+              href="/" 
+              className="flex items-center gap-2 shrink-0 group relative z-10"
+            >
               <Image
                 src="/images/maksab.png"
                 alt="Maksab"
                 width={120}
                 height={40}
-                className="h-8 lg:h-10 w-auto transition-transform group-hover:scale-[1.02]"
+                className="h-7 sm:h-8 lg:h-9 w-auto transition-all duration-300 group-hover:scale-[1.03] group-active:scale-[0.98]"
+                priority
               />
             </Link>
 
             {/* Desktop Navigation - Centered */}
-            <nav className="hidden lg:flex items-center gap-10 absolute left-1/2 -translate-x-1/2">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={clsx(
-                    'group relative py-2 text-[15px] transition-colors duration-150',
-                    pathname === link.href
-                      ? 'text-[var(--primary)] font-semibold'
-                      : 'text-[var(--text-grey)] font-medium hover:text-[var(--primary)]'
-                  )}
-                >
-                  {link.label}
-                  {/* Underline indicator */}
-                  <span 
+            <nav className="hidden lg:flex items-center gap-8 xl:gap-12 absolute left-1/2 -translate-x-1/2">
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href || 
+                  (link.href !== '/' && pathname.startsWith(link.href));
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
                     className={clsx(
-                      'absolute -bottom-1 left-0 right-0 h-[2.5px] bg-[var(--primary)] rounded-full transition-transform duration-200 origin-center',
-                      pathname === link.href 
-                        ? 'scale-x-100' 
-                        : 'scale-x-0 group-hover:scale-x-100'
+                      'relative py-2 text-[15px] font-medium transition-all duration-300 whitespace-nowrap group',
+                      isActive
+                        ? 'text-[var(--primary)]'
+                        : 'text-[var(--text-grey)] hover:text-[var(--black)]'
                     )}
-                  />
-                </Link>
-              ))}
+                  >
+                    {link.label}
+                    {/* Underline indicator */}
+                    <span 
+                      className={clsx(
+                        'absolute -bottom-1 left-0 right-0 h-[2.5px] rounded-full transition-all duration-300',
+                        isActive 
+                          ? 'bg-[var(--primary)] scale-x-100' 
+                          : 'bg-[var(--primary)] scale-x-0 group-hover:scale-x-100'
+                      )}
+                    />
+                  </Link>
+                );
+              })}
             </nav>
 
             {/* Right Actions */}
-            <div className="flex items-center gap-1 sm:gap-2">
-              {/* Language Selector */}
-              <div className="relative hidden sm:block">
+            <div className="flex items-center gap-0.5 sm:gap-1.5">
+              {/* Language Selector - Desktop */}
+              <div className="relative hidden md:block">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -153,89 +192,104 @@ const Header = () => {
                     setIsProfileDropdownOpen(false);
                   }}
                   className={clsx(
-                    'flex items-center gap-1.5 px-3 py-2 rounded-full transition-all duration-200',
+                    'flex items-center gap-1.5 px-3 py-2 rounded-full transition-all duration-300',
                     isLangDropdownOpen
-                      ? 'bg-[var(--main-bg)]'
-                      : 'hover:bg-[var(--main-bg)]'
+                      ? 'bg-[var(--main-bg)] shadow-inner'
+                      : 'hover:bg-[var(--main-bg)]/70'
                   )}
                 >
-                  <Globe size={18} className="text-[var(--text-grey)]" />
-                  <span className="text-sm font-medium text-[var(--black)]">{localeNames[locale]}</span>
+                  <Globe size={17} className="text-[var(--text-grey)]" />
+                  <span className="text-sm font-medium text-[var(--black)] hidden lg:inline">{localeNames[locale]}</span>
                   <ChevronDown 
                     size={14} 
                     className={clsx(
-                      'text-[var(--text-grey)] transition-transform duration-200',
+                      'text-[var(--text-grey)] transition-transform duration-300',
                       isLangDropdownOpen && 'rotate-180'
                     )} 
                   />
                 </button>
 
-                {isLangDropdownOpen && (
-                  <div 
-                    className="absolute top-full end-0 mt-2 w-36 bg-white rounded-xl shadow-lg border border-[var(--border)] overflow-hidden z-20 animate-in fade-in slide-in-from-top-2 duration-200"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <div className="py-1">
-                      <button
-                        onClick={() => handleLanguageChange('ar')}
-                        className={clsx(
-                          'w-full px-4 py-2.5 text-start text-sm transition-colors flex items-center justify-between',
-                          locale === 'ar' 
-                            ? 'text-[var(--primary)] bg-[var(--primary)]/5 font-medium' 
-                            : 'hover:bg-[var(--main-bg)]'
-                        )}
-                      >
-                        العربية
-                        {locale === 'ar' && <span className="w-1.5 h-1.5 bg-[var(--primary)] rounded-full" />}
-                      </button>
-                      <button
-                        onClick={() => handleLanguageChange('en')}
-                        className={clsx(
-                          'w-full px-4 py-2.5 text-start text-sm transition-colors flex items-center justify-between',
-                          locale === 'en' 
-                            ? 'text-[var(--primary)] bg-[var(--primary)]/5 font-medium' 
-                            : 'hover:bg-[var(--main-bg)]'
-                        )}
-                      >
-                        English
-                        {locale === 'en' && <span className="w-1.5 h-1.5 bg-[var(--primary)] rounded-full" />}
-                      </button>
-                    </div>
+                {/* Language Dropdown */}
+                <div 
+                  className={clsx(
+                    'absolute top-full end-0 mt-2 w-40 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl shadow-black/10 border border-white/50 overflow-hidden z-50 transition-all duration-300 origin-top',
+                    isLangDropdownOpen
+                      ? 'opacity-100 scale-100 translate-y-0'
+                      : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
+                  )}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="p-1.5">
+                    <button
+                      onClick={() => handleLanguageChange('ar')}
+                      className={clsx(
+                        'w-full px-3.5 py-2.5 rounded-xl text-sm transition-all duration-200 flex items-center justify-between',
+                        locale === 'ar' 
+                          ? 'text-[var(--primary)] bg-[var(--primary)]/8 font-semibold' 
+                          : 'text-[var(--black)] hover:bg-[var(--main-bg)]'
+                      )}
+                    >
+                      العربية
+                      {locale === 'ar' && (
+                        <span className="w-2 h-2 bg-[var(--primary)] rounded-full animate-pulse" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => handleLanguageChange('en')}
+                      className={clsx(
+                        'w-full px-3.5 py-2.5 rounded-xl text-sm transition-all duration-200 flex items-center justify-between',
+                        locale === 'en' 
+                          ? 'text-[var(--primary)] bg-[var(--primary)]/8 font-semibold' 
+                          : 'text-[var(--black)] hover:bg-[var(--main-bg)]'
+                      )}
+                    >
+                      English
+                      {locale === 'en' && (
+                        <span className="w-2 h-2 bg-[var(--primary)] rounded-full animate-pulse" />
+                      )}
+                    </button>
                   </div>
-                )}
+                </div>
               </div>
 
-              {/* Divider */}
-              <div className="hidden sm:block w-px h-6 bg-[var(--border)] mx-1" />
+              {/* Divider - Desktop */}
+              <div className="hidden md:block w-px h-5 bg-[var(--border)]/60 mx-1" />
 
-              {/* Favorites */}
+              {/* Favorites - Desktop */}
               <Link
                 href="/favorites"
-                className="hidden sm:flex items-center justify-center w-10 h-10 rounded-full hover:bg-[var(--main-bg)] transition-all duration-200 group"
+                className="hidden sm:flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-[var(--main-bg)]/70 active:scale-95 transition-all duration-200 group"
               >
-                <Heart size={20} className="text-[var(--text-grey)] group-hover:text-[var(--primary)] transition-colors" />
+                <Heart 
+                  size={19} 
+                  className="text-[var(--text-grey)] group-hover:text-[var(--primary)] transition-colors duration-200" 
+                />
               </Link>
 
               {/* Cart */}
               <Link
                 href="/cart"
-                className="relative flex items-center justify-center w-10 h-10 rounded-full hover:bg-[var(--main-bg)] transition-all duration-200 group"
+                className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-[var(--main-bg)]/70 active:scale-95 transition-all duration-200 group"
               >
-                <ShoppingCart size={20} className="text-[var(--text-grey)] group-hover:text-[var(--primary)] transition-colors" />
+                <ShoppingCart 
+                  size={19} 
+                  className="text-[var(--text-grey)] group-hover:text-[var(--primary)] transition-colors duration-200" 
+                />
                 {cartItemCount > 0 && (
-                  <span className="absolute -top-0.5 -end-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-[var(--primary)] text-white text-[10px] font-bold rounded-full px-1 animate-in zoom-in duration-200">
+                  <span className="absolute -top-0.5 -end-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-[var(--primary)] text-white text-[10px] font-bold rounded-full px-1 shadow-md shadow-[var(--primary)]/30 animate-in zoom-in duration-200">
                     {cartItemCount > 99 ? '99+' : cartItemCount}
                   </span>
                 )}
               </Link>
 
-              {/* Auth */}
+              {/* Auth Section */}
               {!_hasHydrated ? (
-                // Show loading state while hydrating to prevent flash
+                // Loading state
                 <div className="hidden sm:flex items-center gap-2">
-                  <div className="w-20 h-9 bg-[var(--main-bg)] rounded-full animate-pulse" />
+                  <div className="w-20 h-9 bg-[var(--main-bg)]/70 rounded-full animate-pulse" />
                 </div>
               ) : isAuthenticated ? (
+                // User Profile Dropdown - Desktop
                 <div className="relative hidden sm:block">
                   <button
                     onClick={(e) => {
@@ -244,10 +298,10 @@ const Header = () => {
                       setIsLangDropdownOpen(false);
                     }}
                     className={clsx(
-                      'flex items-center gap-2 ps-1.5 pe-3 py-1.5 rounded-full transition-all duration-200',
+                      'flex items-center gap-2 ps-1 pe-2.5 py-1 rounded-full transition-all duration-300',
                       isProfileDropdownOpen
-                        ? 'bg-[var(--main-bg)]'
-                        : 'hover:bg-[var(--main-bg)]'
+                        ? 'bg-[var(--main-bg)] shadow-inner'
+                        : 'hover:bg-[var(--main-bg)]/70'
                     )}
                   >
                     <Avatar
@@ -255,78 +309,97 @@ const Header = () => {
                       fallback={user?.firstname}
                       size="sm"
                     />
-                    <span className="text-sm font-medium max-w-[100px] truncate hidden md:block text-[var(--black)]">
+                    <span className="text-sm font-medium max-w-[80px] truncate hidden md:block text-[var(--black)]">
                       {user?.firstname}
                     </span>
                     <ChevronDown 
                       size={14} 
                       className={clsx(
-                        'text-[var(--text-grey)] transition-transform duration-200',
+                        'text-[var(--text-grey)] transition-transform duration-300',
                         isProfileDropdownOpen && 'rotate-180'
                       )} 
                     />
                   </button>
 
-                  {isProfileDropdownOpen && (
-                    <div 
-                      className="absolute top-full end-0 mt-2 w-60 bg-white rounded-xl shadow-lg border border-[var(--border)] overflow-hidden z-20 animate-in fade-in slide-in-from-top-2 duration-200"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div className="p-4 bg-gradient-to-br from-[var(--primary)]/5 to-transparent">
-                        <p className="font-semibold text-[var(--black)]">
-                          {user?.firstname} {user?.lastname}
-                        </p>
-                        <p className="text-sm text-[var(--text-grey)] mt-0.5">
-                          {user?.email || user?.phone}
-                        </p>
-                      </div>
-                      <div className="py-1">
-                        <Link
-                          href="/profile"
-                          onClick={() => setIsProfileDropdownOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-[var(--main-bg)] transition-colors group"
-                        >
-                          <User size={18} className="text-[var(--text-grey)] group-hover:text-[var(--primary)] transition-colors" />
-                          {t('profile')}
-                        </Link>
-                        <Link
-                          href="/orders"
-                          onClick={() => setIsProfileDropdownOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-[var(--main-bg)] transition-colors group"
-                        >
-                          <Package size={18} className="text-[var(--text-grey)] group-hover:text-[var(--primary)] transition-colors" />
-                          {t('orders')}
-                        </Link>
-                        <Link
-                          href="/settings"
-                          onClick={() => setIsProfileDropdownOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-[var(--main-bg)] transition-colors group"
-                        >
-                          <Settings size={18} className="text-[var(--text-grey)] group-hover:text-[var(--primary)] transition-colors" />
-                          {t('settings')}
-                        </Link>
-                      </div>
-                      <div className="p-2 border-t border-[var(--border)]">
-                        <button
-                          onClick={handleLogout}
-                          className="flex items-center gap-3 w-full px-3 py-2 text-sm text-[var(--error)] hover:bg-[var(--error)]/10 rounded-lg transition-colors"
-                        >
-                          <LogOut size={18} />
-                          {t('logout')}
-                        </button>
-                      </div>
+                  {/* Profile Dropdown */}
+                  <div 
+                    className={clsx(
+                      'absolute top-full end-0 mt-2 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl shadow-black/10 border border-white/50 overflow-hidden z-50 transition-all duration-300 origin-top',
+                      isProfileDropdownOpen
+                        ? 'opacity-100 scale-100 translate-y-0'
+                        : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
+                    )}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* User Info */}
+                    <div className="p-3 bg-gradient-to-br from-[var(--primary)]/8 to-transparent">
+                      <p className="font-semibold text-[var(--black)] truncate">
+                        {user?.firstname} {user?.lastname}
+                      </p>
+                      <p className="text-xs text-[var(--text-grey)] mt-0.5 truncate">
+                        {user?.email || user?.phone}
+                      </p>
                     </div>
-                  )}
+                    
+                    {/* Menu Items */}
+                    <div className="p-1.5">
+                      <Link
+                        href="/profile"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-[var(--main-bg)] transition-colors group"
+                      >
+                        <User size={17} className="text-[var(--text-grey)] group-hover:text-[var(--primary)] transition-colors" />
+                        <span className="text-[var(--black)]">{t('profile')}</span>
+                      </Link>
+                      <Link
+                        href="/orders"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-[var(--main-bg)] transition-colors group"
+                      >
+                        <Package size={17} className="text-[var(--text-grey)] group-hover:text-[var(--primary)] transition-colors" />
+                        <span className="text-[var(--black)]">{t('orders')}</span>
+                      </Link>
+                      <Link
+                        href="/settings"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-[var(--main-bg)] transition-colors group"
+                      >
+                        <Settings size={17} className="text-[var(--text-grey)] group-hover:text-[var(--primary)] transition-colors" />
+                        <span className="text-[var(--black)]">{t('settings')}</span>
+                      </Link>
+                    </div>
+                    
+                    {/* Logout */}
+                    <div className="p-1.5 border-t border-[var(--border)]/50">
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-[var(--error)] hover:bg-[var(--error)]/8 transition-colors"
+                      >
+                        <LogOut size={17} />
+                        {t('logout')}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               ) : (
-                <div className="hidden sm:flex items-center gap-2">
+                // Auth Buttons - Desktop
+                <div className="hidden sm:flex items-center gap-1.5 ms-1">
                   <Link href="/auth/login">
-                    <Button variant="ghost" size="sm" className="rounded-full">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="rounded-full text-[13px] px-4 h-9 hover:bg-[var(--main-bg)]/70"
+                    >
                       {t('login')}
                     </Button>
                   </Link>
                   <Link href="/auth/register">
-                    <Button size="sm" className="rounded-full px-5">{t('register')}</Button>
+                    <Button 
+                      size="sm" 
+                      className="rounded-full text-[13px] px-4 h-9 shadow-md shadow-[var(--primary)]/20 !bg-[var(--primary)] !text-white hover:!bg-[var(--primary-hover)]"
+                    >
+                      {t('register')}
+                    </Button>
                   </Link>
                 </div>
               )}
@@ -334,25 +407,26 @@ const Header = () => {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden flex items-center justify-center w-10 h-10 rounded-full hover:bg-[var(--main-bg)] transition-all duration-200"
+                className="lg:hidden flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-[var(--main-bg)]/70 active:scale-95 transition-all duration-200 ms-0.5"
+                aria-label="Toggle menu"
               >
-                <div className="relative w-5 h-5">
+                <div className="relative w-5 h-5 flex items-center justify-center">
                   <span 
                     className={clsx(
-                      'absolute left-0 w-5 h-0.5 bg-[var(--black)] transition-all duration-200',
-                      isMobileMenuOpen ? 'top-[9px] rotate-45' : 'top-1'
+                      'absolute w-5 h-[2px] bg-[var(--black)] rounded-full transition-all duration-300',
+                      isMobileMenuOpen ? 'rotate-45' : '-translate-y-1.5'
                     )} 
                   />
                   <span 
                     className={clsx(
-                      'absolute left-0 top-[9px] w-5 h-0.5 bg-[var(--black)] transition-all duration-200',
-                      isMobileMenuOpen && 'opacity-0'
+                      'absolute w-5 h-[2px] bg-[var(--black)] rounded-full transition-all duration-300',
+                      isMobileMenuOpen && 'opacity-0 scale-0'
                     )} 
                   />
                   <span 
                     className={clsx(
-                      'absolute left-0 w-5 h-0.5 bg-[var(--black)] transition-all duration-200',
-                      isMobileMenuOpen ? 'top-[9px] -rotate-45' : 'top-[17px]'
+                      'absolute w-5 h-[2px] bg-[var(--black)] rounded-full transition-all duration-300',
+                      isMobileMenuOpen ? '-rotate-45' : 'translate-y-1.5'
                     )} 
                   />
                 </div>
@@ -365,134 +439,220 @@ const Header = () => {
       {/* Mobile Menu Overlay */}
       <div
         className={clsx(
-          'fixed inset-0 z-30 lg:hidden transition-opacity duration-300',
+          'fixed inset-0 z-30 lg:hidden transition-all duration-300',
           isMobileMenuOpen
             ? 'opacity-100 pointer-events-auto'
             : 'opacity-0 pointer-events-none'
         )}
       >
+        {/* Backdrop */}
         <div
-          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+          className={clsx(
+            'absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300',
+            isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
+          )}
           onClick={() => setIsMobileMenuOpen(false)}
         />
         
         {/* Mobile Menu Panel */}
         <div
           className={clsx(
-            'absolute top-[70px] inset-x-0 bg-white rounded-b-2xl shadow-xl transition-all duration-300 max-h-[calc(100vh-70px)] overflow-y-auto',
-            isMobileMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'
+            'absolute top-[72px] sm:top-[76px] inset-x-0 mx-4 sm:mx-6 bg-white rounded-3xl shadow-2xl shadow-black/25 transition-all duration-300 max-h-[calc(100vh-90px)] sm:max-h-[calc(100vh-100px)] overflow-hidden',
+            isMobileMenuOpen 
+              ? 'translate-y-0 opacity-100 scale-100' 
+              : '-translate-y-6 opacity-0 scale-95'
           )}
         >
-          {/* Mobile Nav Links */}
-          <nav className="p-2">
-            {navLinks.map((link, index) => (
-              <Link
-                key={link.href}
-                href={link.href}
+          <div className="overflow-y-auto max-h-[calc(100vh-110px)] sm:max-h-[calc(100vh-120px)] overscroll-contain p-5 sm:p-6">
+            
+            {/* Menu Header */}
+            <div className="pb-4 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-[var(--black)]">
+                {locale === 'ar' ? 'القائمة' : 'Menu'}
+              </h3>
+              <button
                 onClick={() => setIsMobileMenuOpen(false)}
-                className={clsx(
-                  'flex items-center px-4 py-3.5 rounded-xl font-medium transition-all duration-200',
-                  pathname === link.href
-                    ? 'text-[var(--primary)] bg-[var(--primary)]/8'
-                    : 'text-[var(--black)] hover:bg-[var(--main-bg)] active:scale-[0.98]'
-                )}
-                style={{ animationDelay: `${index * 50}ms` }}
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-[var(--main-bg)] hover:bg-[var(--border)] transition-colors"
               >
-                {link.label}
-                {pathname === link.href && (
-                  <span className="ms-auto w-1.5 h-1.5 bg-[var(--primary)] rounded-full" />
-                )}
-              </Link>
-            ))}
-            <Link
-              href="/favorites"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-[var(--black)] hover:bg-[var(--main-bg)] transition-all duration-200 active:scale-[0.98]"
-            >
-              <Heart size={20} className="text-[var(--text-grey)]" />
-              {locale === 'ar' ? 'المفضلة' : 'Favorites'}
-            </Link>
-          </nav>
-
-          {/* Mobile Auth */}
-          <div className="p-4 border-t border-[var(--border)]">
-            {!_hasHydrated ? (
-              // Show loading state while hydrating
-              <div className="flex gap-3">
-                <div className="flex-1 h-10 bg-[var(--main-bg)] rounded-xl animate-pulse" />
-                <div className="flex-1 h-10 bg-[var(--main-bg)] rounded-xl animate-pulse" />
-              </div>
-            ) : isAuthenticated ? (
-              <div className="space-y-4">
-                <Link
-                  href="/profile"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-br from-[var(--primary)]/5 to-transparent"
-                >
-                  <Avatar src={user?.img} fallback={user?.firstname} size="md" />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold truncate">{user?.firstname} {user?.lastname}</p>
-                    <p className="text-sm text-[var(--text-grey)] truncate">{user?.email || user?.phone}</p>
-                  </div>
-                  <ChevronDown size={18} className="text-[var(--text-grey)] -rotate-90" />
-                </Link>
-                <Button
-                  variant="outline"
-                  fullWidth
-                  onClick={handleLogout}
-                  leftIcon={<LogOut size={18} />}
-                  className="rounded-xl"
-                >
-                  {t('logout')}
-                </Button>
-              </div>
-            ) : (
-              <div className="flex gap-3">
-                <Link href="/auth/login" className="flex-1" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="outline" fullWidth className="rounded-xl">
-                    {t('login')}
-                  </Button>
-                </Link>
-                <Link href="/auth/register" className="flex-1" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button fullWidth className="rounded-xl">{t('register')}</Button>
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* Language Selector Mobile */}
-          <div className="p-4 border-t border-[var(--border)]">
-            <p className="text-xs text-[var(--text-grey)] uppercase tracking-wider mb-3 font-medium">{t('language')}</p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleLanguageChange('ar')}
-                className={clsx(
-                  'flex-1 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
-                  locale === 'ar'
-                    ? 'bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/25'
-                    : 'bg-[var(--main-bg)] text-[var(--black)] hover:bg-[var(--border)]'
-                )}
-              >
-                العربية
-              </button>
-              <button
-                onClick={() => handleLanguageChange('en')}
-                className={clsx(
-                  'flex-1 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
-                  locale === 'en'
-                    ? 'bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/25'
-                    : 'bg-[var(--main-bg)] text-[var(--black)] hover:bg-[var(--border)]'
-                )}
-              >
-                English
+                <span className="sr-only">Close</span>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-[var(--text-grey)]">
+                  <path d="M1 1L13 13M1 13L13 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
               </button>
             </div>
+
+            {/* Mobile Nav Links */}
+            <nav className="pb-5 space-y-3">
+              {navLinks.map((link, index) => {
+                const isActive = pathname === link.href || 
+                  (link.href !== '/' && pathname.startsWith(link.href));
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={clsx(
+                      'flex items-center gap-4 px-4 py-4 rounded-2xl font-semibold text-[15px] transition-all duration-200',
+                      isActive
+                        ? 'text-white bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] shadow-lg shadow-[var(--primary)]/30'
+                        : 'text-[var(--black)] bg-[var(--main-bg)]/50 hover:bg-[var(--main-bg)] active:scale-[0.98]'
+                    )}
+                    style={{ 
+                      animationDelay: `${index * 60}ms`,
+                      animation: isMobileMenuOpen ? `fadeInUp 0.35s ease ${index * 60}ms forwards` : 'none',
+                      opacity: isMobileMenuOpen ? 1 : 0
+                    }}
+                  >
+                    <span className={clsx(
+                      'w-10 h-10 flex items-center justify-center rounded-xl transition-colors',
+                      isActive 
+                        ? 'bg-white/20' 
+                        : 'bg-white shadow-sm'
+                    )}>
+                      <Icon size={20} className={isActive ? 'text-white' : 'text-[var(--primary)]'} />
+                    </span>
+                    {link.label}
+                  </Link>
+                );
+              })}
+              
+              {/* Favorites Link */}
+              <Link
+                href="/favorites"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-4 px-4 py-4 rounded-2xl text-[var(--black)] bg-[var(--main-bg)]/50 hover:bg-[var(--main-bg)] font-semibold text-[15px] transition-all duration-200 active:scale-[0.98]"
+              >
+                <span className="w-10 h-10 flex items-center justify-center rounded-xl bg-white shadow-sm">
+                  <Heart size={20} className="text-[var(--primary)]" />
+                </span>
+                {locale === 'ar' ? 'المفضلة' : 'Favorites'}
+              </Link>
+            </nav>
+
+            {/* Divider */}
+            <div className="my-3 h-px bg-gradient-to-r from-transparent via-[var(--border)] to-transparent" />
+
+            {/* Mobile Auth Section */}
+            <div className="py-4">
+              {!_hasHydrated ? (
+                <div className="flex gap-4">
+                  <div className="flex-1 h-14 bg-[var(--main-bg)] rounded-2xl animate-pulse" />
+                  <div className="flex-1 h-14 bg-[var(--main-bg)] rounded-2xl animate-pulse" />
+                </div>
+              ) : isAuthenticated ? (
+                <div className="space-y-4">
+                  {/* User Profile Card */}
+                  <Link
+                    href="/profile"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-br from-[var(--primary)]/10 via-[var(--primary)]/5 to-transparent border border-[var(--primary)]/10 hover:border-[var(--primary)]/20 transition-all active:scale-[0.99]"
+                  >
+                    <Avatar src={user?.img} fallback={user?.firstname} size="lg" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-[var(--black)] truncate text-[16px]">
+                        {user?.firstname} {user?.lastname}
+                      </p>
+                      <p className="text-sm text-[var(--text-grey)] truncate mt-0.5">
+                        {user?.email || user?.phone}
+                      </p>
+                    </div>
+                    <ChevronDown size={20} className="text-[var(--text-grey)] -rotate-90 rtl:rotate-90" />
+                  </Link>
+                  
+                  {/* Quick Actions */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <Link
+                      href="/orders"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-2xl bg-[var(--main-bg)] hover:bg-[var(--border)]/50 transition-colors font-semibold text-[14px]"
+                    >
+                      <Package size={18} className="text-[var(--primary)]" />
+                      {t('orders')}
+                    </Link>
+                    <Link
+                      href="/settings"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-2xl bg-[var(--main-bg)] hover:bg-[var(--border)]/50 transition-colors font-semibold text-[14px]"
+                    >
+                      <Settings size={18} className="text-[var(--primary)]" />
+                      {t('settings')}
+                    </Link>
+                  </div>
+                  
+                  {/* Logout Button */}
+                  <Button
+                    variant="outline"
+                    fullWidth
+                    onClick={handleLogout}
+                    leftIcon={<LogOut size={18} />}
+                    className="rounded-2xl h-13 py-3.5 border-2 border-[var(--error)]/20 text-[var(--error)] hover:bg-[var(--error)]/8 font-semibold"
+                  >
+                    {t('logout')}
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="text-center text-sm text-[var(--text-grey)] mb-4">
+                    {locale === 'ar' ? 'سجل دخولك للحصول على تجربة أفضل' : 'Sign in for a better experience'}
+                  </p>
+                  <div className="flex gap-3">
+                    <Link href="/auth/login" className="flex-1" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Button variant="outline" fullWidth className="rounded-2xl h-13 py-3.5 border-2 font-semibold">
+                        {t('login')}
+                      </Button>
+                    </Link>
+                    <Link href="/auth/register" className="flex-1" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Button fullWidth className="rounded-2xl h-13 py-3.5 shadow-lg shadow-[var(--primary)]/25 font-semibold !bg-[var(--primary)] !text-white hover:!bg-[var(--primary-hover)]">
+                        {t('register')}
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Divider */}
+            <div className="my-3 h-px bg-gradient-to-r from-transparent via-[var(--border)] to-transparent" />
+
+            {/* Language Selector - Mobile */}
+            <div className="py-4">
+              <p className="text-xs text-[var(--text-grey)] uppercase tracking-widest mb-4 font-bold flex items-center gap-2">
+                <Globe size={14} />
+                {t('language')}
+              </p>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => handleLanguageChange('ar')}
+                  className={clsx(
+                    'flex-1 py-4 rounded-2xl text-[15px] font-bold transition-all duration-300',
+                    locale === 'ar'
+                      ? 'bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] text-white shadow-lg shadow-[var(--primary)]/30'
+                      : 'bg-[var(--main-bg)] text-[var(--black)] hover:bg-[var(--border)]/50 active:scale-[0.98]'
+                  )}
+                >
+                  العربية
+                </button>
+                <button
+                  onClick={() => handleLanguageChange('en')}
+                  className={clsx(
+                    'flex-1 py-4 rounded-2xl text-[15px] font-bold transition-all duration-300',
+                    locale === 'en'
+                      ? 'bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] text-white shadow-lg shadow-[var(--primary)]/30'
+                      : 'bg-[var(--main-bg)] text-[var(--black)] hover:bg-[var(--border)]/50 active:scale-[0.98]'
+                  )}
+                >
+                  English
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
 
-      {/* Spacer for fixed header */}
-      <div className="h-[70px] lg:h-[88px]" />
+      {/* Spacer for fixed header - responsive */}
+      <div className="h-16 sm:h-[68px] lg:h-[76px]" />
     </>
   );
 };

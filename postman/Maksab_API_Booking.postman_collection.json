@@ -1,0 +1,577 @@
+{
+	"info": {
+		"_postman_id": "maksab-api-booking-v1",
+		"name": "Maksab Backend API - Booking",
+		"description": "Booking/Reservation API collection for Maksab Backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]
+	},
+	"variable": [{"key": "baseUrl", "value": "{{base_url}}/api/v1"}],
+	"item": [
+		{
+			"name": "REST - Booking Shops",
+			"item": [
+				{
+					"name": "Get Booking Shops Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {"raw": "{{baseUrl}}/rest/booking/shops/paginate", "host": ["{{baseUrl}}"], "path": ["rest", "booking", "shops", "paginate"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Recommended Booking Shops",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {"raw": "{{baseUrl}}/rest/booking/shops/recommended", "host": ["{{baseUrl}}"], "path": ["rest", "booking", "shops", "recommended"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Booking Shop by UUID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {"raw": "{{baseUrl}}/rest/booking/shops/:uuid", "host": ["{{baseUrl}}"], "path": ["rest", "booking", "shops", ":uuid"], "variable": [{"key": "uuid", "value": "shop-uuid"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Booking Shops",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {"raw": "{{baseUrl}}/rest/booking/shops/search?search=restaurant", "host": ["{{baseUrl}}"], "path": ["rest", "booking", "shops", "search"], "query": [{"key": "search", "value": "restaurant"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shop Categories",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {"raw": "{{baseUrl}}/rest/booking/shops/:id/categories", "host": ["{{baseUrl}}"], "path": ["rest", "booking", "shops", ":id", "categories"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shop Products",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {"raw": "{{baseUrl}}/rest/booking/shops/:id/products", "host": ["{{baseUrl}}"], "path": ["rest", "booking", "shops", ":id", "products"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Shop Working",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {"raw": "{{baseUrl}}/rest/booking/shop-working-check/:id", "host": ["{{baseUrl}}"], "path": ["rest", "booking", "shop-working-check", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST - Bookings",
+			"item": [
+				{
+					"name": "Get Bookings",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {"raw": "{{baseUrl}}/rest/booking/bookings", "host": ["{{baseUrl}}"], "path": ["rest", "booking", "bookings"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Booking by ID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {"raw": "{{baseUrl}}/rest/booking/bookings/:id", "host": ["{{baseUrl}}"], "path": ["rest", "booking", "bookings", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST - Shop Sections",
+			"item": [
+				{
+					"name": "Get Shop Sections",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {"raw": "{{baseUrl}}/rest/booking/shop-sections", "host": ["{{baseUrl}}"], "path": ["rest", "booking", "shop-sections"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shop Section by ID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {"raw": "{{baseUrl}}/rest/booking/shop-sections/:id", "host": ["{{baseUrl}}"], "path": ["rest", "booking", "shop-sections", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST - Tables",
+			"item": [
+				{
+					"name": "Get Tables",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {"raw": "{{baseUrl}}/rest/booking/tables", "host": ["{{baseUrl}}"], "path": ["rest", "booking", "tables"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Table by ID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {"raw": "{{baseUrl}}/rest/booking/tables/:id", "host": ["{{baseUrl}}"], "path": ["rest", "booking", "tables", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Table Disable Dates",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}],
+						"url": {"raw": "{{baseUrl}}/rest/booking/disable-dates/table/:id", "host": ["{{baseUrl}}"], "path": ["rest", "booking", "disable-dates", "table", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User - My Bookings",
+			"item": [
+				{
+					"name": "Get My Bookings",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/user/my-bookings", "host": ["{{baseUrl}}"], "path": ["dashboard", "user", "my-bookings"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Booking",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"table_id\": 1,\n    \"start_date\": \"2024-01-15 14:00:00\",\n    \"end_date\": \"2024-01-15 16:00:00\",\n    \"guest_count\": 4,\n    \"note\": \"Birthday celebration\"\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/user/my-bookings", "host": ["{{baseUrl}}"], "path": ["dashboard", "user", "my-bookings"]}
+					},
+					"response": [{"name": "Success", "status": "Created", "code": 201, "body": "{\n    \"status\": true,\n    \"message\": \"Booking created successfully\",\n    \"data\": {\n        \"id\": 1,\n        \"table_id\": 1,\n        \"start_date\": \"2024-01-15 14:00:00\",\n        \"end_date\": \"2024-01-15 16:00:00\",\n        \"status\": \"pending\"\n    }\n}"}]
+				},
+				{
+					"name": "Get My Booking by ID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/user/my-bookings/:id", "host": ["{{baseUrl}}"], "path": ["dashboard", "user", "my-bookings", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update My Booking",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"guest_count\": 6,\n    \"note\": \"Updated note\"\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/user/my-bookings/:id", "host": ["{{baseUrl}}"], "path": ["dashboard", "user", "my-bookings", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete My Booking",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/user/my-bookings/delete?ids[]=1", "host": ["{{baseUrl}}"], "path": ["dashboard", "user", "my-bookings", "delete"], "query": [{"key": "ids[]", "value": "1"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Seller - Bookings",
+			"item": [
+				{
+					"name": "Get Bookings",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/bookings", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "bookings"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Booking",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"title\": {\"en\": \"VIP Booking\"},\n    \"max_time\": 120\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/bookings", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "bookings"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Booking by ID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/bookings/:id", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "bookings", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Bookings",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/bookings/delete?ids[]=1", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "bookings", "delete"], "query": [{"key": "ids[]", "value": "1"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Seller - User Bookings",
+			"item": [
+				{
+					"name": "Get User Bookings",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/user-bookings", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "user-bookings"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Booking Status",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"status\": \"accepted\"\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/user-booking/status/:id", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "user-booking", "status", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Seller - Shop Sections",
+			"item": [
+				{
+					"name": "Get Shop Sections",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/shop-sections", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "shop-sections"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Shop Section",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"area\": \"main\",\n    \"title\": {\"en\": \"Main Hall\"}\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/shop-sections", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "shop-sections"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Shop Section",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"title\": {\"en\": \"Updated Main Hall\"}\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/shop-sections/:id", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "shop-sections", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Shop Sections",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/shop-sections/delete?ids[]=1", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "shop-sections", "delete"], "query": [{"key": "ids[]", "value": "1"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Seller - Tables",
+			"item": [
+				{
+					"name": "Get Tables",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/tables", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "tables"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Table",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"shop_section_id\": 1,\n    \"name\": \"Table 1\",\n    \"chair_count\": 4,\n    \"tax\": 0,\n    \"active\": true\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/tables", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "tables"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Table by ID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/tables/:id", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "tables", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Table",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"name\": \"VIP Table 1\",\n    \"chair_count\": 6\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/tables/:id", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "tables", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Tables",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/tables/delete?ids[]=1", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "tables", "delete"], "query": [{"key": "ids[]", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Table Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/table/statistic", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "table", "statistic"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Table Disable Dates",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/disable-dates/table/:id", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "disable-dates", "table", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Seller - Booking Working Days",
+			"item": [
+				{
+					"name": "Get Booking Working Days",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/booking/shop-working-days", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "booking", "shop-working-days"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Booking Working Day",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"day\": \"monday\",\n    \"from\": \"09:00\",\n    \"to\": \"22:00\",\n    \"disabled\": false\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/booking/shop-working-days/:id", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "booking", "shop-working-days", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin - Bookings",
+			"item": [
+				{
+					"name": "Get Bookings",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/bookings", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "bookings"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Booking",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"shop_id\": 1,\n    \"title\": {\"en\": \"Standard Booking\"},\n    \"max_time\": 120\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/bookings", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "bookings"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Booking by ID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/bookings/:id", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "bookings", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Booking",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"title\": {\"en\": \"Updated Booking\"},\n    \"max_time\": 180\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/bookings/:id", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "bookings", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Bookings",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/bookings/delete?ids[]=1", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "bookings", "delete"], "query": [{"key": "ids[]", "value": "1"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin - User Bookings",
+			"item": [
+				{
+					"name": "Get User Bookings",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/user-bookings", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "user-bookings"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Booking Status",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"status\": \"accepted\"\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/user-booking/status/:id", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "user-booking", "status", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User Bookings",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/user-bookings/delete?ids[]=1", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "user-bookings", "delete"], "query": [{"key": "ids[]", "value": "1"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin - Tables",
+			"item": [
+				{
+					"name": "Get Tables",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/tables", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "tables"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Table",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"shop_section_id\": 1,\n    \"name\": \"Admin Table\",\n    \"chair_count\": 8,\n    \"active\": true\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/tables", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "tables"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Table Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/table/statistic", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "table", "statistic"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Tables",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/tables/delete?ids[]=1", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "tables", "delete"], "query": [{"key": "ids[]", "value": "1"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin - Shop Sections",
+			"item": [
+				{
+					"name": "Get Shop Sections",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/shop-sections", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "shop-sections"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Shop Section",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"shop_id\": 1,\n    \"area\": \"vip\",\n    \"title\": {\"en\": \"VIP Section\"}\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/shop-sections", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "shop-sections"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Shop Sections",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/shop-sections/delete?ids[]=1", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "shop-sections", "delete"], "query": [{"key": "ids[]", "value": "1"}]}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
+

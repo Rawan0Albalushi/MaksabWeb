@@ -1,0 +1,1003 @@
+{
+	"info": {
+		"_postman_id": "maksab-api-seller-admin-v1",
+		"name": "Maksab Backend API - Seller & Admin",
+		"description": "Seller and Admin dashboard API collection for Maksab Backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]
+	},
+	"variable": [{"key": "baseUrl", "value": "{{base_url}}/api/v1"}],
+	"item": [
+		{
+			"name": "Seller - Dashboard",
+			"item": [
+				{
+					"name": "Get Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/statistics", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "statistics"]}
+					},
+					"response": [{"name": "Success", "status": "OK", "code": 200, "body": "{\n    \"status\": true,\n    \"data\": {\n        \"orders_count\": 150,\n        \"orders_total\": 5000.00,\n        \"products_count\": 50,\n        \"reviews_count\": 30\n    }\n}"}]
+				},
+				{
+					"name": "Get Orders Chart",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/statistics/orders/chart?date_from=2024-01-01&date_to=2024-01-31", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "statistics", "orders", "chart"], "query": [{"key": "date_from", "value": "2024-01-01"}, {"key": "date_to", "value": "2024-01-31"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Seller - Shop",
+			"item": [
+				{
+					"name": "Get My Shop",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/shops", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "shops"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Shop",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"title\": {\"en\": \"My Restaurant\", \"ar\": \"مطعمي\"},\n    \"description\": {\"en\": \"Best food in town\"},\n    \"phone\": \"+968123456789\",\n    \"open\": true,\n    \"delivery_time\": {\"from\": 20, \"to\": 40},\n    \"location\": {\"latitude\": 23.5880, \"longitude\": 58.3829, \"address\": \"Main Street\"}\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/shops", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "shops"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Working Status",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"open\": true\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/shops/working/status", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "shops", "working", "status"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Seller - Products",
+			"item": [
+				{
+					"name": "Get Products Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/products/paginate?perPage=15", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "products", "paginate"], "query": [{"key": "perPage", "value": "15"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Product",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"category_id\": 1,\n    \"brand_id\": 1,\n    \"unit_id\": 1,\n    \"tax\": 0,\n    \"min_qty\": 1,\n    \"max_qty\": 100,\n    \"active\": true,\n    \"title\": {\"en\": \"Burger\", \"ar\": \"برجر\"},\n    \"description\": {\"en\": \"Delicious burger\"},\n    \"images\": [\"image1.jpg\"]\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/products", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "products"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product by UUID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/products/:uuid", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "products", ":uuid"], "variable": [{"key": "uuid", "value": "product-uuid"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Product",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"category_id\": 1,\n    \"active\": true,\n    \"title\": {\"en\": \"Updated Burger\"},\n    \"description\": {\"en\": \"Updated description\"}\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/products/:uuid", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "products", ":uuid"], "variable": [{"key": "uuid", "value": "product-uuid"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Product",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/products/delete?ids[]=1", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "products", "delete"], "query": [{"key": "ids[]", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Stock to Product",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"extras\": [],\n    \"price\": 5.00,\n    \"quantity\": 100,\n    \"sku\": \"BRG001\"\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/products/:uuid/stocks", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "products", ":uuid", "stocks"], "variable": [{"key": "uuid", "value": "product-uuid"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Product Active",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/products/:uuid/active", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "products", ":uuid", "active"], "variable": [{"key": "uuid", "value": "product-uuid"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Export Products",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/products/export", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "products", "export"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Import Products",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "formdata", "formdata": [{"key": "file", "type": "file", "src": ""}]},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/products/import", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "products", "import"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Seller - Categories",
+			"item": [
+				{
+					"name": "Get Categories Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/categories/paginate", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "categories", "paginate"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Category",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"type\": \"main\",\n    \"active\": true,\n    \"title\": {\"en\": \"Burgers\", \"ar\": \"برجر\"}\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/categories", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "categories"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Category by UUID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/categories/:uuid", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "categories", ":uuid"], "variable": [{"key": "uuid", "value": "category-uuid"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Category",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"active\": true,\n    \"title\": {\"en\": \"Updated Category\"}\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/categories/:uuid", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "categories", ":uuid"], "variable": [{"key": "uuid", "value": "category-uuid"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Category",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/categories/delete?ids[]=category-uuid", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "categories", "delete"], "query": [{"key": "ids[]", "value": "category-uuid"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Seller - Orders",
+			"item": [
+				{
+					"name": "Get Orders Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/orders/paginate?perPage=15&status=new", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "orders", "paginate"], "query": [{"key": "perPage", "value": "15"}, {"key": "status", "value": "new"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/orders/:id", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "orders", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order Status",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"status\": \"accepted\"\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/order/:id/status", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "order", ":id", "status"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Deliveryman",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"deliveryman\": 5\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/order/:id/deliveryman", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "order", ":id", "deliveryman"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Order",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"user_id\": 1,\n    \"currency_id\": 1,\n    \"rate\": 1,\n    \"delivery_type\": \"delivery\",\n    \"delivery_date\": \"2024-01-15\",\n    \"delivery_time\": \"14:00\",\n    \"payment_id\": 1,\n    \"products\": [{\"stock_id\": 1, \"quantity\": 2}],\n    \"location\": {\"latitude\": 23.5880, \"longitude\": 58.3829, \"address\": \"Address\"}\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/orders", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "orders"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Export Orders",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/order/export", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "order", "export"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Seller - Coupons",
+			"item": [
+				{
+					"name": "Get Coupons Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/coupons/paginate", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "coupons", "paginate"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Coupon",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"name\": \"DISCOUNT20\",\n    \"type\": \"percent\",\n    \"qty\": 100,\n    \"price\": 20,\n    \"expired_at\": \"2024-12-31\",\n    \"title\": {\"en\": \"20% Discount\"}\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/coupons", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "coupons"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Coupon by ID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/coupons/:id", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "coupons", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Coupon",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"qty\": 150,\n    \"expired_at\": \"2025-06-30\"\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/coupons/:id", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "coupons", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Coupons",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/coupons/delete?ids[]=1", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "coupons", "delete"], "query": [{"key": "ids[]", "value": "1"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Seller - Delivery Zones",
+			"item": [
+				{
+					"name": "Get Delivery Zones List",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/delivery-zones/list", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "delivery-zones", "list"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Delivery Zones",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/delivery-zones", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "delivery-zones"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Delivery Zone",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"address\": [{\"latitude\": 23.5880, \"longitude\": 58.3829}],\n    \"price\": 2.00\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/delivery-zones", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "delivery-zones"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Seller - Banners",
+			"item": [
+				{
+					"name": "Get Banners Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/banners/paginate", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "banners", "paginate"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Banner",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"url\": \"banner.jpg\",\n    \"active\": true,\n    \"clickable\": true,\n    \"title\": {\"en\": \"Special Offer\"}\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/banners", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "banners"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Seller - Users",
+			"item": [
+				{
+					"name": "Get Shop Users Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/shop/users/paginate", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "shop", "users", "paginate"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Deliverymen",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/shop/users/role/deliveryman", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "shop", "users", "role", "deliveryman"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"firstname\": \"Staff\",\n    \"lastname\": \"Member\",\n    \"email\": \"staff@example.com\",\n    \"phone\": \"+968123456789\",\n    \"password\": \"password123\",\n    \"role\": \"deliveryman\"\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/seller/users", "host": ["{{baseUrl}}"], "path": ["dashboard", "seller", "users"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin - Dashboard",
+			"item": [
+				{
+					"name": "Get Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/statistics", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "statistics"]}
+					},
+					"response": [{"name": "Success", "status": "OK", "code": 200, "body": "{\n    \"status\": true,\n    \"data\": {\n        \"orders_count\": 1500,\n        \"orders_total\": 50000.00,\n        \"shops_count\": 25,\n        \"users_count\": 1000,\n        \"products_count\": 500\n    }\n}"}]
+				},
+				{
+					"name": "Get Orders Chart",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/statistics/orders/chart", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "statistics", "orders", "chart"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Products Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/statistics/products", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "statistics", "products"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Users Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/statistics/users", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "statistics", "users"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin - Users",
+			"item": [
+				{
+					"name": "Get Users Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/users/paginate?perPage=15&role=user", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "users", "paginate"], "query": [{"key": "perPage", "value": "15"}, {"key": "role", "value": "user"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"firstname\": \"Admin\",\n    \"lastname\": \"User\",\n    \"email\": \"admin@example.com\",\n    \"phone\": \"+968123456789\",\n    \"password\": \"password123\",\n    \"role\": \"manager\"\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/users", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "users"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by UUID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/users/:uuid", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "users", ":uuid"], "variable": [{"key": "uuid", "value": "user-uuid"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"firstname\": \"Updated\",\n    \"lastname\": \"Name\"\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/users/:uuid", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "users", ":uuid"], "variable": [{"key": "uuid", "value": "user-uuid"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Users",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/users/delete?ids[]=user-uuid", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "users", "delete"], "query": [{"key": "ids[]", "value": "user-uuid"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Role",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"role\": \"seller\"\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/users/:uuid/role/update", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "users", ":uuid", "role", "update"], "variable": [{"key": "uuid", "value": "user-uuid"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Top Up User Wallet",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"price\": 100.00,\n    \"note\": \"Admin top up\"\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/users/:uuid/wallets", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "users", ":uuid", "wallets"], "variable": [{"key": "uuid", "value": "user-uuid"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Roles",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/roles", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "roles"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin - Shops",
+			"item": [
+				{
+					"name": "Get Shops Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/shops/paginate?perPage=15", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "shops", "paginate"], "query": [{"key": "perPage", "value": "15"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Shop",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"user_id\": 1,\n    \"tax\": 5,\n    \"percentage\": 10,\n    \"phone\": \"+968123456789\",\n    \"open\": true,\n    \"delivery_time\": {\"from\": 20, \"to\": 40},\n    \"location\": {\"latitude\": 23.5880, \"longitude\": 58.3829, \"address\": \"Main Street\"},\n    \"title\": {\"en\": \"New Restaurant\"},\n    \"description\": {\"en\": \"Best food in town\"}\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/shops", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "shops"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shop by UUID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/shops/:uuid", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "shops", ":uuid"], "variable": [{"key": "uuid", "value": "shop-uuid"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Shop",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"open\": true,\n    \"title\": {\"en\": \"Updated Restaurant\"}\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/shops/:uuid", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "shops", ":uuid"], "variable": [{"key": "uuid", "value": "shop-uuid"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Shops",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/shops/delete?ids[]=shop-uuid", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "shops", "delete"], "query": [{"key": "ids[]", "value": "shop-uuid"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Shop Status",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"status\": \"approved\"\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/shops/:uuid/status/change", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "shops", ":uuid", "status", "change"], "variable": [{"key": "uuid", "value": "shop-uuid"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Shop",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/shops/:uuid/verify", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "shops", ":uuid", "verify"], "variable": [{"key": "uuid", "value": "shop-uuid"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin - Orders",
+			"item": [
+				{
+					"name": "Get Orders Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/orders/paginate?perPage=15", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "orders", "paginate"], "query": [{"key": "perPage", "value": "15"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/orders/:id", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "orders", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order Status",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"status\": \"delivered\"\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/order/:id/status", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "order", ":id", "status"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Deliveryman",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"deliveryman\": 5\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/order/:id/deliveryman", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "order", ":id", "deliveryman"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Orders Report Chart",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/orders/report/chart", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "orders", "report", "chart"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Revenue Report",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/revenue/report", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "revenue", "report"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin - Categories",
+			"item": [
+				{
+					"name": "Get Categories Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/categories/paginate", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "categories", "paginate"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Category",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"type\": \"main\",\n    \"active\": true,\n    \"title\": {\"en\": \"New Category\", \"ar\": \"فئة جديدة\"}\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/categories", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "categories"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Category by UUID",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/categories/:uuid", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "categories", ":uuid"], "variable": [{"key": "uuid", "value": "category-uuid"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Category",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"active\": true,\n    \"title\": {\"en\": \"Updated Category\"}\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/categories/:uuid", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "categories", ":uuid"], "variable": [{"key": "uuid", "value": "category-uuid"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Categories",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/categories/delete?ids[]=category-uuid", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "categories", "delete"], "query": [{"key": "ids[]", "value": "category-uuid"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin - Products",
+			"item": [
+				{
+					"name": "Get Products Paginate",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/products/paginate?perPage=15", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "products", "paginate"], "query": [{"key": "perPage", "value": "15"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Product",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"shop_id\": 1,\n    \"category_id\": 1,\n    \"unit_id\": 1,\n    \"tax\": 0,\n    \"active\": true,\n    \"title\": {\"en\": \"Product Name\"},\n    \"description\": {\"en\": \"Product description\"}\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/products", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "products"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Product Status",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"status\": \"published\"\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/products/:uuid/status/change", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "products", ":uuid", "status", "change"], "variable": [{"key": "uuid", "value": "product-uuid"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin - Languages",
+			"item": [
+				{
+					"name": "Get Languages",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/languages", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "languages"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Language",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"title\": \"Spanish\",\n    \"locale\": \"es\",\n    \"active\": true,\n    \"backward\": false\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/languages", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "languages"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Default Language",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/languages/default/:id", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "languages", "default", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin - Currencies",
+			"item": [
+				{
+					"name": "Get Currencies",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/currencies", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "currencies"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Currency",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"title\": \"US Dollar\",\n    \"symbol\": \"$\",\n    \"rate\": 3.85,\n    \"active\": true\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/currencies", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "currencies"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Default Currency",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/currencies/default/:id", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "currencies", "default", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin - Settings",
+			"item": [
+				{
+					"name": "Get Settings",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/settings", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "settings"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Settings",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "[\n    {\"key\": \"title\", \"value\": \"Maksab\"},\n    {\"key\": \"min_order\", \"value\": \"5\"}\n]"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/settings", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "settings"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Clear Cache",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/settings/system/cache/clear", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "settings", "system", "cache", "clear"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin - Payments",
+			"item": [
+				{
+					"name": "Get Payments",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/payments", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "payments"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Payment",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"active\": true,\n    \"client_id\": \"your_client_id\",\n    \"secret_id\": \"your_secret_id\"\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/payments/:id", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "payments", ":id"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Payment Active",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/payments/:id/active/status", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "payments", ":id", "active", "status"], "variable": [{"key": "id", "value": "1"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin - Zones",
+			"item": [
+				{
+					"name": "Get Zones",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/zones", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "zones"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Zone",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"name\": \"Zone 1\",\n    \"status\": true,\n    \"coordinates\": [\n        {\"latitude\": 23.5880, \"longitude\": 58.3829},\n        {\"latitude\": 23.5900, \"longitude\": 58.3900}\n    ]\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/zones", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "zones"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Attach Shops to Zone",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"shop_ids\": [1, 2, 3]\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/zones/:zone/shops", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "zones", ":zone", "shops"], "variable": [{"key": "zone", "value": "1"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Attach Delivery Men to Zone",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"user_ids\": [5, 6, 7]\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/zones/:zone/delivery-men", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "zones", ":zone", "delivery-men"], "variable": [{"key": "zone", "value": "1"}]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin - Voucher Tokens",
+			"item": [
+				{
+					"name": "Get Voucher Tokens",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/voucher-tokens", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "voucher-tokens"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Voucher Token",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"body": {"mode": "raw", "raw": "{\n    \"price\": 25.00,\n    \"qty\": 100,\n    \"expired_at\": \"2025-12-31\"\n}"},
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/voucher-tokens", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "voucher-tokens"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Voucher Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+						"url": {"raw": "{{baseUrl}}/dashboard/admin/voucher-tokens/statistics", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin", "voucher-tokens", "statistics"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Webhooks",
+			"item": [
+				{
+					"name": "PayPal Webhook",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}],
+						"body": {"mode": "raw", "raw": "{}"},
+						"url": {"raw": "{{baseUrl}}/webhook/paypal/payment", "host": ["{{baseUrl}}"], "path": ["webhook", "paypal", "payment"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Stripe Webhook",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}],
+						"body": {"mode": "raw", "raw": "{}"},
+						"url": {"raw": "{{baseUrl}}/webhook/stripe/payment", "host": ["{{baseUrl}}"], "path": ["webhook", "stripe", "payment"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Zajil Delivery Webhook",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Accept", "value": "application/json"}, {"key": "Content-Type", "value": "application/json"}],
+						"body": {"mode": "raw", "raw": "{}"},
+						"url": {"raw": "{{baseUrl}}/webhook/zajil/delivery", "host": ["{{baseUrl}}"], "path": ["webhook", "zajil", "delivery"]}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
+

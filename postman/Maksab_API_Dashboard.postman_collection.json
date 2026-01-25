@@ -1,0 +1,1379 @@
+{
+	"info": {
+		"_postman_id": "maksab-api-dashboard-v1",
+		"name": "Maksab Backend API - Dashboard",
+		"description": "Dashboard API collection for Maksab Backend - User, Seller, Deliveryman, Admin endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "{{base_url}}/api/v1"
+		}
+	],
+	"item": [
+		{
+			"name": "User - Profile",
+			"description": "User profile management endpoints",
+			"item": [
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/profile/show",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "profile", "show"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": true,\n    \"data\": {\n        \"id\": 1,\n        \"uuid\": \"user-uuid\",\n        \"firstname\": \"John\",\n        \"lastname\": \"Doe\",\n        \"email\": \"john@example.com\",\n        \"phone\": \"+968123456789\",\n        \"wallet\": {\n            \"uuid\": \"wallet-uuid\",\n            \"price\": 100.00\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstname\": \"John\",\n    \"lastname\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"phone\": \"+968123456789\",\n    \"birthday\": \"1990-01-15\",\n    \"gender\": \"male\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/profile/update",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "profile", "update"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Profile",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/profile/delete",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "profile", "delete"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Firebase Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firebase_token\": \"your-firebase-token-here\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/profile/firebase/token/update",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "profile", "firebase", "token", "update"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\": \"newpassword123\",\n    \"password_confirmation\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/profile/password/update",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "profile", "password", "update"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Notification Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/profile/notifications-statistic",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "profile", "notifications-statistic"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User - Orders",
+			"description": "User order management endpoints",
+			"item": [
+				{
+					"name": "Get My Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/orders/paginate?perPage=15&page=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "orders", "paginate"],
+							"query": [
+								{"key": "perPage", "value": "15"},
+								{"key": "page", "value": "1"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cart_id\": 1,\n    \"currency_id\": 1,\n    \"rate\": 1,\n    \"shop_id\": 1,\n    \"delivery_type\": \"delivery\",\n    \"delivery_date\": \"2024-01-15\",\n    \"delivery_time\": \"14:00\",\n    \"payment_id\": 1,\n    \"location\": {\n        \"latitude\": 23.5880,\n        \"longitude\": 58.3829,\n        \"address\": \"123 Main Street\"\n    },\n    \"phone\": \"+968123456789\",\n    \"note\": \"Please ring the doorbell\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "orders"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "Created",
+							"code": 201,
+							"body": "{\n    \"status\": true,\n    \"message\": \"Order created successfully\",\n    \"data\": {\n        \"id\": 1,\n        \"user_id\": 1,\n        \"total_price\": 25.50,\n        \"status\": \"new\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/orders/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "orders", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"canceled\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/orders/:id/status/change",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "orders", ":id", "status", "change"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Order Review",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 5,\n    \"comment\": \"Great service and food!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/orders/review/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "orders", "review", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Deliveryman Review",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 5,\n    \"comment\": \"Fast delivery!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/orders/deliveryman-review/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "orders", "deliveryman-review", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Repeat Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/orders/:id/repeat",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "orders", ":id", "repeat"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User - Parcel Orders",
+			"description": "User parcel order endpoints",
+			"item": [
+				{
+					"name": "Get Parcel Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/parcel-orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "parcel-orders"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Parcel Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"currency_id\": 1,\n    \"type_id\": 1,\n    \"rate\": 1,\n    \"payment_id\": 1,\n    \"address_from\": {\n        \"latitude\": 23.5880,\n        \"longitude\": 58.3829,\n        \"address\": \"Pickup Address\"\n    },\n    \"address_to\": {\n        \"latitude\": 23.6000,\n        \"longitude\": 58.4000,\n        \"address\": \"Delivery Address\"\n    },\n    \"phone_from\": \"+968111111111\",\n    \"phone_to\": \"+968222222222\",\n    \"username_from\": \"Sender Name\",\n    \"username_to\": \"Receiver Name\",\n    \"note\": \"Handle with care\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/parcel-orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "parcel-orders"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Parcel Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/parcel-orders/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "parcel-orders", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Parcel Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"canceled\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/parcel-orders/:id/status/change",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "parcel-orders", ":id", "status", "change"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User - Addresses",
+			"description": "User address management endpoints",
+			"item": [
+				{
+					"name": "Get Addresses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/addresses",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "addresses"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Address",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Home\",\n    \"address\": \"123 Main Street, Muscat\",\n    \"location\": {\n        \"latitude\": 23.5880,\n        \"longitude\": 58.3829\n    },\n    \"default\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/addresses",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "addresses"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Address by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/addresses/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "addresses", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Address",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Work\",\n    \"address\": \"456 Business Ave, Muscat\",\n    \"location\": {\n        \"latitude\": 23.5900,\n        \"longitude\": 58.3900\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/addresses/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "addresses", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Address",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/addresses/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "addresses", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Active Address",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/address/set-active/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "address", "set-active", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Active Address",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/address/get-active",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "address", "get-active"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User - Wallet",
+			"description": "User wallet management endpoints",
+			"item": [
+				{
+					"name": "Get Wallet Histories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/wallet/histories",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "wallet", "histories"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Point Histories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/point/histories",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "point", "histories"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Withdraw from Wallet",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"price\": 50.00,\n    \"note\": \"Withdrawal request\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/wallet/withdraw",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "wallet", "withdraw"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Wallet Money",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"uuid\": \"receiver-user-uuid\",\n    \"price\": 25.00,\n    \"note\": \"Money transfer\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/wallet/send",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "wallet", "send"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User - Cart",
+			"description": "User cart management endpoints",
+			"item": [
+				{
+					"name": "Get Cart",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/cart",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "cart"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"shop_id\": 1,\n    \"currency_id\": 1,\n    \"rate\": 1,\n    \"products\": [\n        {\n            \"stock_id\": 1,\n            \"quantity\": 2,\n            \"addons\": []\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/cart",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "cart"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insert Products to Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"products\": [\n        {\n            \"stock_id\": 2,\n            \"quantity\": 1\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/cart/insert-product",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "cart", "insert-product"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Calculate Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"coupon\": \"DISCOUNT10\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/cart/calculate/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "cart", "calculate", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Cart",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/cart/delete",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "cart", "delete"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User - Tickets",
+			"description": "User support ticket endpoints",
+			"item": [
+				{
+					"name": "Get Tickets Paginate",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/tickets/paginate",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "tickets", "paginate"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Ticket",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"subject\": \"Order Issue\",\n    \"content\": \"I have an issue with my order #123\",\n    \"type\": \"question\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/tickets",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "tickets"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Ticket by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/tickets/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "tickets", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User - Voucher Tokens",
+			"description": "User voucher token endpoints",
+			"item": [
+				{
+					"name": "Check Voucher Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"VOUCHER123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/voucher-tokens/check",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "voucher-tokens", "check"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Redeem Voucher Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"VOUCHER123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/voucher-tokens/redeem",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "voucher-tokens", "redeem"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Tokens",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/user/voucher-tokens/my-tokens",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "user", "voucher-tokens", "my-tokens"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Deliveryman - Orders",
+			"description": "Deliveryman order management endpoints",
+			"item": [
+				{
+					"name": "Get Orders Paginate",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/deliveryman/orders/paginate?perPage=15&status=ready",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "deliveryman", "orders", "paginate"],
+							"query": [
+								{"key": "perPage", "value": "15"},
+								{"key": "status", "value": "ready"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/deliveryman/orders/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "deliveryman", "orders", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"on_a_way\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/deliveryman/order/:id/status/update",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "deliveryman", "order", ":id", "status", "update"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Attach Order to Me",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/deliveryman/order/:id/attach/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "deliveryman", "order", ":id", "attach", "me"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Current Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/deliveryman/orders/:id/current",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "deliveryman", "orders", ":id", "current"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Order Photo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{"key": "image", "type": "file", "src": ""}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/deliveryman/orders/:id/image",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "deliveryman", "orders", ":id", "image"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Deliveryman - Settings",
+			"description": "Deliveryman settings endpoints",
+			"item": [
+				{
+					"name": "Get Settings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/deliveryman/settings",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "deliveryman", "settings"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Settings",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type_of_technique\": \"car\",\n    \"brand\": \"Toyota\",\n    \"model\": \"Corolla\",\n    \"number\": \"ABC123\",\n    \"color\": \"white\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/deliveryman/settings",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "deliveryman", "settings"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Location",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"latitude\": 23.5880,\n    \"longitude\": 58.3829\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/deliveryman/settings/location",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "deliveryman", "settings", "location"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Online Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"online\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/deliveryman/settings/online",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "deliveryman", "settings", "online"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Deliveryman - Statistics",
+			"description": "Deliveryman statistics endpoints",
+			"item": [
+				{
+					"name": "Get Count Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/deliveryman/statistics/count",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "deliveryman", "statistics", "count"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": true,\n    \"data\": {\n        \"today_orders\": 10,\n        \"total_orders\": 150,\n        \"today_earnings\": 25.50,\n        \"total_earnings\": 500.00\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Order Report",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/deliveryman/order/report?date_from=2024-01-01&date_to=2024-01-31",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "deliveryman", "order", "report"],
+							"query": [
+								{"key": "date_from", "value": "2024-01-01"},
+								{"key": "date_to", "value": "2024-01-31"}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Deliveryman - Parcel Orders",
+			"description": "Deliveryman parcel order endpoints",
+			"item": [
+				{
+					"name": "Get Parcel Orders Paginate",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/deliveryman/parcel-orders/paginate",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "deliveryman", "parcel-orders", "paginate"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Parcel Order Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"on_a_way\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/deliveryman/parcel-orders/:id/status/update",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "deliveryman", "parcel-orders", ":id", "status", "update"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Attach Parcel Order to Me",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/deliveryman/parcel-order/:id/attach/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "deliveryman", "parcel-order", ":id", "attach", "me"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Deliveryman - Payouts",
+			"description": "Deliveryman payout endpoints",
+			"item": [
+				{
+					"name": "Get Payouts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/deliveryman/payouts",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "deliveryman", "payouts"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Payout Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"price\": 100.00,\n    \"note\": \"Weekly payout request\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/deliveryman/payouts",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "deliveryman", "payouts"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Waiter - Orders",
+			"description": "Waiter order management endpoints",
+			"item": [
+				{
+					"name": "Get Orders Paginate",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/waiter/orders/paginate",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "waiter", "orders", "paginate"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/waiter/orders/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "waiter", "orders", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"accepted\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/waiter/order/:id/status/update",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "waiter", "order", ":id", "status", "update"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Attach Order to Me",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/waiter/order/:id/attach/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "waiter", "order", ":id", "attach", "me"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order Count Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/waiter/orders/count",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "waiter", "orders", "count"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cook - Orders",
+			"description": "Cook order management endpoints",
+			"item": [
+				{
+					"name": "Get Orders Paginate",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/cook/orders/paginate",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "cook", "orders", "paginate"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/cook/orders/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "cook", "orders", ":id"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"cooking\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/cook/orders/:id/status/update",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "cook", "orders", ":id", "status", "update"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order Detail Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"ready\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/cook/order-detail/:id/status/update",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "cook", "order-detail", ":id", "status", "update"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Attach Order to Me",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/cook/orders/:id/attach/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "cook", "orders", ":id", "attach", "me"],
+							"variable": [{"key": "id", "value": "1"}]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
+
