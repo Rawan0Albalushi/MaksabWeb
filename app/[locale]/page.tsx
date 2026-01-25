@@ -320,69 +320,105 @@ const HomePage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="relative mt-4 lg:mt-0 overflow-hidden rounded-lg sm:rounded-2xl lg:rounded-3xl"
+              className="relative mt-4 lg:mt-0"
             >
               {loading ? (
                 <BannerSkeleton />
               ) : banners.length > 0 ? (
-                <div className="relative overflow-hidden">
-                  <Swiper
-                    modules={[Autoplay, Pagination, Navigation, EffectFade]}
-                    spaceBetween={0}
-                    slidesPerView={1}
-                    effect="fade"
-                    autoplay={{ delay: 4000, disableOnInteraction: false }}
-                    pagination={{ 
-                      clickable: true,
-                      bulletClass: 'swiper-pagination-bullet !bg-white/30 !w-1.5 !h-1.5 sm:!w-2 sm:!h-2',
-                      bulletActiveClass: '!bg-[var(--primary)] !w-4 sm:!w-6',
-                    }}
-                    navigation={{
-                      prevEl: '.hero-prev',
-                      nextEl: '.hero-next',
-                    }}
-                    loop
-                    className="overflow-hidden shadow-xl sm:shadow-2xl"
-                  >
-                    {banners.map((banner) => (
-                      <SwiperSlide key={banner.id}>
-                        <Link href={banner.url || '#'} className="block aspect-[16/9] sm:aspect-[16/10] relative group">
-                          <Image
-                            src={banner.img}
-                            alt={banner.translation?.title || 'Banner'}
-                            fill
-                            className="object-cover transition-transform duration-700 group-hover:scale-105"
-                            priority
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                          {banner.translation?.title && (
-                            <div className="absolute bottom-3 sm:bottom-4 lg:bottom-6 start-3 sm:start-4 lg:start-6 end-3 sm:end-4 lg:end-6">
-                              <p className="text-white text-sm sm:text-base lg:text-xl font-bold drop-shadow-lg line-clamp-2">
-                                {banner.translation.title}
-                              </p>
+                <div className="relative group/banner">
+                  {/* Decorative glow effect */}
+                  <div className="absolute -inset-2 sm:-inset-4 bg-gradient-to-br from-[var(--primary)]/20 via-transparent to-[var(--primary-dark)]/20 rounded-2xl sm:rounded-3xl lg:rounded-[2rem] blur-xl opacity-60 group-hover/banner:opacity-80 transition-opacity duration-500" />
+                  
+                  {/* Main banner container */}
+                  <div className="relative overflow-hidden rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-2xl shadow-black/30 border border-white/10">
+                    {/* Decorative corner accents */}
+                    <div className="absolute top-0 start-0 w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-br from-[var(--primary)]/30 to-transparent z-10 pointer-events-none rounded-tl-xl sm:rounded-tl-2xl lg:rounded-tl-3xl" />
+                    <div className="absolute bottom-0 end-0 w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-tl from-[var(--primary)]/30 to-transparent z-10 pointer-events-none rounded-br-xl sm:rounded-br-2xl lg:rounded-br-3xl" />
+                    
+                    <Swiper
+                      modules={[Autoplay, Pagination, Navigation, EffectFade]}
+                      spaceBetween={0}
+                      slidesPerView={1}
+                      effect="fade"
+                      autoplay={{ delay: 5000, disableOnInteraction: false, pauseOnMouseEnter: true }}
+                      pagination={{ 
+                        clickable: true,
+                        bulletClass: 'swiper-pagination-bullet !bg-white/40 !w-2 !h-2 sm:!w-2.5 sm:!h-2.5 !mx-1 !transition-all !duration-300 hover:!bg-white/60',
+                        bulletActiveClass: '!bg-[var(--primary)] !w-6 sm:!w-8 !rounded-full !shadow-[0_0_10px_rgba(255,61,0,0.5)]',
+                      }}
+                      navigation={{
+                        prevEl: '.hero-prev',
+                        nextEl: '.hero-next',
+                      }}
+                      loop
+                      className="overflow-hidden"
+                    >
+                      {banners.map((banner, index) => (
+                        <SwiperSlide key={banner.id}>
+                          <Link 
+                            href={banner.url || '#'} 
+                            className="block aspect-[16/9] sm:aspect-[16/10] lg:aspect-[16/9] relative group overflow-hidden"
+                          >
+                            {/* Banner Image with Ken Burns effect */}
+                            <div className="absolute inset-0 animate-[kenburns_20s_ease-in-out_infinite_alternate]">
+                              <Image
+                                src={banner.img}
+                                alt={banner.translation?.title || 'Banner'}
+                                fill
+                                className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                                priority={index === 0}
+                                sizes="(max-width: 768px) 100vw, 50vw"
+                              />
                             </div>
-                          )}
-                        </Link>
-                      </SwiperSlide>
-                    ))}
-                  </Swiper>
+                            
+                            {/* Animated shine effect */}
+                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                            </div>
 
-                  {/* Custom Navigation - Hidden on mobile */}
-                  <button className="hero-prev hidden sm:flex absolute start-2 sm:start-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-xl hover:bg-white hover:scale-110 transition-all">
-                    {isRTL ? <ChevronRight size={16} className="sm:hidden" /> : <ChevronLeft size={16} className="sm:hidden" />}
-                    {isRTL ? <ChevronRight size={20} className="hidden sm:block lg:hidden" /> : <ChevronLeft size={20} className="hidden sm:block lg:hidden" />}
-                    {isRTL ? <ChevronRight size={24} className="hidden lg:block" /> : <ChevronLeft size={24} className="hidden lg:block" />}
-                  </button>
-                  <button className="hero-next hidden sm:flex absolute end-2 sm:end-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-xl hover:bg-white hover:scale-110 transition-all">
-                    {isRTL ? <ChevronLeft size={16} className="sm:hidden" /> : <ChevronRight size={16} className="sm:hidden" />}
-                    {isRTL ? <ChevronLeft size={20} className="hidden sm:block lg:hidden" /> : <ChevronRight size={20} className="hidden sm:block lg:hidden" />}
-                    {isRTL ? <ChevronLeft size={24} className="hidden lg:block" /> : <ChevronRight size={24} className="hidden lg:block" />}
-                  </button>
+                            {/* Slide indicator dots */}
+                            <div className="absolute top-3 sm:top-4 end-3 sm:end-4 flex items-center gap-1.5 z-10">
+                              <span className="text-white/80 text-[10px] sm:text-xs font-medium bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                                {index + 1}/{banners.length}
+                              </span>
+                            </div>
+                          </Link>
+                        </SwiperSlide>
+                      ))}
+                    </Swiper>
 
+                    {/* Custom Navigation */}
+                    <button className="hero-prev absolute start-2 sm:start-3 lg:start-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 flex items-center justify-center bg-white/90 backdrop-blur-md rounded-full shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 opacity-0 group-hover/banner:opacity-100 border border-white/20">
+                      {isRTL ? <ChevronRight size={16} className="text-[var(--black)] sm:hidden" /> : <ChevronLeft size={16} className="text-[var(--black)] sm:hidden" />}
+                      {isRTL ? <ChevronRight size={20} className="text-[var(--black)] hidden sm:block lg:hidden" /> : <ChevronLeft size={20} className="text-[var(--black)] hidden sm:block lg:hidden" />}
+                      {isRTL ? <ChevronRight size={24} className="text-[var(--black)] hidden lg:block" /> : <ChevronLeft size={24} className="text-[var(--black)] hidden lg:block" />}
+                    </button>
+                    <button className="hero-next absolute end-2 sm:end-3 lg:end-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 flex items-center justify-center bg-white/90 backdrop-blur-md rounded-full shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 opacity-0 group-hover/banner:opacity-100 border border-white/20">
+                      {isRTL ? <ChevronLeft size={16} className="text-[var(--black)] sm:hidden" /> : <ChevronRight size={16} className="text-[var(--black)] sm:hidden" />}
+                      {isRTL ? <ChevronLeft size={20} className="text-[var(--black)] hidden sm:block lg:hidden" /> : <ChevronRight size={20} className="text-[var(--black)] hidden sm:block lg:hidden" />}
+                      {isRTL ? <ChevronLeft size={24} className="text-[var(--black)] hidden lg:block" /> : <ChevronRight size={24} className="text-[var(--black)] hidden lg:block" />}
+                    </button>
+
+                    {/* Progress bar */}
+                    <div className="absolute bottom-0 start-0 end-0 h-1 bg-white/10 z-20">
+                      <motion.div
+                        className="h-full bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)]"
+                        initial={{ width: '0%' }}
+                        animate={{ width: '100%' }}
+                        transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
+                      />
+                    </div>
+                  </div>
                 </div>
               ) : (
-                <div className="aspect-[16/9] sm:aspect-[16/10] bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">
-                  <p className="text-white/50 text-sm sm:text-base">{t('noBanners')}</p>
+                <div className="relative">
+                  <div className="absolute -inset-2 sm:-inset-4 bg-gradient-to-br from-[var(--primary)]/10 via-transparent to-[var(--primary-dark)]/10 rounded-2xl sm:rounded-3xl blur-xl" />
+                  <div className="relative aspect-[16/9] sm:aspect-[16/10] bg-white/5 backdrop-blur-sm flex flex-col items-center justify-center border border-white/10 rounded-xl sm:rounded-2xl lg:rounded-3xl">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/10 flex items-center justify-center mb-4">
+                      <ShoppingBag size={32} className="text-white/40" />
+                    </div>
+                    <p className="text-white/50 text-sm sm:text-base">{t('noBanners')}</p>
+                  </div>
                 </div>
               )}
             </motion.div>
