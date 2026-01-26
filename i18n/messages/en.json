@@ -399,6 +399,7 @@
     "tryAgain": "Try Again",
     "backToHome": "Back to Home",
     "needHelp": "Need help?",
-    "contactSupport": "Contact Support"
+    "contactSupport": "Contact Support",
+    "redirectingToOrder": "Redirecting to your order in {seconds} seconds..."
   }
 }

@@ -344,6 +344,9 @@ const CheckoutPage = () => {
       }
       
       // Build order data
+      // Get the base URL for payment callbacks - use API routes for better compatibility
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+      
       const orderData: {
         cart_id: number;
         currency_id: number;
@@ -359,6 +362,11 @@ const CheckoutPage = () => {
         shop_id?: number;
         location?: { latitude: number; longitude: number };
         phone?: string;
+        // Multiple URL parameter names for better backend compatibility
+        success_url?: string;
+        cancel_url?: string;
+        return_url?: string;
+        callback_url?: string;
       } = {
         cart_id: cart.id,
         currency_id: activeCurrency?.id || currency?.id || 1, // Use active currency from API
@@ -373,6 +381,13 @@ const CheckoutPage = () => {
         shop_id: cart.shop_id,
         location: formattedLocation,
         phone: user?.phone || undefined,
+        // Payment callback URLs - use API routes that will redirect to frontend
+        // API route format: /api/payment/success?o_id=xxx will redirect to /[locale]/payment/result
+        success_url: `${baseUrl}/api/payment/success`,
+        cancel_url: `${baseUrl}/api/payment/failed`,
+        // Also send alternative parameter names for backend compatibility
+        return_url: `${baseUrl}/api/payment/callback`,
+        callback_url: `${baseUrl}/api/payment/callback`,
       };
 
       // Add payment_method_id for saved card

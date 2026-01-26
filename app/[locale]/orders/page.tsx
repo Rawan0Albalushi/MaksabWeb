@@ -62,9 +62,20 @@ const OrdersPage = () => {
           response = await orderService.getCancelledOrders();
           break;
       }
+      
+      // Debug: Log the API response
+      console.log('📦 Orders API Response:', {
+        tab: activeTab,
+        status: response?.status,
+        message: response?.message,
+        dataLength: response?.data?.length,
+        data: response?.data,
+        meta: response?.meta,
+      });
+      
       setOrders(response?.data || []);
     } catch (error) {
-      console.error('Error fetching orders:', error);
+      console.error('❌ Error fetching orders:', error);
       setOrders([]);
     } finally {
       setLoading(false);

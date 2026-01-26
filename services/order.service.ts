@@ -19,6 +19,12 @@ interface CreateOrderData {
     longitude: number;
   };
   phone?: string;
+  // Payment callback URLs - where to redirect after payment
+  // Multiple parameter names for backend compatibility
+  success_url?: string; // URL to redirect on successful payment
+  cancel_url?: string; // URL to redirect on cancelled/failed payment
+  return_url?: string; // Alternative: general return URL
+  callback_url?: string; // Alternative: callback URL
 }
 
 interface TransactionData {
@@ -36,24 +42,39 @@ interface RefundData {
 }
 
 export const orderService = {
-  // Get active orders
+  // Get active orders (API returns active orders by default when no status is specified)
+  // Active orders include: new, accepted, ready, on_a_way
   getActiveOrders: async (params?: { page?: number; perPage?: number }): Promise<PaginatedResponse<Order>> => {
-    return get('/api/v1/dashboard/user/orders/paginate', { status: 'new,accepted,ready,on_a_way', ...params });
+    const apiParams: Record<string, unknown> = {};
+    if (params?.page) apiParams.page = params.page;
+    if (params?.perPage) apiParams.per_page = params.perPage;
+    // Don't pass status - API returns active (non-delivered, non-canceled) orders by default
+    return get('/api/v1/dashboard/user/orders/paginate', apiParams);
   },
 
   // Get completed orders
   getCompletedOrders: async (params?: { page?: number; perPage?: number }): Promise<PaginatedResponse<Order>> => {
-    return get('/api/v1/dashboard/user/orders/paginate', { status: 'delivered', ...params });
+    const apiParams: Record<string, unknown> = { status: 'delivered' };
+    if (params?.page) apiParams.page = params.page;
+    if (params?.perPage) apiParams.per_page = params.perPage;
+    return get('/api/v1/dashboard/user/orders/paginate', apiParams);
   },
 
   // Get cancelled orders
   getCancelledOrders: async (params?: { page?: number; perPage?: number }): Promise<PaginatedResponse<Order>> => {
-    return get('/api/v1/dashboard/user/orders/paginate', { status: 'canceled', ...params });
+    const apiParams: Record<string, unknown> = { status: 'canceled' };
+    if (params?.page) apiParams.page = params.page;
+    if (params?.perPage) apiParams.per_page = params.perPage;
+    return get('/api/v1/dashboard/user/orders/paginate', apiParams);
   },
 
   // Get all orders
   getAllOrders: async (params?: { page?: number; perPage?: number; status?: string }): Promise<PaginatedResponse<Order>> => {
-    return get('/api/v1/dashboard/user/orders/paginate', params);
+    const apiParams: Record<string, unknown> = {};
+    if (params?.page) apiParams.page = params.page;
+    if (params?.perPage) apiParams.per_page = params.perPage;
+    if (params?.status) apiParams.status = params.status;
+    return get('/api/v1/dashboard/user/orders/paginate', apiParams);
   },
 
   // Get order details

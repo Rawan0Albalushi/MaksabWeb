@@ -33,15 +33,35 @@ const PaymentResultPage = () => {
   const [orderId, setOrderId] = useState<number | null>(null);
   const [message, setMessage] = useState('');
   const [transactionId, setTransactionId] = useState<string | null>(null);
+  const [redirectCountdown, setRedirectCountdown] = useState(3);
 
   useEffect(() => {
     processPaymentResult();
   }, []);
 
+  // Auto-redirect to order page on success after a countdown
+  useEffect(() => {
+    if (status === 'success' && orderId) {
+      // Countdown timer
+      const countdownInterval = setInterval(() => {
+        setRedirectCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(countdownInterval);
+            router.push(`/${locale}/orders/${orderId}`);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      
+      return () => clearInterval(countdownInterval);
+    }
+  }, [status, orderId, router, locale]);
+
   const processPaymentResult = async () => {
     try {
-      // Get parameters from URL
-      const orderIdParam = searchParams.get('order_id');
+      // Get parameters from URL - support multiple parameter names
+      const orderIdParam = searchParams.get('order_id') || searchParams.get('o_id');
       const sessionId = searchParams.get('session_id');
       const paymentIntentId = searchParams.get('payment_intent_id');
       const statusParam = searchParams.get('status');
@@ -240,7 +260,16 @@ const PaymentResultPage = () => {
           </h1>
 
           {/* Status Message */}
-          <p className="text-[var(--text-grey)] mb-6">{message}</p>
+          <p className="text-[var(--text-grey)] mb-3">{message}</p>
+          
+          {/* Auto-redirect countdown for success */}
+          {status === 'success' && orderId && (
+            <p className="text-sm text-[var(--primary)] mb-6 animate-pulse">
+              {t('redirectingToOrder', { seconds: redirectCountdown })}
+            </p>
+          )}
+          
+          {status !== 'success' && <div className="mb-6" />}
 
           {/* Order & Transaction Info */}
           {(orderId || transactionId) && status !== 'loading' && (

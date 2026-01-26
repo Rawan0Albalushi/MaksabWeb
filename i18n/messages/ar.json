@@ -399,6 +399,7 @@
     "tryAgain": "حاول مرة أخرى",
     "backToHome": "العودة للرئيسية",
     "needHelp": "هل تحتاج مساعدة؟",
-    "contactSupport": "تواصل مع الدعم"
+    "contactSupport": "تواصل مع الدعم",
+    "redirectingToOrder": "سيتم تحويلك لصفحة الطلب خلال {seconds} ثواني..."
   }
 }
