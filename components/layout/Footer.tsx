@@ -42,7 +42,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-[var(--black)] text-white mt-16">
+    <footer className="bg-[var(--black)] text-white">
       {/* Main Footer */}
       <div className="container py-12 lg:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">

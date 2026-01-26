@@ -48,7 +48,7 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
           <ScrollToTop />
           <LocaleSync />
           <Header />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 bg-[var(--black)]">{children}</main>
           <Footer />
         </NextIntlClientProvider>
       </body>

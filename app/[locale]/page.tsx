@@ -63,7 +63,7 @@ const HomePage = () => {
     try {
       const results = await Promise.allSettled([
         shopService.getBanners({ perPage: 10 }),
-        shopService.getCategories(), // Gets parent categories only (no pagination)
+        shopService.getCategoriesPaginate({ perPage: 20, type: 'main' }), // Gets main categories with pagination
         shopService.getStories({ perPage: 20 }),
       ]);
 
@@ -171,7 +171,7 @@ const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden bg-[var(--black)]">
       {/* Hero Section */}
       <section className="relative min-h-[auto] sm:min-h-[520px] lg:min-h-[580px] flex items-start sm:items-center overflow-hidden">
         {/* Animated Background */}
@@ -426,6 +426,48 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* Categories Section - Hidden */}
+      {/* 
+      <section className="pt-6 pb-8 sm:pt-12 sm:pb-16 lg:pt-16 lg:pb-20 bg-[var(--main-bg)]">
+        <div className="container">
+          <div className="flex items-center justify-between mb-5 sm:mb-10">
+            <div>
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[var(--black)] mb-1 sm:mb-2">
+                {t('categories')}
+              </h2>
+              <p className="text-sm sm:text-base text-[var(--text-grey)]">{t('browseByCategory')}</p>
+            </div>
+            <Link
+              href="/categories"
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-white rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white transition-all shadow-sm"
+            >
+              {tCommon('viewAll')}
+              {isRTL ? <ChevronLeft size={14} className="sm:hidden" /> : <ChevronRight size={14} className="sm:hidden" />}
+              {isRTL ? <ChevronLeft size={16} className="hidden sm:block" /> : <ChevronRight size={16} className="hidden sm:block" />}
+            </Link>
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 sm:gap-4 lg:gap-6">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <CategorySkeleton key={i} />
+              ))}
+            </div>
+          ) : categories.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-[var(--text-grey)]">لا توجد تصنيفات متاحة</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 sm:gap-4 lg:gap-6">
+              {categories.map((category) => (
+                <CategoryCard key={category.id} category={category} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+      */}
+
       {/* Stories Section */}
       {stories.length > 0 && (
         <section className="py-4 sm:py-8 bg-[var(--main-bg)]">
@@ -471,47 +513,7 @@ const HomePage = () => {
         </section>
       )}
 
-      {/* Categories Section */}
-      <section className="pt-6 pb-8 sm:pt-12 sm:pb-16 lg:pt-16 lg:pb-20 bg-[var(--main-bg)]">
-        <div className="container">
-          <div className="flex items-center justify-between mb-5 sm:mb-10">
-            <div>
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[var(--black)] mb-1 sm:mb-2">
-                {t('categories')}
-              </h2>
-              <p className="text-sm sm:text-base text-[var(--text-grey)]">{t('browseByCategory')}</p>
-            </div>
-            <Link
-              href="/categories"
-              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-white rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white transition-all shadow-sm"
-            >
-              {tCommon('viewAll')}
-              {isRTL ? <ChevronLeft size={14} className="sm:hidden" /> : <ChevronRight size={14} className="sm:hidden" />}
-              {isRTL ? <ChevronLeft size={16} className="hidden sm:block" /> : <ChevronRight size={16} className="hidden sm:block" />}
-            </Link>
-          </div>
-
-          {loading ? (
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 sm:gap-4 lg:gap-6">
-              {Array.from({ length: 10 }).map((_, i) => (
-                <CategorySkeleton key={i} />
-              ))}
-            </div>
-          ) : categories.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-[var(--text-grey)]">لا توجد تصنيفات متاحة</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 sm:gap-4 lg:gap-6">
-              {categories.map((category) => (
-                <CategoryCard key={category.id} category={category} />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Spacer between Categories and How It Works */}
+      {/* Spacer between Stories and How It Works */}
       <div className="h-4 sm:h-8 lg:h-12 bg-[var(--main-bg)]" />
 
       {/* How It Works Section */}
@@ -883,34 +885,6 @@ const HomePage = () => {
                     </div>
                   </div>
                 </div>
-
-                {/* Floating elements */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.5 }}
-                  className="absolute top-1/4 -start-10 bg-white rounded-2xl p-4 shadow-2xl hidden lg:flex items-center gap-3"
-                >
-                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                    <Truck size={22} className="text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-[var(--text-grey)] mb-1">{t('app.onTheWay')}</p>
-                    <p className="font-bold text-[var(--black)]">5 {t('app.minutes')}</p>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.6 }}
-                  className="absolute bottom-1/4 -end-10 bg-[var(--primary)] text-white rounded-2xl px-5 py-3 shadow-2xl hidden lg:block"
-                >
-                  <p className="text-sm font-bold mb-1">{t('app.discount')}</p>
-                  <p className="text-xs text-white/70">{t('app.onFirstOrder')}</p>
-                </motion.div>
 
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
