@@ -1,12 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Address } from '@/types';
+import { getAddressLocation, getAddressDisplayString } from '@/utils/helpers';
+import { MapConfig } from '@/utils/mapConfig';
 
 // Default coordinates (Muscat, Oman)
-export const DEFAULT_LOCATION = {
-  latitude: 23.5880,
-  longitude: 58.3829,
-};
+export const DEFAULT_LOCATION = MapConfig.defaultLocation;
 
 export interface UserLocation {
   latitude: number;
@@ -101,15 +100,16 @@ export const useLocationStore = create<LocationState>()(
         const state = get();
         if (!state.selectedAddress && addresses.length > 0) {
           const activeAddress = addresses.find(a => a.active) || addresses[0];
-          if (activeAddress?.location) {
+          const location = getAddressLocation(activeAddress);
+          if (location) {
             set({
               selectedAddress: {
                 id: activeAddress.id,
                 title: activeAddress.title,
-                address: activeAddress.address,
+                address: getAddressDisplayString(activeAddress),
                 location: {
-                  latitude: activeAddress.location.latitude,
-                  longitude: activeAddress.location.longitude,
+                  latitude: location.latitude,
+                  longitude: location.longitude,
                 },
                 active: activeAddress.active,
                 isCurrentLocation: false,
@@ -135,15 +135,16 @@ export const useLocationStore = create<LocationState>()(
       setError: (error) => set({ error }),
 
       selectSavedAddress: (address) => {
-        if (address.location) {
+        const location = getAddressLocation(address);
+        if (location) {
           set({
             selectedAddress: {
               id: address.id,
               title: address.title,
-              address: address.address,
+              address: getAddressDisplayString(address),
               location: {
-                latitude: address.location.latitude,
-                longitude: address.location.longitude,
+                latitude: location.latitude,
+                longitude: location.longitude,
               },
               active: address.active,
               isCurrentLocation: false,
@@ -186,28 +187,30 @@ export const useLocationStore = create<LocationState>()(
             async (position) => {
               const { latitude, longitude } = position.coords;
               
-              // Try to get address from coordinates using reverse geocoding
+              // Try to get address from coordinates using Google Geocoding
               let address = '';
               let city = '';
               
               try {
-                const response = await fetch(
-                  `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=ar`
-                );
-                const data = await response.json();
-                
-                if (data.address) {
-                  city = data.address.city || data.address.town || data.address.village || data.address.state || '';
-                  address = data.display_name || '';
+                // Wait for Google Maps to be loaded
+                if (window.google?.maps) {
+                  const geocoder = new window.google.maps.Geocoder();
+                  const result = await geocoder.geocode({ 
+                    location: { lat: latitude, lng: longitude },
+                    language: 'ar'
+                  });
                   
-                  // Simplify the address
-                  if (data.address.road) {
-                    address = data.address.road;
-                    if (data.address.suburb) {
-                      address += ', ' + data.address.suburb;
-                    }
-                    if (city) {
-                      address += ', ' + city;
+                  if (result.results && result.results.length > 0) {
+                    address = result.results[0].formatted_address;
+                    
+                    // Extract city from address components
+                    const addressComponents = result.results[0].address_components;
+                    for (const component of addressComponents) {
+                      if (component.types.includes('locality') || 
+                          component.types.includes('administrative_area_level_1')) {
+                        city = component.long_name;
+                        break;
+                      }
                     }
                   }
                 }

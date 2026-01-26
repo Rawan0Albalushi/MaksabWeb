@@ -77,17 +77,31 @@ export const useAddressManager = (): UseAddressManagerReturn => {
 
     try {
       const response = await userService.getAddresses();
-      if (response.status && response.data) {
-        setSavedAddresses(response.data);
+      
+      // Handle different response structures
+      let addresses: Address[] = [];
+      
+      if (response) {
+        // Check if response has data property (standard format)
+        if (response.data && Array.isArray(response.data)) {
+          addresses = response.data;
+        }
+        // Check if response itself is an array
+        else if (Array.isArray(response)) {
+          addresses = response;
+        }
+        // Check if data is nested differently
+        else if (response.data?.data && Array.isArray(response.data.data)) {
+          addresses = response.data.data;
+        }
       }
+      
+      setSavedAddresses(addresses);
     } catch (err: any) {
       // If 401 error, the token is invalid/expired - just skip fetching
-      // Don't logout here as it can cause a loop
       if (err?.response?.status === 401) {
-        console.warn('Token expired or invalid, skipping address fetch');
         setSavedAddresses([]);
       } else {
-        console.error('Failed to fetch addresses:', err);
         setError('FETCH_ADDRESSES_FAILED');
       }
     } finally {

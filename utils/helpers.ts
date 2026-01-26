@@ -221,3 +221,116 @@ export const getOrderStatusInfo = (status: string, locale = 'ar') => {
   };
 };
 
+/**
+ * Address helpers - Normalize address data from API
+ * API returns location as [latitude, longitude] array
+ * We store it as { latitude, longitude } object
+ */
+export interface NormalizedAddress {
+  id: number;
+  title?: string;
+  address: string;
+  location: {
+    latitude: number;
+    longitude: number;
+  };
+  active: boolean;
+  street_house_number?: string;
+  additional_details?: string;
+}
+
+export interface ApiAddress {
+  id: number;
+  title?: string;
+  address?: string | { address?: string; floor?: string; house?: string };
+  location?: [number, number] | { latitude: number; longitude: number };
+  active: boolean;
+  street_house_number?: string;
+  additional_details?: string;
+}
+
+/**
+ * Normalize address from API format to app format
+ */
+export const normalizeAddress = (apiAddress: ApiAddress): NormalizedAddress | null => {
+  if (!apiAddress) return null;
+
+  // Normalize address string
+  let addressString = '';
+  if (typeof apiAddress.address === 'string') {
+    addressString = apiAddress.address;
+  } else if (apiAddress.address?.address) {
+    addressString = apiAddress.address.address;
+  }
+
+  // Normalize location
+  let location: { latitude: number; longitude: number } | null = null;
+  if (apiAddress.location) {
+    if (Array.isArray(apiAddress.location)) {
+      // API format: [latitude, longitude]
+      location = {
+        latitude: apiAddress.location[0],
+        longitude: apiAddress.location[1],
+      };
+    } else if (typeof apiAddress.location === 'object' && 'latitude' in apiAddress.location) {
+      // Already in correct format
+      location = apiAddress.location;
+    }
+  }
+
+  if (!location) return null;
+
+  return {
+    id: apiAddress.id,
+    title: apiAddress.title,
+    address: addressString,
+    location,
+    active: apiAddress.active,
+    street_house_number: apiAddress.street_house_number,
+    additional_details: apiAddress.additional_details,
+  };
+};
+
+/**
+ * Normalize array of addresses
+ */
+export const normalizeAddresses = (apiAddresses: ApiAddress[]): NormalizedAddress[] => {
+  return apiAddresses
+    .map(normalizeAddress)
+    .filter((addr): addr is NormalizedAddress => addr !== null);
+};
+
+/**
+ * Get address display string
+ */
+export const getAddressDisplayString = (address: ApiAddress | NormalizedAddress): string => {
+  if ('address' in address) {
+    if (typeof address.address === 'string') {
+      return address.address;
+    } else if (typeof address.address === 'object' && address.address?.address) {
+      return address.address.address;
+    }
+  }
+  return '';
+};
+
+/**
+ * Get location from address (handles both API and normalized formats)
+ */
+export const getAddressLocation = (address: ApiAddress | NormalizedAddress): { latitude: number; longitude: number } | null => {
+  if (!address.location) return null;
+
+  if (Array.isArray(address.location)) {
+    return {
+      latitude: address.location[0],
+      longitude: address.location[1],
+    };
+  }
+
+  if (typeof address.location === 'object' && 'latitude' in address.location) {
+    return address.location;
+  }
+
+  return null;
+};
+

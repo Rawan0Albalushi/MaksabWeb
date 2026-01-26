@@ -21,12 +21,16 @@ import {
 
 import { useAddressManager } from '@/hooks';
 import { Address } from '@/types';
+import { AddressForm } from './AddressForm';
+import { getAddressDisplayString } from '@/utils/helpers';
 
 interface AddressSelectorProps {
   variant?: 'hero' | 'compact' | 'full';
   showAddButton?: boolean;
   onAddressChange?: (address: Address | null) => void;
   className?: string;
+  /** If true, clicking will open the address modal instead of dropdown */
+  useModal?: boolean;
 }
 
 export const AddressSelector = ({
@@ -34,9 +38,11 @@ export const AddressSelector = ({
   showAddButton = false,
   onAddressChange,
   className,
+  useModal = false,
 }: AddressSelectorProps) => {
   const t = useTranslations('common');
   const [isOpen, setIsOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -77,6 +83,22 @@ export const AddressSelector = ({
     onAddressChange?.(null);
   };
 
+  // Handle opening form or dropdown
+  const handleTriggerClick = () => {
+    if (useModal) {
+      setIsFormOpen(true);
+    } else {
+      setIsOpen(!isOpen);
+    }
+  };
+
+  // Handle form success
+  const handleFormSuccess = (address: Address) => {
+    setIsFormOpen(false);
+    selectAddress(address);
+    onAddressChange?.(address);
+  };
+
   // Get location error message
   const getLocationErrorMessage = () => {
     switch (error) {
@@ -106,11 +128,12 @@ export const AddressSelector = ({
   // Compact variant (for header)
   if (variant === 'compact') {
     return (
-      <div className={clsx("relative", className)} ref={dropdownRef}>
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
-        >
+      <>
+        <div className={clsx("relative", className)} ref={dropdownRef}>
+          <button
+            onClick={handleTriggerClick}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+          >
           <MapPin size={18} className={selectedAddress ? "text-green-500" : "text-[var(--primary)]"} />
           <span className="text-sm font-medium text-[var(--black)] max-w-[120px] truncate">
             {selectedAddress?.title || selectedAddress?.address?.split(',')[0] || t('selectLocation')}
@@ -122,7 +145,7 @@ export const AddressSelector = ({
         </button>
 
         <AnimatePresence>
-          {isOpen && (
+          {isOpen && !useModal && (
             <motion.div
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -134,7 +157,15 @@ export const AddressSelector = ({
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+        </div>
+
+        {/* Address Form (includes saved addresses list) */}
+        <AddressForm
+          isOpen={isFormOpen}
+          onClose={() => setIsFormOpen(false)}
+          onSuccess={handleFormSuccess}
+        />
+      </>
     );
   }
 
@@ -152,7 +183,7 @@ export const AddressSelector = ({
               <div className="flex-1">
                 <p className="text-sm font-semibold text-green-800">{t('currentLocation')}</p>
                 <p className="text-sm text-green-600">
-                  {selectedAddress.address || `${selectedAddress.location.latitude.toFixed(4)}, ${selectedAddress.location.longitude.toFixed(4)}`}
+                  {(typeof selectedAddress.address === 'string' ? selectedAddress.address : '') || `${selectedAddress.location.latitude.toFixed(4)}, ${selectedAddress.location.longitude.toFixed(4)}`}
                 </p>
               </div>
               <button
@@ -225,7 +256,7 @@ export const AddressSelector = ({
                     )}>
                       {address.title}
                     </p>
-                    <p className="text-xs text-[var(--text-grey)] truncate">{address.address}</p>
+                    <p className="text-xs text-[var(--text-grey)] truncate">{getAddressDisplayString(address)}</p>
                   </div>
                   {isSelected && (
                     <div className="w-6 h-6 rounded-full bg-[var(--primary)] flex items-center justify-center">
@@ -254,11 +285,12 @@ export const AddressSelector = ({
 
   // Hero variant (default - for homepage)
   return (
-    <div className={clsx("relative", className)} ref={dropdownRef}>
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className={clsx(
+    <>
+      <div className={clsx("relative", className)} ref={dropdownRef}>
+        <button
+          type="button"
+          onClick={handleTriggerClick}
+          className={clsx(
           "flex items-center gap-1.5 sm:gap-3 px-2 sm:px-5 py-2.5 sm:py-5 border-e border-white/10 transition-all duration-200 rounded-s-xl group",
           isOpen ? "bg-white/10" : "hover:bg-white/[0.06]"
         )}
@@ -282,7 +314,7 @@ export const AddressSelector = ({
             <>
               <span className="text-[10px] text-green-400/80 font-semibold uppercase tracking-wider block">{t('yourLocation')}</span>
               <span className="text-sm text-white font-bold truncate block leading-tight mt-0.5">
-                {selectedAddress.title || selectedAddress.address?.split(',')[0] || t('currentLocation')}
+                {selectedAddress.title || (typeof selectedAddress.address === 'string' ? selectedAddress.address?.split(',')[0] : '') || t('currentLocation')}
               </span>
             </>
           ) : (
@@ -300,19 +332,27 @@ export const AddressSelector = ({
 
       {/* Dropdown */}
       <AnimatePresence>
-        {isOpen && (
+        {isOpen && !useModal && (
           <motion.div
             initial={{ opacity: 0, y: 8, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute top-full start-0 mt-3 w-[340px] sm:w-[380px] bg-white rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] border border-gray-200/60 overflow-hidden z-50"
+            className="absolute top-full start-0 mt-3 w-[340px] sm:w-[380px] bg-white rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] border border-gray-200/60 overflow-hidden z-[100]"
           >
             {renderDropdownContent()}
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+      </div>
+
+      {/* Address Form (includes saved addresses list) */}
+      <AddressForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSuccess={handleFormSuccess}
+      />
+    </>
   );
 
   // Render dropdown content (shared between variants)
@@ -466,7 +506,7 @@ export const AddressSelector = ({
                           "text-[15px] font-semibold leading-relaxed",
                           isSelected ? "text-[var(--primary)]" : "text-gray-900"
                         )}>{addr.title}</p>
-                        <p className="text-[13px] text-gray-500 truncate mt-0.5 leading-relaxed">{addr.address}</p>
+                        <p className="text-[13px] text-gray-500 truncate mt-0.5 leading-relaxed">{getAddressDisplayString(addr)}</p>
                       </div>
                       {isSelected ? (
                         <div className="w-7 h-7 rounded-full bg-[var(--primary)] flex items-center justify-center flex-shrink-0 shadow-lg shadow-[var(--primary)]/30">
@@ -496,21 +536,26 @@ export const AddressSelector = ({
         )}
 
         {/* Add New Address */}
-        {showAddButton && (
-          <>
-            {/* Section Divider */}
-            <div className="px-4">
-              <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
-            </div>
+        <>
+          {/* Section Divider */}
+          <div className="px-4">
+            <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+          </div>
 
-            <div className="p-4">
-              <button className="w-full flex items-center justify-center gap-3 py-4 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all active:scale-[0.98]">
-                <Plus size={20} />
-                <span className="text-sm font-semibold">{t('addNewAddress')}</span>
-              </button>
-            </div>
-          </>
-        )}
+          <div className="p-4">
+            <button 
+              type="button"
+              onClick={() => {
+                setIsOpen(false);
+                setIsFormOpen(true);
+              }}
+              className="w-full flex items-center justify-center gap-3 py-4 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all active:scale-[0.98]"
+            >
+              <Plus size={20} />
+              <span className="text-sm font-semibold">{t('addNewAddress')}</span>
+            </button>
+          </div>
+        </>
 
         {/* Bottom Safe Area */}
         <div className="h-2" />

@@ -95,8 +95,13 @@ export const shopService = {
   },
 
   // Get family shops
-  getFamilyShops: async (params?: { page?: number; perPage?: number }): Promise<PaginatedResponse<Shop>> => {
-    return get('/api/v1/rest/shops/families/paginate', formatParams(params));
+  getFamilyShops: async (lat?: number, lng?: number, params?: { page?: number; perPage?: number }): Promise<PaginatedResponse<Shop>> => {
+    const apiParams: Record<string, unknown> = { ...formatParams(params) };
+    if (lat !== undefined && lng !== undefined) {
+      apiParams['address[latitude]'] = lat;
+      apiParams['address[longitude]'] = lng;
+    }
+    return get('/api/v1/rest/shops/families/paginate', apiParams);
   },
 
   // Get Ruwad shops

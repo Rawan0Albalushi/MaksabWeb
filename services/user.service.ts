@@ -26,6 +26,23 @@ interface AddressData {
   additional_details?: string;
 }
 
+// Format address data for API (converts to API expected format)
+const formatAddressForApi = (data: AddressData) => {
+  return {
+    title: data.title,
+    // API expects address as object with address, floor, house
+    address: {
+      address: data.address,
+      floor: '', // Optional field
+      house: data.street_house_number || '',
+    },
+    // API expects location as array [latitude, longitude]
+    location: [data.location.latitude, data.location.longitude],
+    // Additional details can be sent separately if needed
+    ...(data.additional_details && { additional_details: data.additional_details }),
+  };
+};
+
 interface NotificationSettings {
   [key: string]: boolean;
 }
@@ -68,12 +85,14 @@ export const userService = {
 
   // Add address
   addAddress: async (data: AddressData): Promise<ApiResponse<Address>> => {
-    return post('/api/v1/dashboard/user/addresses', data);
+    const formattedData = formatAddressForApi(data);
+    return post('/api/v1/dashboard/user/addresses', formattedData);
   },
 
   // Update address
   updateAddress: async (addressId: number, data: AddressData): Promise<ApiResponse<void>> => {
-    return put(`/api/v1/dashboard/user/addresses/${addressId}`, data);
+    const formattedData = formatAddressForApi(data);
+    return put(`/api/v1/dashboard/user/addresses/${addressId}`, formattedData);
   },
 
   // Delete address

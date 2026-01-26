@@ -105,7 +105,7 @@ const HomePage = () => {
       
       const results = await Promise.allSettled([
         shopService.getNearbyShops(location.latitude, location.longitude, { perPage: 8 }),
-        shopService.getFamilyShops({ perPage: 8 }),
+        shopService.getFamilyShops(location.latitude, location.longitude, { perPage: 8 }),
       ]);
 
       const [recommendedRes, familyRes] = results;
@@ -173,7 +173,7 @@ const HomePage = () => {
   return (
     <div className="min-h-screen overflow-x-hidden bg-[var(--black)]">
       {/* Hero Section */}
-      <section className="relative min-h-[auto] sm:min-h-[520px] lg:min-h-[580px] flex items-start sm:items-center overflow-hidden">
+      <section className="relative min-h-[auto] sm:min-h-[520px] lg:min-h-[580px] flex items-start sm:items-center">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] overflow-hidden">
           <div className="absolute top-10 sm:top-20 start-5 sm:start-10 w-32 sm:w-72 h-32 sm:h-72 bg-[var(--primary)]/20 rounded-full blur-3xl animate-pulse pointer-events-none" />
@@ -220,7 +220,7 @@ const HomePage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="relative max-w-xl mx-auto lg:mx-0 z-20 w-full px-1 sm:px-0"
+                className="relative max-w-xl mx-auto lg:mx-0 z-[60] w-full px-1 sm:px-0"
               >
                 <form onSubmit={handleSearch}>
                   {/* Outer glow effect */}
@@ -410,7 +410,7 @@ const HomePage = () => {
         </div>
 
         {/* Wave Decoration */}
-        <div className="absolute bottom-0 left-0 right-0 z-10 pointer-events-none">
+        <div className="absolute bottom-0 left-0 right-0 z-0 pointer-events-none">
           <svg
             viewBox="0 0 1440 50"
             fill="none"
