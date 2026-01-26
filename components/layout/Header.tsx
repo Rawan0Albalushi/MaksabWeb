@@ -444,53 +444,93 @@ const Header = () => {
         </div>
       </header>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu Overlay - Full Screen Drawer */}
       <div
         className={clsx(
-          'fixed inset-0 z-30 lg:hidden transition-all duration-300',
+          'fixed inset-0 z-50 lg:hidden transition-all duration-400',
           isMobileMenuOpen
             ? 'opacity-100 pointer-events-auto'
             : 'opacity-0 pointer-events-none'
         )}
       >
-        {/* Backdrop */}
+        {/* Backdrop with blur */}
         <div
           className={clsx(
-            'absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300',
+            'absolute inset-0 bg-black/50 backdrop-blur-sm transition-all duration-400',
             isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
           )}
           onClick={() => setIsMobileMenuOpen(false)}
         />
         
-        {/* Mobile Menu Panel */}
+        {/* Mobile Menu Drawer - Slide from side */}
         <div
           className={clsx(
-            'absolute top-[72px] sm:top-[76px] inset-x-0 mx-4 sm:mx-6 bg-white rounded-3xl shadow-2xl shadow-black/25 transition-all duration-300 max-h-[calc(100vh-90px)] sm:max-h-[calc(100vh-100px)] overflow-hidden',
+            'absolute top-0 bottom-0 w-[85%] max-w-[340px] bg-white shadow-2xl shadow-black/30 transition-all duration-400 ease-out flex flex-col',
+            locale === 'ar' ? 'right-0' : 'left-0',
             isMobileMenuOpen 
-              ? 'translate-y-0 opacity-100 scale-100' 
-              : '-translate-y-6 opacity-0 scale-95'
+              ? 'translate-x-0' 
+              : locale === 'ar' ? 'translate-x-full' : '-translate-x-full'
           )}
         >
-          <div className="overflow-y-auto max-h-[calc(100vh-110px)] sm:max-h-[calc(100vh-120px)] overscroll-contain p-5 sm:p-6">
+          {/* Drawer Header with gradient */}
+          <div className="relative bg-gradient-to-br from-[var(--primary)] via-[var(--primary)] to-[var(--primary-light)] pt-safe-top">
+            {/* Decorative circles */}
+            <div className="absolute top-0 end-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
+            <div className="absolute bottom-0 start-0 w-24 h-24 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-xl" />
             
-            {/* Menu Header */}
-            <div className="pb-4 flex items-center justify-between" style={{ padding: '0 4px 16px 4px' }}>
-              <h3 className="text-lg font-bold text-[var(--black)]">
-                {locale === 'ar' ? 'القائمة' : 'Menu'}
-              </h3>
+            <div className="relative p-5 pt-14">
+              {/* Close Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-[var(--main-bg)] hover:bg-[var(--border)] transition-colors"
+                className="absolute top-4 end-4 w-9 h-9 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 active:scale-95 transition-all"
               >
-                <span className="sr-only">Close</span>
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-[var(--text-grey)]">
-                  <path d="M1 1L13 13M1 13L13 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <svg width="12" height="12" viewBox="0 0 14 14" fill="none" className="text-white">
+                  <path d="M1 1L13 13M1 13L13 1" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
                 </svg>
               </button>
-            </div>
 
-            {/* Mobile Nav Links */}
-            <nav className="pb-5 space-y-3">
+              {/* User Section in Header */}
+              {_hasHydrated && isAuthenticated ? (
+                <Link
+                  href="/profile"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-3.5 group"
+                >
+                  <div className="relative">
+                    <Avatar src={user?.img} fallback={user?.firstname} size="lg" className="ring-2 ring-white/30" />
+                    <div className="absolute -bottom-0.5 -end-0.5 w-4 h-4 bg-green-400 rounded-full border-2 border-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-white text-[17px] truncate group-hover:underline">
+                      {user?.firstname} {user?.lastname}
+                    </p>
+                    <p className="text-white/70 text-sm truncate mt-0.5">
+                      {user?.email || user?.phone}
+                    </p>
+                  </div>
+                  <ChevronDown size={18} className="text-white/60 -rotate-90 rtl:rotate-90 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" />
+                </Link>
+              ) : (
+                <div>
+                  <Image
+                    src="/images/maksab.png"
+                    alt="Maksab"
+                    width={100}
+                    height={32}
+                    className="h-7 w-auto brightness-0 invert opacity-90"
+                  />
+                  <p className="text-white/70 text-sm mt-2">
+                    {locale === 'ar' ? 'مرحباً بك في مكسب' : 'Welcome to Maksab'}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto overscroll-contain">
+            {/* Navigation Links */}
+            <nav className="p-4 space-y-1.5">
               {navLinks.map((link, index) => {
                 const isActive = pathname === link.href || 
                   (link.href !== '/' && pathname.startsWith(link.href));
@@ -501,27 +541,29 @@ const Header = () => {
                     href={link.href}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={clsx(
-                      'flex items-center gap-4 rounded-2xl font-semibold text-[15px] transition-all duration-200',
+                      'flex items-center gap-3.5 px-4 py-3.5 rounded-2xl font-semibold text-[15px] transition-all duration-200 active:scale-[0.98]',
                       isActive
-                        ? 'text-white bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] shadow-lg shadow-[var(--primary)]/30'
-                        : 'text-[var(--black)] bg-[var(--main-bg)]/50 hover:bg-[var(--main-bg)] active:scale-[0.98]'
+                        ? 'text-[var(--primary)] bg-[var(--primary)]/10'
+                        : 'text-[var(--black)] hover:bg-[var(--main-bg)]'
                     )}
-                    style={{ 
-                      padding: '16px 20px',
-                      animationDelay: `${index * 60}ms`,
-                      animation: isMobileMenuOpen ? `fadeInUp 0.35s ease ${index * 60}ms forwards` : 'none',
-                      opacity: isMobileMenuOpen ? 1 : 0
+                    style={{
+                      transform: isMobileMenuOpen ? 'translateX(0)' : locale === 'ar' ? 'translateX(20px)' : 'translateX(-20px)',
+                      opacity: isMobileMenuOpen ? 1 : 0,
+                      transition: `all 0.3s ease ${index * 50 + 100}ms`
                     }}
                   >
                     <span className={clsx(
                       'w-10 h-10 flex items-center justify-center rounded-xl transition-colors',
                       isActive 
-                        ? 'bg-white/20' 
-                        : 'bg-white shadow-sm'
+                        ? 'bg-[var(--primary)]/15' 
+                        : 'bg-[var(--main-bg)]'
                     )}>
-                      <Icon size={20} className={isActive ? 'text-white' : 'text-[var(--primary)]'} />
+                      <Icon size={20} className={isActive ? 'text-[var(--primary)]' : 'text-[var(--text-grey)]'} />
                     </span>
-                    <span>{link.label}</span>
+                    <span className="flex-1">{link.label}</span>
+                    {isActive && (
+                      <span className="w-2 h-2 bg-[var(--primary)] rounded-full" />
+                    )}
                   </Link>
                 );
               })}
@@ -530,140 +572,122 @@ const Header = () => {
               <Link
                 href="/favorites"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-4 rounded-2xl text-[var(--black)] bg-[var(--main-bg)]/50 hover:bg-[var(--main-bg)] font-semibold text-[15px] transition-all duration-200 active:scale-[0.98]"
-                style={{ padding: '16px 20px' }}
+                className="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-[var(--black)] hover:bg-[var(--main-bg)] font-semibold text-[15px] transition-all duration-200 active:scale-[0.98]"
+                style={{
+                  transform: isMobileMenuOpen ? 'translateX(0)' : locale === 'ar' ? 'translateX(20px)' : 'translateX(-20px)',
+                  opacity: isMobileMenuOpen ? 1 : 0,
+                  transition: `all 0.3s ease ${navLinks.length * 50 + 100}ms`
+                }}
               >
-                <span className="w-10 h-10 flex items-center justify-center rounded-xl bg-white shadow-sm">
-                  <Heart size={20} className="text-[var(--primary)]" />
+                <span className="w-10 h-10 flex items-center justify-center rounded-xl bg-[var(--main-bg)]">
+                  <Heart size={20} className="text-[var(--text-grey)]" />
                 </span>
-                <span>{locale === 'ar' ? 'المفضلة' : 'Favorites'}</span>
+                <span className="flex-1">{locale === 'ar' ? 'المفضلة' : 'Favorites'}</span>
               </Link>
             </nav>
 
             {/* Divider */}
-            <div className="my-3 h-px bg-gradient-to-r from-transparent via-[var(--border)] to-transparent" />
+            <div className="mx-6 h-px bg-[var(--border)]/60" />
 
-            {/* Mobile Auth Section */}
-            <div className="py-4">
-              {!_hasHydrated ? (
-                <div className="flex gap-4">
-                  <div className="flex-1 h-14 bg-[var(--main-bg)] rounded-2xl animate-pulse" />
-                  <div className="flex-1 h-14 bg-[var(--main-bg)] rounded-2xl animate-pulse" />
-                </div>
-              ) : isAuthenticated ? (
-                <div className="space-y-4">
-                  {/* User Profile Card */}
+            {/* Settings Link for Authenticated Users */}
+            {_hasHydrated && isAuthenticated && (
+              <>
+                <div className="p-4 space-y-1.5">
                   <Link
-                    href="/profile"
+                    href="/settings"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-4 rounded-2xl bg-gradient-to-br from-[var(--primary)]/10 via-[var(--primary)]/5 to-transparent border border-[var(--primary)]/10 hover:border-[var(--primary)]/20 transition-all active:scale-[0.99]"
-                    style={{ padding: '16px 20px' }}
+                    className="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-[var(--black)] hover:bg-[var(--main-bg)] font-semibold text-[15px] transition-all duration-200 active:scale-[0.98]"
                   >
-                    <Avatar src={user?.img} fallback={user?.firstname} size="lg" />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-[var(--black)] truncate text-[16px]">
-                        {user?.firstname} {user?.lastname}
-                      </p>
-                      <p className="text-sm text-[var(--text-grey)] truncate mt-0.5">
-                        {user?.email || user?.phone}
-                      </p>
-                    </div>
-                    <ChevronDown size={20} className="text-[var(--text-grey)] -rotate-90 rtl:rotate-90" />
+                    <span className="w-10 h-10 flex items-center justify-center rounded-xl bg-[var(--main-bg)]">
+                      <Settings size={20} className="text-[var(--text-grey)]" />
+                    </span>
+                    <span className="flex-1">{t('settings')}</span>
                   </Link>
-                  
-                  {/* Quick Actions */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <Link
-                      href="/orders"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center justify-center gap-2.5 rounded-2xl bg-[var(--main-bg)] hover:bg-[var(--border)]/50 transition-colors font-semibold text-[14px]"
-                      style={{ padding: '14px 20px' }}
-                    >
-                      <Package size={18} className="text-[var(--primary)]" />
-                      <span>{t('orders')}</span>
-                    </Link>
-                    <Link
-                      href="/settings"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center justify-center gap-2.5 rounded-2xl bg-[var(--main-bg)] hover:bg-[var(--border)]/50 transition-colors font-semibold text-[14px]"
-                      style={{ padding: '14px 20px' }}
-                    >
-                      <Settings size={18} className="text-[var(--primary)]" />
-                      <span>{t('settings')}</span>
-                    </Link>
-                  </div>
-                  
-                  {/* Logout Button */}
-                  <Button
-                    variant="outline"
-                    fullWidth
-                    onClick={handleLogout}
-                    leftIcon={<LogOut size={18} />}
-                    className="rounded-2xl h-13 py-3.5 border-2 border-[var(--error)]/20 text-[var(--error)] hover:bg-[var(--error)]/8 font-semibold"
-                    style={{ padding: '14px 20px' }}
-                  >
-                    {t('logout')}
-                  </Button>
                 </div>
-              ) : (
-                <div className="space-y-3">
-                  <p className="text-center text-sm text-[var(--text-grey)] mb-4">
+                <div className="mx-6 h-px bg-[var(--border)]/60" />
+              </>
+            )}
+
+            {/* Auth Section for Non-Authenticated Users */}
+            {_hasHydrated && !isAuthenticated && (
+              <>
+                <div className="p-4 space-y-2">
+                  <p className="text-sm text-[var(--text-grey)] px-2 mb-3">
                     {locale === 'ar' ? 'سجل دخولك للحصول على تجربة أفضل' : 'Sign in for a better experience'}
                   </p>
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
                     <Link href="/auth/login" className="flex-1" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Button variant="outline" fullWidth className="rounded-2xl h-13 py-3.5 border-2 font-semibold" style={{ padding: '14px 20px' }}>
+                      <Button 
+                        variant="outline" 
+                        fullWidth 
+                        className="rounded-xl h-11 font-semibold text-[14px] border-2"
+                      >
                         {t('login')}
                       </Button>
                     </Link>
                     <Link href="/auth/register" className="flex-1" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Button fullWidth className="rounded-2xl h-13 py-3.5 shadow-lg shadow-[var(--primary)]/25 font-semibold !bg-[var(--primary)] !text-white hover:!bg-[var(--primary-hover)]" style={{ padding: '14px 20px' }}>
+                      <Button 
+                        fullWidth 
+                        className="rounded-xl h-11 shadow-md shadow-[var(--primary)]/20 font-bold text-[14px] !bg-[var(--primary)] !text-white hover:!bg-[var(--primary-hover)]"
+                      >
                         {t('register')}
                       </Button>
                     </Link>
                   </div>
                 </div>
-              )}
-            </div>
+                <div className="mx-6 h-px bg-[var(--border)]/60" />
+              </>
+            )}
 
-            {/* Divider */}
-            <div className="my-3 h-px bg-gradient-to-r from-transparent via-[var(--border)] to-transparent" />
-
-            {/* Language Selector - Mobile */}
-            <div className="py-4">
-              <p className="text-xs text-[var(--text-grey)] uppercase tracking-widest mb-4 font-bold flex items-center gap-2" style={{ paddingInlineStart: '4px' }}>
+            {/* Language Section */}
+            <div className="p-4">
+              <p className="text-xs text-[var(--text-grey)] uppercase tracking-wider mb-3 px-2 font-semibold flex items-center gap-2">
                 <Globe size={14} />
                 {t('language')}
               </p>
-              <div className="flex gap-4">
+              <div className="flex gap-2">
                 <button
                   onClick={() => handleLanguageChange('ar')}
                   className={clsx(
-                    'flex-1 rounded-2xl text-[15px] font-bold transition-all duration-300',
+                    'flex-1 py-3 px-4 rounded-xl text-[14px] font-bold transition-all duration-200 active:scale-[0.98] border-2',
                     locale === 'ar'
-                      ? 'bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] text-white shadow-lg shadow-[var(--primary)]/30'
-                      : 'bg-[var(--main-bg)] text-[var(--black)] hover:bg-[var(--border)]/50 active:scale-[0.98]'
+                      ? 'bg-[var(--primary)]/10 text-[var(--primary)] border-[var(--primary)]'
+                      : 'bg-[var(--main-bg)] text-[var(--black)] border-transparent hover:bg-[var(--border)]/50'
                   )}
-                  style={{ padding: '16px 20px' }}
                 >
-                  <span>العربية</span>
+                  العربية
                 </button>
                 <button
                   onClick={() => handleLanguageChange('en')}
                   className={clsx(
-                    'flex-1 rounded-2xl text-[15px] font-bold transition-all duration-300',
+                    'flex-1 py-3 px-4 rounded-xl text-[14px] font-bold transition-all duration-200 active:scale-[0.98] border-2',
                     locale === 'en'
-                      ? 'bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] text-white shadow-lg shadow-[var(--primary)]/30'
-                      : 'bg-[var(--main-bg)] text-[var(--black)] hover:bg-[var(--border)]/50 active:scale-[0.98]'
+                      ? 'bg-[var(--primary)]/10 text-[var(--primary)] border-[var(--primary)]'
+                      : 'bg-[var(--main-bg)] text-[var(--black)] border-transparent hover:bg-[var(--border)]/50'
                   )}
-                  style={{ padding: '16px 20px' }}
                 >
-                  <span>English</span>
+                  English
                 </button>
               </div>
             </div>
-
           </div>
+
+          {/* Footer - Logout for Authenticated Users */}
+          {_hasHydrated && isAuthenticated && (
+            <div className="border-t border-[var(--border)]/60 p-4 pb-safe-bottom bg-white">
+              <button
+                onClick={handleLogout}
+                className="flex items-center justify-center gap-3 w-full h-14 rounded-xl text-white font-semibold text-[16px] transition-all duration-200 active:scale-[0.98]"
+                style={{ 
+                  backgroundColor: '#E53935',
+                  boxShadow: '0 4px 6px -1px rgba(229, 57, 53, 0.3)'
+                }}
+              >
+                <LogOut size={20} />
+                <span>{t('logout')}</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

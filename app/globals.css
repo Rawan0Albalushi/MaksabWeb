@@ -1420,6 +1420,44 @@ footer {
   }
 }
 
+/* Smooth Ken Burns effect for full image banners */
+@keyframes kenburns-smooth {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Banner bounce animation - gentle up and down movement */
+@keyframes banner-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Banner shimmer effect */
+@keyframes banner-shimmer {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
 /* Banner shine effect */
 @keyframes banner-shine {
   0% {
@@ -1790,4 +1828,20 @@ footer {
   .hero-xs-compact p {
     font-size: 0.6875rem !important;
   }
+}
+
+/* ===== MOBILE MENU UTILITIES ===== */
+
+/* Safe area padding for notched devices */
+.pt-safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.pb-safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Custom transition duration */
+.duration-400 {
+  transition-duration: 400ms;
 }
