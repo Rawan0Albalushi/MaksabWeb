@@ -326,7 +326,7 @@ const Header = () => {
                   {/* Profile Dropdown */}
                   <div 
                     className={clsx(
-                      'absolute top-full end-0 mt-2 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl shadow-black/10 border border-white/50 overflow-hidden z-50 transition-all duration-300 origin-top',
+                      'absolute top-full end-0 mt-2 w-60 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl shadow-black/10 border border-white/50 overflow-hidden z-50 transition-all duration-300 origin-top',
                       isProfileDropdownOpen
                         ? 'opacity-100 scale-100 translate-y-0'
                         : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
@@ -334,7 +334,7 @@ const Header = () => {
                     onClick={(e) => e.stopPropagation()}
                   >
                     {/* User Info */}
-                    <div className="p-3 bg-gradient-to-br from-[var(--primary)]/8 to-transparent">
+                    <div className="bg-gradient-to-br from-[var(--primary)]/8 to-transparent" style={{ padding: '14px 20px' }}>
                       <p className="font-semibold text-[var(--black)] truncate">
                         {user?.firstname} {user?.lastname}
                       </p>
@@ -344,11 +344,12 @@ const Header = () => {
                     </div>
                     
                     {/* Menu Items */}
-                    <div className="p-1.5">
+                    <div style={{ padding: '8px 12px' }}>
                       <Link
                         href="/profile"
                         onClick={() => setIsProfileDropdownOpen(false)}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-[var(--main-bg)] transition-colors group"
+                        className="flex items-center gap-3 rounded-xl text-sm hover:bg-[var(--main-bg)] transition-colors group"
+                        style={{ padding: '12px 16px' }}
                       >
                         <User size={17} className="text-[var(--text-grey)] group-hover:text-[var(--primary)] transition-colors" />
                         <span className="text-[var(--black)]">{t('profile')}</span>
@@ -356,7 +357,8 @@ const Header = () => {
                       <Link
                         href="/orders"
                         onClick={() => setIsProfileDropdownOpen(false)}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-[var(--main-bg)] transition-colors group"
+                        className="flex items-center gap-3 rounded-xl text-sm hover:bg-[var(--main-bg)] transition-colors group"
+                        style={{ padding: '12px 16px' }}
                       >
                         <Package size={17} className="text-[var(--text-grey)] group-hover:text-[var(--primary)] transition-colors" />
                         <span className="text-[var(--black)]">{t('orders')}</span>
@@ -364,7 +366,8 @@ const Header = () => {
                       <Link
                         href="/settings"
                         onClick={() => setIsProfileDropdownOpen(false)}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-[var(--main-bg)] transition-colors group"
+                        className="flex items-center gap-3 rounded-xl text-sm hover:bg-[var(--main-bg)] transition-colors group"
+                        style={{ padding: '12px 16px' }}
                       >
                         <Settings size={17} className="text-[var(--text-grey)] group-hover:text-[var(--primary)] transition-colors" />
                         <span className="text-[var(--black)]">{t('settings')}</span>
@@ -372,13 +375,14 @@ const Header = () => {
                     </div>
                     
                     {/* Logout */}
-                    <div className="p-1.5 border-t border-[var(--border)]/50">
+                    <div className="border-t border-[var(--border)]/50" style={{ padding: '8px 12px' }}>
                       <button
                         onClick={handleLogout}
-                        className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-[var(--error)] hover:bg-[var(--error)]/8 transition-colors"
+                        className="flex items-center gap-3 w-full rounded-xl text-sm text-[var(--error)] hover:bg-[var(--error)]/8 transition-colors"
+                        style={{ padding: '12px 16px' }}
                       >
                         <LogOut size={17} />
-                        {t('logout')}
+                        <span>{t('logout')}</span>
                       </button>
                     </div>
                   </div>
