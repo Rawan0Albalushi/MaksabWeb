@@ -47,12 +47,14 @@ export interface Shop {
   open: boolean;
   verify?: boolean;
   delivery_time?: {
-    from: number;
-    to: number;
+    from: number | string;
+    to: number | string;
     type: string;
   };
   delivery_range?: number;
   delivery_fee?: number;
+  price?: number; // Delivery fee (from API)
+  price_per_km?: number; // Delivery price per km
   min_amount?: number;
   tax?: number;
   percentage?: number;
@@ -390,12 +392,20 @@ export interface ParcelOrder {
 
 // Calculate
 export interface CalculateResult {
+  // Snake case (from API)
   total_price: number;
   delivery_fee: number;
   tax: number;
   service_fee: number;
   discount: number;
   coupon_price: number;
+  // Camel case alternatives (some APIs return this)
+  totalPrice?: number;
+  deliveryFee?: number;
+  totalTax?: number;
+  serviceFee?: number;
+  couponPrice?: number;
+  totalDiscount?: number;
 }
 
 // Wallet History

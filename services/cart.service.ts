@@ -12,10 +12,10 @@ interface CartProductData {
 }
 
 interface CalculateData {
-  delivery_type?: string;
-  delivery_fee?: number;
+  type?: string;
   coupon?: string;
-  location?: {
+  currency_id?: number;
+  address?: {
     latitude: number;
     longitude: number;
   };
@@ -151,22 +151,64 @@ export const cartService = {
 
   // Update product quantity in cart
   updateCartProduct: async (data: CartProductData): Promise<ApiResponse<Cart>> => {
-    return post('/api/v1/dashboard/user/cart/insert-product', data);
+    // Get currency_id (required for the endpoint)
+    let currencyId: number = 2; // Default to 2 (OMR)
+    
+    if (typeof window !== 'undefined') {
+      const storedCurrencyId = localStorage.getItem('currency_id');
+      if (storedCurrencyId) {
+        currencyId = parseInt(storedCurrencyId, 10);
+      }
+    }
+    
+    const updateData = {
+      shop_id: data.shop_id,
+      currency_id: currencyId,
+      products: [
+        {
+          stock_id: data.stock_id,
+          quantity: data.quantity,
+        },
+      ],
+    };
+    
+    return post('/api/v1/dashboard/user/cart/insert-product', updateData);
   },
 
   // Delete cart
-  deleteCart: async (): Promise<ApiResponse<void>> => {
+  deleteCart: async (cartId?: number): Promise<ApiResponse<void>> => {
+    if (cartId) {
+      return del('/api/v1/dashboard/user/cart/delete', { 'ids[]': cartId });
+    }
     return del('/api/v1/dashboard/user/cart/delete');
   },
 
   // Delete product from cart
   deleteCartProduct: async (cartDetailId: number): Promise<ApiResponse<void>> => {
-    return del('/api/v1/dashboard/user/cart/product/delete', { cart_detail_id: cartDetailId });
+    console.log('🗑️ Deleting cart product with ID:', cartDetailId);
+    // Use the correct parameter format: ids[]=value
+    const result = await del<ApiResponse<void>>(`/api/v1/dashboard/user/cart/product/delete?ids[]=${cartDetailId}`, {});
+    console.log('🗑️ Delete result:', result);
+    return result;
   },
 
   // Calculate cart totals
   calculateCart: async (cartId: number, data: CalculateData): Promise<ApiResponse<CalculateResult>> => {
-    return post(`/api/v1/dashboard/user/cart/calculate/${cartId}`, data);
+    // Get currency_id
+    let currencyId: number = 2; // Default to 2 (OMR)
+    if (typeof window !== 'undefined') {
+      const storedCurrencyId = localStorage.getItem('currency_id');
+      if (storedCurrencyId) {
+        currencyId = parseInt(storedCurrencyId, 10);
+      }
+    }
+    
+    const calculatePayload = {
+      ...data,
+      currency_id: data.currency_id || currencyId,
+    };
+    
+    return post(`/api/v1/dashboard/user/cart/calculate/${cartId}`, calculatePayload);
   },
 
   // Check coupon

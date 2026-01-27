@@ -360,7 +360,7 @@ export const AddressSelector = ({
     return (
       <div className="max-h-[450px] overflow-y-auto">
         {/* Header Section */}
-        <div className="px-6 py-5 bg-gradient-to-br from-gray-50 via-white to-gray-50/50">
+        <div className="bg-gradient-to-br from-gray-50 via-white to-gray-50/50" style={{ padding: '20px 24px' }}>
           <h3 className="text-lg font-bold text-gray-900 leading-relaxed">{t('selectLocation')}</h3>
           <p className="text-sm text-gray-500 mt-1 leading-relaxed">{t('chooseDeliveryAddress')}</p>
         </div>
@@ -369,13 +369,13 @@ export const AddressSelector = ({
         <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
 
         {/* GPS Detection Card */}
-        <div className="p-4">
+        <div style={{ padding: '16px 20px' }}>
           <button
             type="button"
             onClick={handleDetectLocation}
             disabled={isLoading}
             className={clsx(
-              "w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-200",
+              "w-full flex items-center gap-4 rounded-xl transition-all duration-200",
               "bg-gradient-to-r from-[var(--primary)]/[0.08] to-[var(--primary)]/[0.03]",
               "border border-[var(--primary)]/20",
               "hover:from-[var(--primary)]/[0.12] hover:to-[var(--primary)]/[0.06]",
@@ -383,6 +383,7 @@ export const AddressSelector = ({
               "active:scale-[0.98]",
               "group"
             )}
+            style={{ padding: '16px 20px' }}
           >
             <div className={clsx(
               "w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200",
@@ -408,8 +409,8 @@ export const AddressSelector = ({
 
         {/* Location Error */}
         {error && (
-          <div className="px-4 pb-4">
-            <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-xl">
+          <div style={{ padding: '0 20px 16px 20px' }}>
+            <div className="flex items-center gap-3 bg-red-50 border border-red-100 rounded-xl" style={{ padding: '14px 18px' }}>
               <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
                 <X size={18} className="text-red-500" />
               </div>
@@ -426,8 +427,8 @@ export const AddressSelector = ({
               <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
             </div>
 
-            <div className="p-4">
-              <div className="p-4 bg-gradient-to-br from-green-50 via-emerald-50/50 to-teal-50/30 border border-green-200/60 rounded-xl shadow-sm">
+            <div style={{ padding: '16px 20px' }}>
+              <div className="bg-gradient-to-br from-green-50 via-emerald-50/50 to-teal-50/30 border border-green-200/60 rounded-xl shadow-sm" style={{ padding: '16px 20px' }}>
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-green-500/30">
                     <MapPinned size={22} className="text-white" />
@@ -447,7 +448,8 @@ export const AddressSelector = ({
                       clearLocation();
                       setIsOpen(false);
                     }}
-                    className="px-3 py-1.5 text-[13px] font-semibold text-green-700 hover:text-white hover:bg-green-600 bg-green-100 rounded-lg transition-all flex-shrink-0"
+                    className="text-[13px] font-semibold text-green-700 hover:text-white hover:bg-green-600 bg-green-100 rounded-lg transition-all flex-shrink-0"
+                    style={{ padding: '8px 14px' }}
                   >
                     {t('change')}
                   </button>
@@ -465,14 +467,14 @@ export const AddressSelector = ({
               <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
             </div>
 
-            <div className="py-4">
+            <div style={{ padding: '16px 0' }}>
               {/* Section Title */}
-              <p className="px-6 pb-3 text-xs font-bold text-gray-400 uppercase tracking-wider">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider" style={{ padding: '0 24px 12px 24px' }}>
                 {t('savedAddresses')}
               </p>
 
               {/* Address List */}
-              <div className="space-y-1 px-4">
+              <div className="space-y-1" style={{ padding: '0 20px' }}>
                 {savedAddresses.slice(0, 5).map((addr) => {
                   const Icon = getAddressIcon(addr.title);
                   const isSelected = selectedAddress?.id === addr.id && !selectedAddress?.isCurrentLocation;
@@ -483,12 +485,13 @@ export const AddressSelector = ({
                       type="button"
                       onClick={() => handleSelectAddress(addr)}
                       className={clsx(
-                        "w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-200 group",
+                        "w-full flex items-center gap-4 rounded-xl transition-all duration-200 group",
                         isSelected 
                           ? "bg-[var(--primary)]/[0.08] border border-[var(--primary)]/20" 
                           : "bg-transparent hover:bg-gray-50 border border-transparent hover:border-gray-100",
                         "active:scale-[0.98]"
                       )}
+                      style={{ padding: '14px 18px' }}
                     >
                       <div className={clsx(
                         "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0",
@@ -513,7 +516,7 @@ export const AddressSelector = ({
                           <Check size={16} className="text-white" />
                         </div>
                       ) : addr.active ? (
-                        <span className="px-2.5 py-1 text-[11px] font-bold text-[var(--primary)] bg-[var(--primary)]/10 rounded-full flex-shrink-0">
+                        <span className="text-[11px] font-bold text-[var(--primary)] bg-[var(--primary)]/10 rounded-full flex-shrink-0" style={{ padding: '6px 12px' }}>
                           {t('default')}
                         </span>
                       ) : (
@@ -529,7 +532,7 @@ export const AddressSelector = ({
 
         {/* Loading Addresses */}
         {isLoadingAddresses && savedAddresses.length === 0 && (
-          <div className="px-6 py-10 flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center" style={{ padding: '40px 24px' }}>
             <Loader2 size={28} className="text-[var(--primary)] animate-spin" />
             <p className="text-sm text-gray-500 mt-4 leading-relaxed">{t('loadingAddresses')}</p>
           </div>
@@ -538,18 +541,19 @@ export const AddressSelector = ({
         {/* Add New Address */}
         <>
           {/* Section Divider */}
-          <div className="px-4">
+          <div style={{ padding: '0 16px' }}>
             <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
           </div>
 
-          <div className="p-4">
+          <div style={{ padding: '16px 20px' }}>
             <button 
               type="button"
               onClick={() => {
                 setIsOpen(false);
                 setIsFormOpen(true);
               }}
-              className="w-full flex items-center justify-center gap-3 py-4 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all active:scale-[0.98]"
+              className="w-full flex items-center justify-center gap-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all active:scale-[0.98]"
+              style={{ padding: '16px 20px' }}
             >
               <Plus size={20} />
               <span className="text-sm font-semibold">{t('addNewAddress')}</span>

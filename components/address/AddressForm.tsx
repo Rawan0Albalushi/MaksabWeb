@@ -472,7 +472,7 @@ export const AddressForm = ({
           >
             {/* Header */}
             <div className="flex-shrink-0 bg-white border-b border-gray-100">
-              <div className="flex items-center gap-3 p-4 sm:p-5">
+              <div className="flex items-center gap-3" style={{ padding: '20px 24px' }}>
                 <button
                   onClick={() => {
                     if (viewMode === 'form' && !editAddress && savedAddresses.length > 0) {
@@ -505,7 +505,7 @@ export const AddressForm = ({
             <div className="flex-1 overflow-y-auto">
               {/* Saved Addresses List View */}
               {viewMode === 'list' && (
-                <div className="p-4 sm:p-5 space-y-4">
+                <div className="space-y-4" style={{ padding: '20px 24px' }}>
                   {/* Detect Location Button */}
                   <button
                     type="button"
@@ -515,7 +515,7 @@ export const AddressForm = ({
                     }}
                     disabled={isLoading}
                     className={clsx(
-                      "w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-200",
+                      "w-full flex items-center gap-4 rounded-2xl transition-all duration-200",
                       "bg-gradient-to-r from-[var(--primary)]/[0.08] to-[var(--primary)]/[0.03]",
                       "border border-[var(--primary)]/20",
                       "hover:from-[var(--primary)]/[0.12] hover:to-[var(--primary)]/[0.06]",
@@ -523,6 +523,7 @@ export const AddressForm = ({
                       "active:scale-[0.98]",
                       "group"
                     )}
+                    style={{ padding: '16px 20px' }}
                   >
                     <div className={clsx(
                       "w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200",
@@ -586,7 +587,8 @@ export const AddressForm = ({
                                 <button
                                   type="button"
                                   onClick={() => handleSelectSavedAddress(addr)}
-                                  className="w-full flex items-center gap-4 p-4"
+                                  className="w-full flex items-center gap-4"
+                                  style={{ padding: '16px 20px' }}
                                 >
                                   <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center transition-all duration-200 flex-shrink-0">
                                     <Icon size={20} className="text-gray-500" />
@@ -597,7 +599,7 @@ export const AddressForm = ({
                                         {addr.title || tAddress('other')}
                                       </p>
                                       {addr.active && (
-                                        <span className="px-2 py-0.5 text-[10px] font-bold text-[var(--primary)] bg-[var(--primary)]/10 rounded-full">
+                                        <span className="text-[10px] font-bold text-[var(--primary)] bg-[var(--primary)]/10 rounded-full" style={{ padding: '4px 10px' }}>
                                           {t('default')}
                                         </span>
                                       )}
@@ -656,7 +658,8 @@ export const AddressForm = ({
                       {/* Add New Address Button */}
                       <button
                         onClick={handleAddNewAddress}
-                        className="w-full flex items-center justify-center gap-3 py-4 border-2 border-dashed border-gray-200 rounded-2xl text-gray-500 hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all active:scale-[0.98]"
+                        className="w-full flex items-center justify-center gap-3 border-2 border-dashed border-gray-200 rounded-2xl text-gray-500 hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all active:scale-[0.98]"
+                        style={{ padding: '16px 20px' }}
                       >
                         <Plus size={20} />
                         <span className="text-sm font-semibold">{t('addNewAddress')}</span>
@@ -668,7 +671,8 @@ export const AddressForm = ({
                   {!isAuthenticated && (
                     <button
                       onClick={handleAddNewAddress}
-                      className="w-full flex items-center justify-center gap-3 py-4 border-2 border-dashed border-gray-200 rounded-2xl text-gray-500 hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all active:scale-[0.98]"
+                      className="w-full flex items-center justify-center gap-3 border-2 border-dashed border-gray-200 rounded-2xl text-gray-500 hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all active:scale-[0.98]"
+                      style={{ padding: '16px 20px' }}
                     >
                       <Plus size={20} />
                       <span className="text-sm font-semibold">حدد موقعك يدوياً</span>
@@ -679,7 +683,7 @@ export const AddressForm = ({
 
               {/* Add/Edit Address Form View */}
               {viewMode === 'form' && (
-              <div className="p-4 sm:p-5 space-y-5">
+              <div className="space-y-5" style={{ padding: '20px 24px' }}>
                 {/* Map Section */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -752,7 +756,7 @@ export const AddressForm = ({
 
                   {/* Selected Address Display */}
                   {address && (
-                    <div className="flex items-start gap-3 p-3 bg-green-50 rounded-xl border border-green-200">
+                    <div className="flex items-start gap-3 bg-green-50 rounded-xl border border-green-200" style={{ padding: '14px 18px' }}>
                       <MapPin size={18} className="text-green-600 flex-shrink-0 mt-0.5" />
                       <p className="text-sm text-green-700">{address}</p>
                     </div>
@@ -768,11 +772,12 @@ export const AddressForm = ({
                         key={type}
                         onClick={() => setAddressType(type)}
                         className={clsx(
-                          "flex-1 flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
+                          "flex-1 flex flex-col items-center gap-2 rounded-xl border-2 transition-all",
                           addressType === type
                             ? "border-[var(--primary)] bg-[var(--primary)]/5"
                             : "border-gray-200 hover:border-gray-300"
                         )}
+                        style={{ padding: '16px 12px' }}
                       >
                         <div className={clsx(
                           "w-10 h-10 rounded-full flex items-center justify-center",
@@ -844,13 +849,13 @@ export const AddressForm = ({
 
             {/* Footer - Only show in form mode */}
             {viewMode === 'form' && (
-            <div className="flex-shrink-0 bg-white border-t border-gray-100 p-4 sm:p-5">
+            <div className="flex-shrink-0 bg-white border-t border-gray-100" style={{ padding: '20px 24px' }}>
               <button
                 onClick={handleSave}
                 disabled={isSaving || !address}
-                style={{ backgroundColor: '#FF3D00' }}
+                style={{ backgroundColor: '#FF3D00', padding: '16px 24px' }}
                 className={clsx(
-                  "w-full flex items-center justify-center gap-2 py-4 px-6 rounded-xl text-base font-bold transition-all",
+                  "w-full flex items-center justify-center gap-2 rounded-xl text-base font-bold transition-all",
                   "text-white",
                   "hover:opacity-90",
                   "disabled:opacity-50 disabled:cursor-not-allowed",

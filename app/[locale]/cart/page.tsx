@@ -30,10 +30,96 @@ import {
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
-import { Button } from '@/components/ui';
+import { Button, Modal } from '@/components/ui';
 import { cartService } from '@/services';
 import { Cart, CartDetail } from '@/types';
 import { useCartStore, useAuthStore, useSettingsStore } from '@/store';
+
+// ============================================
+// CONFIRMATION MODAL COMPONENT
+// ============================================
+const ConfirmModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmText,
+  cancelText,
+  isLoading,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+  confirmText: string;
+  cancelText: string;
+  isLoading?: boolean;
+}) => {
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} size="sm" showCloseButton={false}>
+      <div style={{ 
+        padding: '24px 28px', 
+        textAlign: 'center',
+        background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.08) 0%, rgba(0, 151, 155, 0.08) 100%)'
+      }}>
+        {/* Warning Icon */}
+        <div 
+          style={{ 
+            width: '64px', 
+            height: '64px', 
+            margin: '0 auto 20px auto',
+            backgroundColor: '#FEE2E2',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <Trash2 className="w-8 h-8 text-red-500" />
+        </div>
+        
+        {/* Title */}
+        <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827', marginBottom: '12px' }}>
+          {title}
+        </h3>
+        
+        {/* Message */}
+        <p style={{ color: '#6B7280', marginBottom: '28px', lineHeight: '1.6' }}>
+          {message}
+        </p>
+        
+        {/* Buttons */}
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            fullWidth
+            onClick={onClose}
+            disabled={isLoading}
+            className="!border-gray-300 !text-gray-700 hover:!bg-gray-100"
+            style={{ padding: '14px 20px' }}
+          >
+            {cancelText}
+          </Button>
+          <Button
+            fullWidth
+            onClick={onConfirm}
+            disabled={isLoading}
+            className="!bg-red-500 hover:!bg-red-600 !text-white"
+            style={{ padding: '14px 20px' }}
+          >
+            {isLoading ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              confirmText
+            )}
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+};
 
 // ============================================
 // ANIMATION VARIANTS
@@ -69,18 +155,34 @@ const CartItemCard = ({
 }) => {
   const [isRemoving, setIsRemoving] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [localQuantity, setLocalQuantity] = useState(item.quantity);
+
+  // Sync local quantity with item quantity when it changes from parent
+  useEffect(() => {
+    setLocalQuantity(item.quantity);
+  }, [item.quantity]);
 
   const product = item.stock?.product;
   const productImage = product?.img || item.stock?.extras?.find(e => e.group?.type === 'image')?.value;
   const productTitle = product?.translation?.title || `#${item.stock?.id}`;
   const unitPrice = item.stock?.total_price || item.price;
-  const totalPrice = item.price * item.quantity;
+  const totalPrice = unitPrice * localQuantity;
 
   const handleQuantityChange = async (newQty: number) => {
     if (newQty < 1 || isUpdating) return;
+    
+    // Optimistic update - change UI immediately
+    setLocalQuantity(newQty);
     setIsUpdating(true);
-    await onUpdateQuantity(newQty);
-    setIsUpdating(false);
+    
+    try {
+      await onUpdateQuantity(newQty);
+    } catch (error) {
+      // Revert on error
+      setLocalQuantity(item.quantity);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const handleRemove = async () => {
@@ -175,33 +277,36 @@ const CartItemCard = ({
             {/* Bottom Row: Quantity & Price */}
             <div className="flex items-center justify-between gap-4 mt-auto">
               {/* Quantity Selector */}
-              <div className="flex items-center bg-gray-100 rounded-xl p-1">
+              <div className="flex items-center rounded-xl overflow-hidden border-2 border-gray-300">
                 <button
-                  onClick={() => handleQuantityChange(item.quantity - 1)}
-                  disabled={item.quantity <= 1 || isUpdating}
-                  className={clsx(
-                    'w-10 h-10 rounded-lg flex items-center justify-center transition-all',
-                    item.quantity <= 1
-                      ? 'text-gray-300 cursor-not-allowed'
-                      : 'text-gray-600 hover:bg-white hover:shadow active:scale-95'
-                  )}
+                  onClick={() => handleQuantityChange(localQuantity + 1)}
+                  disabled={isUpdating}
+                  style={{ backgroundColor: '#f97316', color: 'white', width: '44px', height: '44px' }}
+                  className="flex items-center justify-center hover:opacity-90 transition-all active:scale-95"
                 >
-                  <Minus className="w-5 h-5" />
+                  <Plus className="w-5 h-5" />
                 </button>
                 
                 <span className={clsx(
-                  'w-12 text-center font-bold text-gray-900 text-lg',
+                  'w-14 text-center font-bold text-gray-900 text-lg bg-white',
                   isUpdating && 'opacity-50 animate-pulse'
                 )}>
-                  {item.quantity}
+                  {localQuantity}
                 </span>
                 
                 <button
-                  onClick={() => handleQuantityChange(item.quantity + 1)}
-                  disabled={isUpdating}
-                  className="w-10 h-10 rounded-lg bg-[var(--primary)] text-white flex items-center justify-center hover:bg-[var(--primary-hover)] transition-all active:scale-95"
+                  onClick={() => handleQuantityChange(localQuantity - 1)}
+                  disabled={localQuantity <= 1 || isUpdating}
+                  style={{ 
+                    backgroundColor: localQuantity <= 1 ? '#d1d5db' : '#6b7280',
+                    color: localQuantity <= 1 ? '#9ca3af' : 'white',
+                    width: '44px', 
+                    height: '44px',
+                    cursor: localQuantity <= 1 ? 'not-allowed' : 'pointer'
+                  }}
+                  className="flex items-center justify-center hover:opacity-90 transition-all active:scale-95"
                 >
-                  <Plus className="w-5 h-5" />
+                  <Minus className="w-5 h-5" />
                 </button>
               </div>
 
@@ -211,9 +316,9 @@ const CartItemCard = ({
                   {totalPrice.toFixed(2)}
                   <span className="text-sm font-medium text-gray-500 ms-1">{currency}</span>
                 </p>
-                {item.quantity > 1 && (
+                {localQuantity > 1 && (
                   <p className="text-xs text-gray-400 mt-0.5">
-                    {unitPrice.toFixed(2)} × {item.quantity}
+                    {unitPrice.toFixed(2)} × {localQuantity}
                   </p>
                 )}
               </div>
@@ -308,6 +413,8 @@ const CartPage = () => {
   const [couponError, setCouponError] = useState('');
   const [couponSuccess, setCouponSuccess] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [clearingCart, setClearingCart] = useState(false);
 
   const currency = tCommon('sar');
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
@@ -327,9 +434,11 @@ const CartPage = () => {
       const response = await cartService.getCart();
       setCart(response.data);
     } catch (error: any) {
-      console.error('Error fetching cart:', error);
+      // 404 means cart is empty/doesn't exist - this is expected
       if (error?.response?.status === 404) {
         clearCart();
+      } else {
+        console.error('Error fetching cart:', error);
       }
     } finally {
       setLoading(false);
@@ -352,22 +461,55 @@ const CartPage = () => {
   };
 
   const handleRemoveItem = async (cartDetailId: number) => {
+    console.log('🗑️ Attempting to delete cart item:', cartDetailId);
+    
+    // Optimistic update - remove from UI immediately
+    if (cart) {
+      const updatedCart = {
+        ...cart,
+        user_carts: cart.user_carts?.map(uc => ({
+          ...uc,
+          cart_details: uc.cart_details?.filter(cd => cd.id !== cartDetailId),
+          cartDetails: uc.cartDetails?.filter(cd => cd.id !== cartDetailId),
+        }))
+      };
+      setCart(updatedCart);
+    }
+    
     try {
       await cartService.deleteCartProduct(cartDetailId);
-      await fetchCart();
-    } catch (error) {
-      console.error('Error removing item:', error);
+      
+      // Refresh cart to sync with server
+      try {
+        const response = await cartService.getCart();
+        setCart(response.data);
+      } catch (error: any) {
+        // If cart is empty (404), clear it
+        if (error?.response?.status === 404) {
+          clearCart();
+        }
+      }
+    } catch (error: any) {
+      console.error('❌ Error removing item:', error);
+      // On error, refresh cart to restore the item
+      fetchCart();
     }
   };
 
-  const handleClearCart = async () => {
-    if (!confirm(t('confirmClear'))) return;
-    
+  const handleClearCart = () => {
+    setShowClearConfirm(true);
+  };
+
+  const confirmClearCart = async () => {
+    setClearingCart(true);
     try {
-      await cartService.deleteCart();
+      await cartService.deleteCart(cart?.id);
       clearCart();
+      setShowClearConfirm(false);
     } catch (error) {
       console.error('Error clearing cart:', error);
+    } finally {
+      setClearingCart(false);
     }
   };
 
@@ -414,27 +556,32 @@ const CartPage = () => {
   // Not Authenticated State
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
+      <div className="bg-gray-50 flex items-center justify-center" style={{ minHeight: 'calc(100vh - 80px)' }}>
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center max-w-sm w-full"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center justify-center text-center px-4"
         >
-          <div className="w-28 h-28 mx-auto mb-6 bg-gradient-to-br from-[var(--primary)]/20 to-[var(--primary)]/5 rounded-full flex items-center justify-center">
-            <ShoppingBag className="w-12 h-12 text-[var(--primary)]" />
-          </div>
+          <motion.div
+            animate={{ y: [0, -10, 0] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+            className="w-40 h-40 sm:w-48 sm:h-48 bg-gradient-to-br from-orange-100 to-orange-50 rounded-full flex items-center justify-center shadow-lg shadow-orange-100"
+            style={{ marginBottom: '48px' }}
+          >
+            <ShoppingBag className="w-20 h-20 sm:w-24 sm:h-24 text-orange-400" />
+          </motion.div>
           
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900" style={{ marginBottom: '16px' }}>
             {t('loginRequired')}
           </h2>
-          <p className="text-gray-500 mb-8 text-sm">
+          <p className="text-gray-500 text-base sm:text-lg max-w-xs" style={{ marginBottom: '56px' }}>
             {t('loginRequiredDesc')}
           </p>
           
           <Link href="/auth/login?redirect=/cart">
-            <Button size="lg" className="text-base font-semibold" style={{ padding: '14px 32px' }}>
+            <Button size="lg" className="text-base sm:text-lg font-semibold rounded-xl shadow-lg shadow-orange-200 !bg-[var(--primary)] !text-white hover:!bg-[var(--primary-hover)]" style={{ padding: '16px 40px' }}>
               {tCommon('login')}
-              <ArrowIcon className="w-5 h-5 ms-2" />
+              <ArrowIcon className="w-5 h-5 sm:w-6 sm:h-6 ms-2" />
             </Button>
           </Link>
         </motion.div>
@@ -445,47 +592,34 @@ const CartPage = () => {
   // Empty Cart State
   if (!cart || cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
+      <div className="bg-gray-50 flex items-center justify-center" style={{ minHeight: 'calc(100vh - 80px)' }}>
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center max-w-sm w-full"
+          className="flex flex-col items-center justify-center text-center px-4"
         >
           <motion.div
-            animate={{ y: [0, -8, 0] }}
+            animate={{ y: [0, -10, 0] }}
             transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-            className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-orange-100 to-orange-50 rounded-full flex items-center justify-center"
+            className="w-40 h-40 sm:w-48 sm:h-48 bg-gradient-to-br from-orange-100 to-orange-50 rounded-full flex items-center justify-center shadow-lg shadow-orange-100"
+            style={{ marginBottom: '48px' }}
           >
-            <ShoppingCart className="w-14 h-14 text-orange-400" />
+            <ShoppingCart className="w-20 h-20 sm:w-24 sm:h-24 text-orange-400" />
           </motion.div>
           
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900" style={{ marginBottom: '16px' }}>
             {t('empty')}
           </h2>
-          <p className="text-gray-500 mb-8 text-sm">
+          <p className="text-gray-500 text-base sm:text-lg max-w-xs" style={{ marginBottom: '56px' }}>
             {t('emptySubtitle')}
           </p>
           
           <Link href="/shops">
-            <Button size="lg" className="text-base font-semibold" style={{ padding: '14px 32px' }}>
-              <Store className="w-5 h-5 me-2" />
+            <Button size="lg" className="text-base sm:text-lg font-semibold rounded-xl shadow-lg shadow-orange-200 !bg-[var(--primary)] !text-white hover:!bg-[var(--primary-hover)]" style={{ padding: '16px 40px' }}>
+              <Store className="w-5 h-5 sm:w-6 sm:h-6 me-2" />
               {t('browsShops')}
             </Button>
           </Link>
-
-          {/* Features */}
-          <div className="mt-10 grid grid-cols-3 gap-3">
-            {[
-              { icon: Gift, text: t('offers') },
-              { icon: Truck, text: t('delivery') },
-              { icon: Shield, text: t('secure') },
-            ].map((item, index) => (
-              <div key={index} className="flex flex-col items-center bg-white rounded-xl border border-gray-100" style={{ padding: '14px 12px' }}>
-                <item.icon className="w-5 h-5 text-[var(--primary)] mb-1.5" />
-                <span className="text-[10px] text-gray-600 text-center">{item.text}</span>
-              </div>
-            ))}
-          </div>
         </motion.div>
       </div>
     );
@@ -583,7 +717,7 @@ const CartPage = () => {
                   
                   {/* View Shop Button */}
                   <Link href={`/shops/${cart.shop.uuid}`} className="hidden sm:block">
-                    <Button variant="outline" size="sm" className="rounded-lg text-sm" style={{ padding: '10px 18px' }}>
+                    <Button variant="outline" size="sm" className="rounded-lg text-sm border-[var(--primary)] text-[var(--primary)] hover:!bg-[var(--primary)] hover:!text-white" style={{ padding: '10px 18px' }}>
                       {t('viewShop')}
                       <ChevronIcon className="w-4 h-4 ms-1" />
                     </Button>
@@ -650,7 +784,7 @@ const CartPage = () => {
                 </label>
                 <div className="flex gap-2">
                   <div className="relative flex-1">
-                    <Ticket className="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Ticket style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)' }} className="w-5 h-5 text-gray-400 pointer-events-none" />
                     <input
                       type="text"
                       placeholder={t('enterCoupon')}
@@ -660,9 +794,10 @@ const CartPage = () => {
                         setCouponError('');
                         setCouponSuccess(false);
                       }}
+                      style={{ paddingRight: '44px', paddingLeft: '14px' }}
                       className={clsx(
-                        'w-full h-11 sm:h-12 ps-10 pe-3 rounded-xl border-2 bg-gray-50',
-                        'text-gray-900 placeholder:text-gray-400',
+                        'w-full h-11 sm:h-12 rounded-xl border-2 bg-gray-50',
+                        'text-gray-900 placeholder:text-gray-400 text-right',
                         'focus:outline-none focus:bg-white transition-all',
                         couponError ? 'border-red-300 focus:border-red-400' :
                         couponSuccess ? 'border-green-300' :
@@ -670,7 +805,7 @@ const CartPage = () => {
                       )}
                     />
                     {couponSuccess && (
-                      <div className="absolute end-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
+                      <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
                         <Check className="w-4 h-4 text-green-600" />
                       </div>
                     )}
@@ -726,8 +861,8 @@ const CartPage = () => {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500 text-sm">{t('deliveryFee')}</span>
-                  <span className="text-xs font-medium text-gray-400 bg-gray-100 rounded" style={{ padding: '6px 10px' }}>
-                    {t('toBeCalculated')}
+                  <span className="font-semibold text-gray-900">
+                    {(cart.shop?.price || 0).toFixed(2)} {currency}
                   </span>
                 </div>
                 {appliedCoupon && (
@@ -746,7 +881,7 @@ const CartPage = () => {
                 <span className="text-base font-bold text-gray-900">{t('total')}</span>
                 <div className="text-end">
                   <span className="text-2xl sm:text-3xl font-bold text-[var(--primary)]">
-                    {(cart.total_price || subtotal).toFixed(2)}
+                    {(subtotal + (cart.shop?.price || 0)).toFixed(2)}
                   </span>
                   <span className="text-sm font-medium text-gray-500 ms-1">{currency}</span>
                 </div>
@@ -765,41 +900,29 @@ const CartPage = () => {
                 <ArrowIcon className="w-5 h-5 ms-2" />
               </Button>
 
-              {/* Security Badge */}
-              <div className="flex items-center justify-center gap-2 mt-4 pt-4 border-t border-gray-100">
-                <Shield className="w-4 h-4 text-green-500" />
-                <span className="text-xs text-gray-500">{t('securePayment')}</span>
-              </div>
-
               {/* Continue Shopping - Desktop */}
-              <Link href="/shops" className="hidden lg:block mt-3">
+              <Link href="/shops" className="hidden lg:block mt-4">
                 <Button variant="ghost" fullWidth className="text-gray-500 hover:text-[var(--primary)] text-sm" style={{ padding: '12px 20px' }}>
                   <Store className="w-4 h-4 me-2" />
                   {t('continueShopping')}
                 </Button>
               </Link>
             </motion.div>
-
-            {/* Trust Badges */}
-            <div className="grid grid-cols-2 gap-3 mt-4">
-              {[
-                { icon: Truck, text: t('fastDelivery'), subtext: t('deliveryTime'), color: 'text-green-600', bg: 'bg-green-50' },
-                { icon: Shield, text: t('guarantee'), subtext: t('moneyBack'), color: 'text-blue-600', bg: 'bg-blue-50' },
-              ].map((badge, index) => (
-                <div key={index} className="flex items-center gap-3 bg-white rounded-xl border border-gray-200/60" style={{ padding: '14px 16px' }}>
-                  <div className={clsx('w-9 h-9 rounded-lg flex items-center justify-center', badge.bg)}>
-                    <badge.icon className={clsx('w-4 h-4', badge.color)} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold text-gray-900 truncate">{badge.text}</p>
-                    <p className="text-[10px] text-gray-500 truncate">{badge.subtext}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>
+
+      {/* Clear Cart Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showClearConfirm}
+        onClose={() => setShowClearConfirm(false)}
+        onConfirm={confirmClearCart}
+        title={t('clearCartTitle')}
+        message={t('confirmClear')}
+        confirmText={t('clearCart')}
+        cancelText={tCommon('cancel')}
+        isLoading={clearingCart}
+      />
     </div>
   );
 };

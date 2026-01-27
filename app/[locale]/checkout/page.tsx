@@ -235,9 +235,9 @@ const CheckoutPage = () => {
       }
       
       const calculateData = {
-        delivery_type: deliveryType,
+        type: deliveryType,
         coupon: appliedCoupon || undefined,
-        location: formattedLocation,
+        address: formattedLocation,
       };
       console.log('📊 Calculating prices with data:', JSON.stringify(calculateData, null, 2));
       
@@ -1432,25 +1432,19 @@ const CheckoutPage = () => {
                     <div className="flex justify-between">
                       <span className="text-gray-500">{tCart('deliveryFee')}</span>
                       <span className="text-gray-700 font-medium">
-                        {calculateLoading ? (
-                          <Loader2 size={14} className="animate-spin text-[var(--primary)]" />
-                        ) : calculatedPrices?.delivery_fee ? (
-                          `${calculatedPrices.delivery_fee.toFixed(2)} ${tCommon('sar')}`
-                        ) : (
-                          <span className="text-gray-400 text-xs">{t('calculated')}</span>
-                        )}
+                        {(cart?.shop?.price || 0).toFixed(2)} {tCommon('sar')}
                       </span>
                     </div>
                   )}
 
-                  {(calculatedPrices?.discount || calculatedPrices?.coupon_price) && (
+                  {(calculatedPrices?.discount || calculatedPrices?.totalDiscount || calculatedPrices?.coupon_price || calculatedPrices?.couponPrice) && (
                     <div className="flex justify-between text-emerald-600">
                       <span className="flex items-center gap-1">
                         <Sparkles size={14} />
                         {tCart('discount')}
                       </span>
                       <span className="font-semibold">
-                        -{((calculatedPrices.discount || 0) + (calculatedPrices.coupon_price || 0)).toFixed(2)} {tCommon('sar')}
+                        -{((calculatedPrices?.discount ?? calculatedPrices?.totalDiscount ?? 0) + (calculatedPrices?.coupon_price ?? calculatedPrices?.couponPrice ?? 0)).toFixed(2)} {tCommon('sar')}
                       </span>
                     </div>
                   )}
@@ -1461,7 +1455,7 @@ const CheckoutPage = () => {
                   <span className="font-bold text-gray-800">{tCart('total')}</span>
                   <div className="text-end">
                     <span className="text-2xl font-black text-[var(--primary)]">
-                      {(calculatedPrices?.total_price || cart.total_price || subtotal).toFixed(2)}
+                      {(subtotal + (deliveryType === 'delivery' ? (cart?.shop?.price || 0) : 0)).toFixed(2)}
                     </span>
                     <span className="text-sm font-medium text-gray-500 ms-1">{tCommon('sar')}</span>
                   </div>
@@ -1515,7 +1509,7 @@ const CheckoutPage = () => {
             <span className="text-sm text-gray-500">{tCart('total')}</span>
             <div className="flex items-baseline gap-1">
               <span className="text-xl font-black text-[var(--primary)]">
-                {(calculatedPrices?.total_price || cart.total_price || subtotal).toFixed(2)}
+                {(subtotal + (deliveryType === 'delivery' ? (cart?.shop?.price || 0) : 0)).toFixed(2)}
               </span>
               <span className="text-xs font-medium text-gray-500">{tCommon('sar')}</span>
             </div>
