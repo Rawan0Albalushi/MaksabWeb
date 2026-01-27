@@ -65,14 +65,15 @@ const Modal = ({
           >
             {/* Header */}
             {(title || showCloseButton) && (
-              <div className="flex items-center justify-between p-5 border-b border-[var(--border)]">
+              <div className="flex items-center justify-between border-b border-[var(--border)]" style={{ padding: '20px 24px' }}>
                 {title && (
                   <h2 className="text-xl font-bold text-[var(--black)]">{title}</h2>
                 )}
                 {showCloseButton && (
                   <button
                     onClick={onClose}
-                    className="p-2 rounded-[var(--radius-md)] hover:bg-[var(--main-bg)] transition-colors"
+                    className="rounded-[var(--radius-md)] hover:bg-[var(--main-bg)] transition-colors"
+                    style={{ padding: '10px' }}
                   >
                     <X size={20} className="text-[var(--text-grey)]" />
                   </button>
@@ -81,7 +82,7 @@ const Modal = ({
             )}
 
             {/* Content */}
-            <div className="p-5 max-h-[calc(100vh-12rem)] overflow-y-auto">
+            <div className="max-h-[calc(100vh-12rem)] overflow-y-auto" style={{ padding: '20px 24px' }}>
               {children}
             </div>
           </motion.div>

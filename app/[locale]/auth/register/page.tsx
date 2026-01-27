@@ -88,7 +88,7 @@ const RegisterPage = () => {
     <div className="auth-page min-h-[calc(100vh-80px)] grid grid-cols-1 lg:grid-cols-2 bg-gradient-to-br from-[var(--primary-dark)] to-[var(--primary-dark-hover)]">
       
       {/* Left - Register Form on Background */}
-      <div className="flex items-center justify-center p-6 lg:p-12">
+      <div className="flex items-center justify-center bg-gradient-to-br from-[#FFF5F3] via-[#F5FAFA] to-[#E8F7F7]" style={{ padding: '24px 28px' }}>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -101,35 +101,37 @@ const RegisterPage = () => {
           </div>
 
           <div className="text-center" style={{ marginBottom: '32px' }}>
-            <h1 className="text-3xl font-bold" style={{ marginBottom: '12px' }}>
+            <h1 className="text-3xl font-bold text-[var(--primary-dark)]" style={{ marginBottom: '12px' }}>
               {t('registerTitle')}
             </h1>
-            <p className="text-white text-base">
+            <p className="text-[var(--text-secondary)] text-base">
               أنشئ حسابك وابدأ بالطلب الآن
             </p>
           </div>
 
           {/* Register Method Toggle */}
-          <div className="flex bg-white/10 rounded-lg p-1" style={{ marginBottom: '24px' }}>
+          <div className="flex bg-[var(--primary-dark)]/15 rounded-lg" style={{ marginBottom: '24px', padding: '4px' }}>
             <button
               type="button"
               onClick={() => setRegisterMethod('email')}
-              className={`flex-1 py-2.5 px-4 rounded-md text-sm font-medium transition-all ${
+              className={`flex-1 rounded-md text-sm font-semibold transition-all ${
                 registerMethod === 'email'
-                  ? 'bg-white text-[var(--primary-dark)]'
-                  : 'text-white hover:text-white/80'
+                  ? 'bg-white text-[var(--primary-dark)] shadow-sm'
+                  : 'text-[var(--primary-dark)]/60 hover:text-[var(--primary-dark)]'
               }`}
+              style={{ padding: '12px 18px' }}
             >
               {t('email')}
             </button>
             <button
               type="button"
               onClick={() => setRegisterMethod('phone')}
-              className={`flex-1 py-2.5 px-4 rounded-md text-sm font-medium transition-all ${
+              className={`flex-1 rounded-md text-sm font-semibold transition-all ${
                 registerMethod === 'phone'
-                  ? 'bg-white text-[var(--primary-dark)]'
-                  : 'text-white hover:text-white/80'
+                  ? 'bg-white text-[var(--primary-dark)] shadow-sm'
+                  : 'text-[var(--primary-dark)]/60 hover:text-[var(--primary-dark)]'
               }`}
+              style={{ padding: '12px 18px' }}
             >
               {t('phone')}
             </button>
@@ -213,7 +215,7 @@ const RegisterPage = () => {
             </div>
 
             {/* Terms */}
-            <label className="flex items-start gap-3 cursor-pointer text-white" style={{ marginBottom: '24px' }}>
+            <label className="flex items-start gap-3 cursor-pointer text-[var(--text-primary)]" style={{ marginBottom: '24px' }}>
               <input
                 type="checkbox"
                 required
@@ -221,45 +223,45 @@ const RegisterPage = () => {
               />
               <span className="text-sm">
                 أوافق على{' '}
-                <Link href="/terms" className="text-white font-bold hover:underline">
+                <Link href="/terms" className="text-[var(--primary-dark)] font-bold hover:underline">
                   الشروط والأحكام
                 </Link>{' '}
                 و{' '}
-                <Link href="/privacy" className="text-white font-bold hover:underline">
+                <Link href="/privacy" className="text-[var(--primary-dark)] font-bold hover:underline">
                   سياسة الخصوصية
                 </Link>
               </span>
             </label>
 
             {error && (
-              <p className="text-sm text-[var(--error)] bg-[var(--error-light)] p-3 rounded-md" style={{ marginBottom: '20px' }}>
+              <p className="text-sm text-[var(--error)] bg-[var(--error-light)] rounded-md" style={{ marginBottom: '20px', padding: '14px 18px' }}>
                 {error}
               </p>
             )}
 
             <div style={{ marginBottom: '32px' }}>
-              <Button type="submit" fullWidth size="lg" isLoading={loading}>
+              <Button type="submit" fullWidth size="lg" isLoading={loading} style={{ padding: '16px 24px' }}>
                 {t('registerTitle')}
               </Button>
             </div>
           </form>
 
           <div className="flex items-center gap-4" style={{ marginTop: '32px', marginBottom: '32px' }}>
-            <div className="flex-1 h-px bg-[var(--primary-dark)]/40" />
-            <span className="text-sm font-medium">
+            <div className="flex-1 h-px bg-[var(--border-color)]" />
+            <span className="text-sm font-medium text-[var(--text-secondary)]" style={{ padding: '0 12px' }}>
               {t('orContinueWith')}
             </span>
-            <div className="flex-1 h-px bg-[var(--primary-dark)]/40" />
+            <div className="flex-1 h-px bg-[var(--border-color)]" />
           </div>
 
           <div className="grid grid-cols-2 gap-4" style={{ marginBottom: '32px' }}>
-            <Button variant="outline" fullWidth>Google</Button>
-            <Button variant="outline" fullWidth>Apple</Button>
+            <Button variant="outline" fullWidth style={{ padding: '14px 20px' }}>Google</Button>
+            <Button variant="outline" fullWidth style={{ padding: '14px 20px' }}>Apple</Button>
           </div>
 
-          <p className="text-center text-sm" style={{ marginTop: '24px' }}>
+          <p className="text-center text-sm text-[var(--text-secondary)]" style={{ marginTop: '24px' }}>
             {t('hasAccount')}{' '}
-            <Link href="/auth/login" className="text-white font-bold hover:text-white/90 hover:underline transition-colors">
+            <Link href="/auth/login" className="text-[var(--primary)] font-bold hover:text-[var(--primary-hover)] hover:underline transition-colors">
               {tCommon('login')}
             </Link>
           </p>
@@ -271,38 +273,9 @@ const RegisterPage = () => {
         <div className="text-center max-w-md w-full flex flex-col items-center justify-center">
           <Image src="/images/maksab.png" alt="Maksab Right" width={160} height={53} className="mx-auto" style={{ marginBottom: '48px' }}/>
           <h2 className="text-3xl font-bold text-white" style={{ marginBottom: '20px' }}>انضم إلى مكسب</h2>
-          <p className="text-lg text-white" style={{ marginBottom: '40px' }}>
+          <p className="text-lg text-white">
             سجّل الآن واستمتع بعروض حصرية وتوصيل سريع لجميع طلباتك
           </p>
-          
-          {/* Features */}
-          <div className="space-y-4 text-start w-full max-w-xs">
-            {[
-              'توصيل سريع لباب منزلك',
-              'عروض وخصومات حصرية',
-              'تتبع طلباتك مباشرة',
-              'دعم على مدار الساعة',
-            ].map((feature, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                  <svg
-                    className="w-3 h-3"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={3}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </div>
-                <span className="text-white">{feature}</span>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </div>

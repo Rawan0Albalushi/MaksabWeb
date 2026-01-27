@@ -65,7 +65,7 @@ const LoginPage = () => {
     <div className="auth-page min-h-[calc(100vh-80px)] grid grid-cols-1 lg:grid-cols-2 bg-gradient-to-br from-[var(--primary-dark)] to-[var(--primary-dark-hover)]">
       
       {/* Left - Login Form on Background */}
-      <div className="flex items-center justify-center p-6 lg:p-12">
+      <div className="flex items-center justify-center bg-gradient-to-br from-[#FFF5F3] via-[#F5FAFA] to-[#E8F7F7]" style={{ padding: '24px 28px' }}>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -78,10 +78,10 @@ const LoginPage = () => {
           </div>
 
           <div className="text-center" style={{ marginBottom: '32px' }}>
-            <h1 className="text-3xl font-bold" style={{ marginBottom: '12px' }}>
+            <h1 className="text-3xl font-bold text-[var(--primary-dark)]" style={{ marginBottom: '12px' }}>
               {t('loginTitle')}
             </h1>
-            <p className="text-white text-base">
+            <p className="text-[var(--text-secondary)] text-base">
               أهلاً بك مرة أخرى، سجّل دخولك للمتابعة
             </p>
           </div>
@@ -112,47 +112,47 @@ const LoginPage = () => {
             </div>
 
             <div className="flex items-center justify-between text-sm" style={{ marginBottom: '24px' }}>
-              <label className="flex items-center gap-2 text-white cursor-pointer">
+              <label className="flex items-center gap-2 text-[var(--text-primary)] cursor-pointer">
                 <input type="checkbox" className="w-4 h-4 accent-[var(--primary)] cursor-pointer" />
                 <span>{t('rememberMe')}</span>
               </label>
               <Link
                 href="/auth/forgot-password"
-                className="text-white hover:text-white/90 hover:underline transition-colors font-medium"
+                className="text-[var(--primary-dark)] hover:text-[var(--primary-dark)]/80 hover:underline transition-colors font-medium"
               >
                 {t('forgotPassword')}
               </Link>
             </div>
 
             {error && (
-              <p className="text-sm text-[var(--error)] bg-[var(--error-light)] p-3 rounded-md" style={{ marginBottom: '20px' }}>
+              <p className="text-sm text-[var(--error)] bg-[var(--error-light)] rounded-md" style={{ marginBottom: '20px', padding: '14px 18px' }}>
                 {error}
               </p>
             )}
 
             <div style={{ marginBottom: '32px' }}>
-              <Button type="submit" fullWidth size="lg" isLoading={loading}>
+              <Button type="submit" fullWidth size="lg" isLoading={loading} style={{ padding: '16px 24px' }}>
                 {t('loginTitle')}
               </Button>
             </div>
           </form>
 
           <div className="flex items-center gap-4" style={{ marginTop: '32px', marginBottom: '32px' }}>
-            <div className="flex-1 h-px bg-[var(--primary-dark)]/40" />
-            <span className="text-sm font-medium">
+            <div className="flex-1 h-px bg-[var(--border-color)]" />
+            <span className="text-sm font-medium text-[var(--text-secondary)]" style={{ padding: '0 12px' }}>
               {t('orContinueWith')}
             </span>
-            <div className="flex-1 h-px bg-[var(--primary-dark)]/40" />
+            <div className="flex-1 h-px bg-[var(--border-color)]" />
           </div>
 
           <div className="grid grid-cols-2 gap-4" style={{ marginBottom: '32px' }}>
-            <Button variant="outline" fullWidth>Google</Button>
-            <Button variant="outline" fullWidth>Apple</Button>
+            <Button variant="outline" fullWidth style={{ padding: '14px 20px' }}>Google</Button>
+            <Button variant="outline" fullWidth style={{ padding: '14px 20px' }}>Apple</Button>
           </div>
 
-          <p className="text-center text-sm" style={{ marginTop: '24px' }}>
+          <p className="text-center text-sm text-[var(--text-secondary)]" style={{ marginTop: '24px' }}>
             {t('noAccount')}{' '}
-            <Link href="/auth/register" className="text-white font-bold hover:text-white/90 hover:underline transition-colors">
+            <Link href="/auth/register" className="text-[var(--primary)] font-bold hover:text-[var(--primary-hover)] hover:underline transition-colors">
               {tCommon('register')}
             </Link>
           </p>

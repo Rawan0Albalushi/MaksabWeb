@@ -69,9 +69,15 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const sizes = {
-      sm: 'px-3 py-1.5 text-sm',
-      md: 'px-5 py-2.5 text-base',
-      lg: 'px-7 py-3.5 text-lg',
+      sm: 'text-sm',
+      md: 'text-base',
+      lg: 'text-lg',
+    };
+    
+    const sizePaddings = {
+      sm: { padding: '8px 16px' },
+      md: { padding: '12px 22px' },
+      lg: { padding: '16px 28px' },
     };
 
     return (
@@ -84,6 +90,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           fullWidth && 'w-full',
           className
         )}
+        style={sizePaddings[size]}
         disabled={disabled || isLoading}
         {...props}
       >

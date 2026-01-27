@@ -50,7 +50,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             type={inputType}
             className={clsx(
-              `w-full px-4 py-3 text-base
+              `w-full text-base
               bg-white border border-[var(--border)] rounded-[var(--radius-md)]
               text-[var(--black)] placeholder:text-[var(--text-grey)]
               transition-all duration-[var(--transition-fast)]
@@ -61,6 +61,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               error && 'border-[var(--error)] focus:border-[var(--error)] focus:ring-[var(--error)]/20',
               className
             )}
+            style={{ padding: '14px 18px' }}
             disabled={disabled}
             {...props}
           />

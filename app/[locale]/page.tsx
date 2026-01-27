@@ -259,15 +259,16 @@ const HomePage = () => {
                     </div>
 
                     {/* Search Button */}
-                    <div className="p-1 sm:p-2.5 ps-0.5 sm:ps-1">
+                    <div style={{ padding: '4px 4px 4px 2px' }} className="sm:p-2.5 sm:ps-1">
                       <Button 
                         type="submit" 
                         className={clsx(
-                          "rounded-lg sm:rounded-xl px-2.5 sm:px-8 py-2 sm:py-3.5 font-semibold transition-all duration-300",
+                          "rounded-lg sm:rounded-xl font-semibold transition-all duration-300",
                           "bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)] hover:from-[var(--primary-hover)] hover:to-[var(--primary)]",
                           "shadow-[0_4px_20px_rgba(255,61,0,0.35)] hover:shadow-[0_6px_25px_rgba(255,61,0,0.45)]",
                           "hover:scale-[1.02] active:scale-[0.98]"
                         )}
+                        style={{ padding: '10px 12px' }}
                       >
                         <span className="hidden sm:inline">{tCommon('search')}</span>
                         <Search size={16} className="sm:hidden" />
@@ -282,6 +283,7 @@ const HomePage = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="sm:hidden mt-2 flex items-center justify-center gap-2 text-white/70"
+                    style={{ padding: '8px 12px' }}
                   >
                     <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
                     <span className="text-[10px] truncate max-w-[180px]">
@@ -372,7 +374,7 @@ const HomePage = () => {
 
                             {/* Slide indicator */}
                             <div className="absolute top-3 sm:top-4 end-3 sm:end-4 flex items-center gap-1.5 z-10">
-                              <span className="text-white text-[10px] sm:text-xs font-semibold bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full">
+                              <span className="text-white text-[10px] sm:text-xs font-semibold bg-black/40 backdrop-blur-md rounded-full" style={{ padding: '6px 12px' }}>
                                 {index + 1}/{banners.length}
                               </span>
                             </div>
@@ -382,12 +384,12 @@ const HomePage = () => {
                     </Swiper>
 
                     {/* Custom Navigation */}
-                    <button className="hero-prev absolute start-2 sm:start-3 lg:start-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 flex items-center justify-center bg-white/90 backdrop-blur-md rounded-full shadow-lg hover:bg-white hover:scale-110 transition-all duration-300 opacity-0 group-hover/banner:opacity-100">
+                    <button className="hero-prev absolute start-2 sm:start-3 lg:start-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 flex items-center justify-center bg-white/90 backdrop-blur-md rounded-full shadow-lg hover:bg-white hover:scale-110 transition-all duration-300 opacity-0 group-hover/banner:opacity-100" style={{ padding: '8px' }}>
                       {isRTL ? <ChevronRight size={16} className="text-[var(--black)] sm:hidden" /> : <ChevronLeft size={16} className="text-[var(--black)] sm:hidden" />}
                       {isRTL ? <ChevronRight size={20} className="text-[var(--black)] hidden sm:block lg:hidden" /> : <ChevronLeft size={20} className="text-[var(--black)] hidden sm:block lg:hidden" />}
                       {isRTL ? <ChevronRight size={24} className="text-[var(--black)] hidden lg:block" /> : <ChevronLeft size={24} className="text-[var(--black)] hidden lg:block" />}
                     </button>
-                    <button className="hero-next absolute end-2 sm:end-3 lg:end-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 flex items-center justify-center bg-white/90 backdrop-blur-md rounded-full shadow-lg hover:bg-white hover:scale-110 transition-all duration-300 opacity-0 group-hover/banner:opacity-100">
+                    <button className="hero-next absolute end-2 sm:end-3 lg:end-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 flex items-center justify-center bg-white/90 backdrop-blur-md rounded-full shadow-lg hover:bg-white hover:scale-110 transition-all duration-300 opacity-0 group-hover/banner:opacity-100" style={{ padding: '8px' }}>
                       {isRTL ? <ChevronLeft size={16} className="text-[var(--black)] sm:hidden" /> : <ChevronRight size={16} className="text-[var(--black)] sm:hidden" />}
                       {isRTL ? <ChevronLeft size={20} className="text-[var(--black)] hidden sm:block lg:hidden" /> : <ChevronRight size={20} className="text-[var(--black)] hidden sm:block lg:hidden" />}
                       {isRTL ? <ChevronLeft size={24} className="text-[var(--black)] hidden lg:block" /> : <ChevronRight size={24} className="text-[var(--black)] hidden lg:block" />}
@@ -397,11 +399,11 @@ const HomePage = () => {
               ) : (
                 <div className="relative">
                   <div className="absolute -inset-2 sm:-inset-4 bg-gradient-to-br from-[var(--primary)]/10 via-transparent to-[var(--primary-dark)]/10 rounded-2xl sm:rounded-3xl blur-xl" />
-                  <div className="relative aspect-[16/9] sm:aspect-[16/10] bg-white/5 backdrop-blur-sm flex flex-col items-center justify-center border border-white/10 rounded-xl sm:rounded-2xl lg:rounded-3xl">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/10 flex items-center justify-center mb-4">
+                  <div className="relative aspect-[16/9] sm:aspect-[16/10] bg-white/5 backdrop-blur-sm flex flex-col items-center justify-center border border-white/10 rounded-xl sm:rounded-2xl lg:rounded-3xl" style={{ padding: '24px' }}>
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/10 flex items-center justify-center mb-4" style={{ padding: '16px' }}>
                       <ShoppingBag size={32} className="text-white/40" />
                     </div>
-                    <p className="text-white/50 text-sm sm:text-base">{t('noBanners')}</p>
+                    <p className="text-white/50 text-sm sm:text-base" style={{ padding: '8px 16px' }}>{t('noBanners')}</p>
                   </div>
                 </div>
               )}
@@ -537,7 +539,8 @@ const HomePage = () => {
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-1.5 sm:py-2.5 bg-gradient-to-r from-[var(--primary)]/10 to-[var(--primary)]/5 text-[var(--primary)] text-xs sm:text-sm font-bold rounded-full mb-4 sm:mb-6 border border-[var(--primary)]/20"
+              className="inline-flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-[var(--primary)]/10 to-[var(--primary)]/5 text-[var(--primary)] text-xs sm:text-sm font-bold rounded-full mb-4 sm:mb-6 border border-[var(--primary)]/20"
+              style={{ padding: '8px 16px' }}
             >
               <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--primary)] opacity-75"></span>
@@ -669,7 +672,7 @@ const HomePage = () => {
                     <div className="relative w-full flex-1 flex flex-col">
                       <div className={`absolute inset-0 bg-gradient-to-br ${item.bgGradient} rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl`} />
                       
-                      <div className="relative bg-white rounded-xl sm:rounded-2xl p-3 sm:p-6 lg:p-7 border border-[var(--border)] group-hover:border-transparent shadow-sm group-hover:shadow-xl transition-all duration-500 flex-1 flex flex-col">
+                      <div className="relative bg-white rounded-xl sm:rounded-2xl border border-[var(--border)] group-hover:border-transparent shadow-sm group-hover:shadow-xl transition-all duration-500 flex-1 flex flex-col" style={{ padding: '16px 14px' }}>
                         {/* Decorative Corner - Hidden on mobile */}
                         <div 
                           className="absolute top-0 end-0 w-12 h-12 sm:w-16 sm:h-16 opacity-10 group-hover:opacity-20 transition-opacity duration-300 hidden sm:block"
@@ -703,7 +706,7 @@ const HomePage = () => {
             className="text-center mt-6 sm:mt-10 lg:mt-12"
           >
             <Link href="/shops">
-              <Button className="px-5 sm:px-8 py-3 sm:py-4 text-sm sm:text-lg font-semibold bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)] hover:from-[var(--primary-hover)] hover:to-[var(--primary)] shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+              <Button className="text-sm sm:text-lg font-semibold bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)] hover:from-[var(--primary-hover)] hover:to-[var(--primary)] shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300" style={{ padding: '14px 24px' }}>
                 {tCommon('startShopping')}
                 {isRTL ? <ChevronLeft size={18} className="ms-1.5 sm:ms-2 sm:hidden" /> : <ChevronRight size={18} className="ms-1.5 sm:ms-2 sm:hidden" />}
                 {isRTL ? <ChevronLeft size={20} className="ms-2 hidden sm:inline" /> : <ChevronRight size={20} className="ms-2 hidden sm:inline" />}
@@ -738,7 +741,8 @@ const HomePage = () => {
             </div>
             <Link
               href="/shops"
-              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-white rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white transition-all shadow-sm"
+              className="flex items-center gap-1.5 sm:gap-2 bg-white rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white transition-all shadow-sm"
+              style={{ padding: '10px 16px' }}
             >
               {tCommon('viewAll')}
               {isRTL ? <ChevronLeft size={14} className="sm:hidden" /> : <ChevronRight size={14} className="sm:hidden" />}
@@ -789,7 +793,7 @@ const HomePage = () => {
               transition={{ duration: 0.6 }}
               className="text-white text-center lg:text-start"
             >
-              <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 text-[var(--primary-light)] text-xs sm:text-sm font-semibold rounded-full mb-5 sm:mb-8">
+              <span className="inline-block bg-white/10 text-[var(--primary-light)] text-xs sm:text-sm font-semibold rounded-full mb-5 sm:mb-8" style={{ padding: '8px 18px' }}>
                 {t('app.badge')}
               </span>
               
@@ -806,7 +810,8 @@ const HomePage = () => {
               <div className="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-5 mb-8 sm:mb-12">
                 <a
                   href="#"
-                  className="group flex items-center gap-2.5 sm:gap-4 min-w-[140px] sm:min-w-[180px] px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-b from-gray-800 to-black text-white rounded-xl hover:from-gray-700 hover:to-gray-900 hover:scale-[1.03] transition-all duration-300 shadow-xl border border-gray-600/50"
+                  className="group flex items-center gap-2.5 sm:gap-4 min-w-[140px] sm:min-w-[180px] bg-gradient-to-b from-gray-800 to-black text-white rounded-xl hover:from-gray-700 hover:to-gray-900 hover:scale-[1.03] transition-all duration-300 shadow-xl border border-gray-600/50"
+                  style={{ padding: '14px 20px' }}
                 >
                   <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
                     <svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 sm:w-10 sm:h-10 group-hover:scale-110 transition-transform">
@@ -820,7 +825,8 @@ const HomePage = () => {
                 </a>
                 <a
                   href="#"
-                  className="group flex items-center gap-2.5 sm:gap-4 min-w-[140px] sm:min-w-[180px] px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-b from-gray-800 to-black text-white rounded-xl hover:from-gray-700 hover:to-gray-900 hover:scale-[1.03] transition-all duration-300 shadow-xl border border-gray-600/50"
+                  className="group flex items-center gap-2.5 sm:gap-4 min-w-[140px] sm:min-w-[180px] bg-gradient-to-b from-gray-800 to-black text-white rounded-xl hover:from-gray-700 hover:to-gray-900 hover:scale-[1.03] transition-all duration-300 shadow-xl border border-gray-600/50"
+                  style={{ padding: '14px 20px' }}
                 >
                   <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
                     <svg viewBox="0 0 24 24" className="w-7 h-7 sm:w-9 sm:h-9 group-hover:scale-110 transition-transform">
@@ -891,7 +897,8 @@ const HomePage = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.7 }}
-                  className="absolute -bottom-4 sm:-bottom-6 start-1/2 -translate-x-1/2 bg-white rounded-xl sm:rounded-2xl px-3 sm:px-5 py-2 sm:py-3 shadow-2xl flex items-center gap-2 sm:gap-3"
+                  className="absolute -bottom-4 sm:-bottom-6 start-1/2 -translate-x-1/2 bg-white rounded-xl sm:rounded-2xl shadow-2xl flex items-center gap-2 sm:gap-3"
+                  style={{ padding: '12px 18px' }}
                 >
                   <div className="flex -space-x-1.5 sm:-space-x-2 space-x-reverse">
                     {[1, 2, 3].map((i) => (
@@ -922,6 +929,7 @@ const HomePage = () => {
             <button
               onClick={() => setActiveStory(null)}
               className="absolute top-4 end-4 w-12 h-12 flex items-center justify-center bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors"
+              style={{ padding: '12px' }}
             >
               <X size={24} />
             </button>

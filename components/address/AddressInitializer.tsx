@@ -201,39 +201,41 @@ export const AddressInitializer = ({ children }: AddressInitializerProps) => {
                 <button
                   onClick={() => setShowPrompt(false)}
                   className="absolute top-4 end-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
+                  style={{ padding: '8px' }}
                 >
                   <X size={16} className="text-gray-600" />
                 </button>
 
                 {/* Header with gradient */}
-                <div className="relative bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] p-6 pb-12">
+                <div className="relative bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)]" style={{ padding: '32px 24px 56px 24px' }}>
                   <div className="absolute inset-0 overflow-hidden">
                     <div className="absolute -top-10 -end-10 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
                     <div className="absolute -bottom-10 -start-10 w-24 h-24 bg-white/10 rounded-full blur-xl" />
                   </div>
                   
-                  <div className="relative">
-                    <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-4">
-                      <MapPin size={28} className="text-white" />
+                  <div className="relative" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                    <div className="rounded-2xl bg-white/20 backdrop-blur-sm" style={{ width: '64px', height: '64px', padding: '14px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <MapPin size={32} className="text-white" />
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-1">
+                    <h3 className="text-xl font-bold text-white" style={{ marginBottom: '10px' }}>
                       أين نوصل لك؟
                     </h3>
-                    <p className="text-white/80 text-sm">
+                    <p className="text-white/80 text-sm" style={{ padding: '0 16px' }}>
                       حدد موقعك لنعرض لك المتاجر القريبة منك
                     </p>
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className="p-4 -mt-6 relative z-10 max-h-[60vh] overflow-y-auto">
+                <div className="-mt-6 relative z-10 max-h-[60vh] overflow-y-auto" style={{ padding: '0 20px 20px 20px' }}>
                   {/* Detect Location Button */}
                   <button
                     onClick={handleDetectLocation}
                     disabled={isLoading}
-                    className="w-full flex items-center gap-4 p-4 bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-[var(--primary)]/30 hover:shadow-xl transition-all group"
+                    className="w-full flex items-center gap-4 bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-[var(--primary)]/30 hover:shadow-xl transition-all group"
+                    style={{ padding: '18px 20px' }}
                   >
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--primary)]/20 to-[var(--primary)]/10 flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--primary)]/20 to-[var(--primary)]/10 flex items-center justify-center flex-shrink-0" style={{ padding: '10px' }}>
                       {isLoading ? (
                         <Loader2 size={22} className="text-[var(--primary)] animate-spin" />
                       ) : (
@@ -241,10 +243,10 @@ export const AddressInitializer = ({ children }: AddressInitializerProps) => {
                       )}
                     </div>
                     <div className="flex-1 text-start">
-                      <p className="font-bold text-gray-900">
+                      <p className="font-bold text-gray-900" style={{ padding: '0 4px' }}>
                         {isLoading ? t('detectingLocation') : 'استخدم موقعي الحالي'}
                       </p>
-                      <p className="text-xs text-gray-500 mt-0.5">
+                      <p className="text-xs text-gray-500 mt-0.5" style={{ padding: '0 4px' }}>
                         تحديد تلقائي عبر GPS
                       </p>
                     </div>
@@ -260,7 +262,7 @@ export const AddressInitializer = ({ children }: AddressInitializerProps) => {
                           <div className="w-full border-t border-gray-200"></div>
                         </div>
                         <div className="relative flex justify-center">
-                          <span className="px-3 bg-white text-xs text-gray-400">
+                          <span className="bg-white text-xs text-gray-400" style={{ padding: '0 12px' }}>
                             {savedAddresses.length > 0 ? 'أو اختر من عناوينك' : 'أو'}
                           </span>
                         </div>
@@ -268,9 +270,9 @@ export const AddressInitializer = ({ children }: AddressInitializerProps) => {
 
                       {/* Loading State */}
                       {isLoadingAddresses && savedAddresses.length === 0 && (
-                        <div className="flex flex-col items-center justify-center py-6">
+                        <div className="flex flex-col items-center justify-center" style={{ padding: '28px 20px' }}>
                           <Loader2 size={24} className="text-[var(--primary)] animate-spin" />
-                          <p className="text-sm text-gray-500 mt-3">جاري تحميل العناوين...</p>
+                          <p className="text-sm text-gray-500 mt-3" style={{ padding: '0 8px' }}>جاري تحميل العناوين...</p>
                         </div>
                       )}
 
@@ -284,15 +286,16 @@ export const AddressInitializer = ({ children }: AddressInitializerProps) => {
                                 key={addr.id}
                                 onClick={() => handleSelectSavedAddress(addr)}
                                 className={clsx(
-                                  "w-full flex items-center gap-3 p-3 rounded-xl border transition-all",
+                                  "w-full flex items-center gap-3 rounded-xl border transition-all",
                                   "bg-white border-gray-200 hover:border-[var(--primary)] hover:bg-[var(--primary)]/5",
                                   addr.active && "border-[var(--primary)]/50 bg-[var(--primary)]/5"
                                 )}
+                                style={{ padding: '14px 18px' }}
                               >
                                 <div className={clsx(
                                   "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0",
                                   addr.active ? "bg-[var(--primary)]/15" : "bg-gray-100"
-                                )}>
+                                )} style={{ padding: '8px' }}>
                                   <Icon size={18} className={addr.active ? "text-[var(--primary)]" : "text-gray-500"} />
                                 </div>
                                 <div className="flex-1 text-start min-w-0">
@@ -300,16 +303,16 @@ export const AddressInitializer = ({ children }: AddressInitializerProps) => {
                                     <p className={clsx(
                                       "text-sm font-semibold",
                                       addr.active ? "text-[var(--primary)]" : "text-gray-900"
-                                    )}>
+                                    )} style={{ padding: '0 4px' }}>
                                       {addr.title || 'عنوان'}
                                     </p>
                                     {addr.active && (
-                                      <span className="px-1.5 py-0.5 text-[9px] font-bold text-[var(--primary)] bg-[var(--primary)]/10 rounded-full">
+                                      <span className="text-[9px] font-bold text-[var(--primary)] bg-[var(--primary)]/10 rounded-full" style={{ padding: '4px 8px' }}>
                                         افتراضي
                                       </span>
                                     )}
                                   </div>
-                                  <p className="text-xs text-gray-500 truncate mt-0.5">
+                                  <p className="text-xs text-gray-500 truncate mt-0.5" style={{ padding: '0 4px' }}>
                                     {getAddressString(addr)}
                                   </p>
                                 </div>
@@ -323,10 +326,11 @@ export const AddressInitializer = ({ children }: AddressInitializerProps) => {
                       {/* Add New Address Button */}
                       <button
                         onClick={handleOpenAddressForm}
-                        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-dashed border-gray-300 text-gray-600 font-semibold hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all"
+                        className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 text-gray-600 font-semibold hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all"
+                        style={{ padding: '14px 20px' }}
                       >
                         <Plus size={18} />
-                        أضف عنوان جديد
+                        <span style={{ padding: '0 4px' }}>أضف عنوان جديد</span>
                       </button>
                     </>
                   )}
@@ -340,16 +344,17 @@ export const AddressInitializer = ({ children }: AddressInitializerProps) => {
                           <div className="w-full border-t border-gray-200"></div>
                         </div>
                         <div className="relative flex justify-center">
-                          <span className="px-3 bg-white text-xs text-gray-400">أو</span>
+                          <span className="bg-white text-xs text-gray-400" style={{ padding: '0 12px' }}>أو</span>
                         </div>
                       </div>
 
                       <button
                         onClick={handleOpenAddressForm}
-                        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-[var(--primary)] text-[var(--primary)] font-semibold hover:bg-[var(--primary)]/10 transition-all"
+                        className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-[var(--primary)] text-[var(--primary)] font-semibold hover:bg-[var(--primary)]/10 transition-all"
+                        style={{ padding: '14px 20px' }}
                       >
                         <MapPin size={18} />
-                        حدد موقعك يدوياً
+                        <span style={{ padding: '0 4px' }}>حدد موقعك يدوياً</span>
                       </button>
                     </>
                   )}
