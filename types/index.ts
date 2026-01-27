@@ -393,11 +393,14 @@ export interface ParcelOrder {
 // Calculate
 export interface CalculateResult {
   // Snake case (from API)
+  price?: number; // Subtotal
   total_price: number;
   delivery_fee: number;
   tax: number;
+  total_tax?: number;
   service_fee: number;
   discount: number;
+  total_discount?: number;
   coupon_price: number;
   // Camel case alternatives (some APIs return this)
   totalPrice?: number;

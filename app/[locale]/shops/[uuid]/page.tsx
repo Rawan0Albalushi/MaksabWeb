@@ -145,18 +145,19 @@ const ProductModal = ({
             transition={{ type: 'spring', damping: 30, stiffness: 400 }}
             className="fixed bottom-0 inset-x-0 z-50 bg-white rounded-t-[28px] max-h-[85vh] overflow-hidden safe-area-bottom lg:hidden"
           >
-            <div className="flex justify-center pt-3 pb-2">
+            <div className="flex justify-center" style={{ padding: '12px 0 8px 0' }}>
               <div className="w-12 h-1.5 bg-[var(--border)] rounded-full" />
             </div>
 
             <button
               onClick={onClose}
               className="absolute top-4 end-4 w-10 h-10 bg-[var(--main-bg)] hover:bg-[var(--border)] rounded-full flex items-center justify-center transition-colors"
+              style={{ padding: '10px' }}
             >
               <X size={20} className="text-[var(--text-grey)]" />
             </button>
 
-            <div className="px-5 pb-8 pt-2 overflow-y-auto max-h-[calc(85vh-60px)]">
+            <div className="overflow-y-auto max-h-[calc(85vh-60px)]" style={{ padding: '8px 20px 32px 20px' }}>
               <div className="flex gap-4">
                 <div className="w-28 h-28 rounded-2xl overflow-hidden bg-[var(--main-bg)] shrink-0 shadow-lg">
                   {product.img ? (
@@ -198,9 +199,9 @@ const ProductModal = ({
               </div>
 
               {/* Quantity Section - Enhanced */}
-              <div className="flex items-center justify-between mt-8 py-5 border-t-2 border-gray-100">
-                <span className="font-bold text-gray-900 text-lg">الكمية</span>
-                <div className="flex items-center gap-3 bg-gray-100 rounded-2xl p-2">
+              <div className="flex items-center justify-between border-t-2 border-gray-100" style={{ marginTop: '32px', padding: '20px 0' }}>
+                <span className="font-bold text-gray-900 text-lg" style={{ padding: '0 4px' }}>الكمية</span>
+                <div className="flex items-center gap-3 bg-gray-100 rounded-2xl" style={{ padding: '8px' }}>
                   {/* Minus Button */}
                   <button
                     onClick={() => qty > 1 && setQty(qty - 1)}
@@ -209,6 +210,7 @@ const ProductModal = ({
                       backgroundColor: qty <= 1 ? '#e5e7eb' : '#ffffff',
                       borderColor: qty <= 1 ? '#d1d5db' : '#FF3D00',
                       color: qty <= 1 ? '#9ca3af' : '#FF3D00',
+                      padding: '12px',
                     }}
                     className="w-12 h-12 rounded-xl flex items-center justify-center transition-all border-2 font-bold text-2xl shadow-sm hover:shadow-md"
                   >
@@ -216,7 +218,7 @@ const ProductModal = ({
                   </button>
                   
                   {/* Quantity Display */}
-                  <span className="w-12 text-center font-bold text-2xl text-gray-900">{qty}</span>
+                  <span className="w-12 text-center font-bold text-2xl text-gray-900" style={{ padding: '0 8px' }}>{qty}</span>
                   
                   {/* Plus Button */}
                   <button
@@ -226,6 +228,7 @@ const ProductModal = ({
                       borderColor: '#FF3D00',
                       color: '#ffffff',
                       boxShadow: '0 4px 14px rgba(255, 61, 0, 0.4)',
+                      padding: '12px',
                     }}
                     className="w-12 h-12 rounded-xl flex items-center justify-center transition-all border-2 font-bold text-2xl hover:opacity-90 active:scale-95"
                   >
@@ -244,6 +247,7 @@ const ProductModal = ({
                   boxShadow: success 
                     ? '0 8px 24px rgba(34, 197, 94, 0.4)' 
                     : '0 8px 24px rgba(255, 61, 0, 0.4)',
+                  padding: '18px 24px',
                 }}
                 className="w-full h-16 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all hover:opacity-95 active:scale-[0.98]"
               >
@@ -302,7 +306,7 @@ const ProductModal = ({
                   
                   {hasDiscount && (
                     <div className="absolute top-4 start-4">
-                      <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-[var(--error)] text-white text-sm font-bold rounded-full shadow-lg">
+                      <span className="inline-flex items-center gap-1 bg-[var(--error)] text-white text-sm font-bold rounded-full shadow-lg" style={{ padding: '8px 14px' }}>
                         <BadgePercent size={14} />
                         خصم {discountPercent}%
                       </span>
@@ -312,13 +316,14 @@ const ProductModal = ({
                   <button
                     onClick={onClose}
                     className="absolute top-4 end-4 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-all shadow-lg hover:scale-105"
+                    style={{ padding: '10px' }}
                   >
                     <X size={18} className="text-[var(--text-grey)]" />
                   </button>
                 </div>
 
                 {/* Product Info */}
-                <div className="flex-1 p-6 flex flex-col">
+                <div className="flex-1 flex flex-col" style={{ padding: '24px' }}>
                   <h3 className="font-bold text-[var(--black)] text-xl leading-tight">
                     {product.translation?.title}
                   </h3>
@@ -346,9 +351,9 @@ const ProductModal = ({
                   <div className="flex-1" />
 
                   {/* Quantity Section - Desktop */}
-                  <div className="flex items-center justify-between py-5 border-t-2 border-gray-100 mt-4">
-                    <span className="font-bold text-gray-900 text-lg">الكمية</span>
-                    <div className="flex items-center gap-3 bg-gray-100 rounded-2xl p-2">
+                  <div className="flex items-center justify-between border-t-2 border-gray-100" style={{ padding: '20px 0', marginTop: '16px' }}>
+                    <span className="font-bold text-gray-900 text-lg" style={{ padding: '0 4px' }}>الكمية</span>
+                    <div className="flex items-center gap-3 bg-gray-100 rounded-2xl" style={{ padding: '8px' }}>
                       {/* Minus Button */}
                       <button
                         onClick={() => qty > 1 && setQty(qty - 1)}
@@ -357,6 +362,7 @@ const ProductModal = ({
                           backgroundColor: qty <= 1 ? '#e5e7eb' : '#ffffff',
                           borderColor: qty <= 1 ? '#d1d5db' : '#FF3D00',
                           color: qty <= 1 ? '#9ca3af' : '#FF3D00',
+                          padding: '10px',
                         }}
                         className="w-11 h-11 rounded-xl flex items-center justify-center transition-all border-2 font-bold shadow-sm hover:shadow-md"
                       >
@@ -364,7 +370,7 @@ const ProductModal = ({
                       </button>
                       
                       {/* Quantity Display */}
-                      <span className="w-12 text-center font-bold text-2xl text-gray-900">{qty}</span>
+                      <span className="w-12 text-center font-bold text-2xl text-gray-900" style={{ padding: '0 8px' }}>{qty}</span>
                       
                       {/* Plus Button */}
                       <button
@@ -374,6 +380,7 @@ const ProductModal = ({
                           borderColor: '#FF3D00',
                           color: '#ffffff',
                           boxShadow: '0 4px 14px rgba(255, 61, 0, 0.4)',
+                          padding: '10px',
                         }}
                         className="w-11 h-11 rounded-xl flex items-center justify-center transition-all border-2 font-bold hover:opacity-90 active:scale-95"
                       >
@@ -394,8 +401,10 @@ const ProductModal = ({
                       boxShadow: success 
                         ? '0 8px 24px rgba(34, 197, 94, 0.4)' 
                         : '0 8px 24px rgba(255, 61, 0, 0.4)',
+                      padding: '16px 24px',
+                      marginTop: '8px',
                     }}
-                    className="w-full h-14 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 mt-2 transition-all"
+                    className="w-full h-14 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all"
                   >
                     {success ? (
                       <motion.div
@@ -478,7 +487,7 @@ const ProductCard = ({
           {/* Discount Badge */}
           {hasDiscount && (
             <div className="absolute top-2 start-2">
-              <span className="inline-flex items-center gap-0.5 px-2 py-1 bg-[var(--error)] text-white text-[11px] font-bold rounded-lg shadow-lg">
+              <span className="inline-flex items-center gap-0.5 bg-[var(--error)] text-white text-[11px] font-bold rounded-lg shadow-lg" style={{ padding: '6px 10px' }}>
                 -{discountPercent}%
               </span>
             </div>
@@ -497,6 +506,7 @@ const ProductCard = ({
                 backgroundColor: '#FF3D00',
                 color: '#ffffff',
                 boxShadow: '0 4px 15px rgba(255, 61, 0, 0.5)',
+                padding: '10px',
               }}
               className="absolute bottom-3 end-3 w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center border-2 border-white transition-all"
             >
@@ -507,7 +517,7 @@ const ProductCard = ({
           {/* Out of Stock */}
           {outOfStock && (
             <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center">
-              <span className="bg-[var(--black)] text-white text-xs font-semibold px-4 py-2 rounded-full">
+              <span className="bg-[var(--black)] text-white text-xs font-semibold rounded-full" style={{ padding: '10px 18px' }}>
                 نفد المخزون
               </span>
             </div>
@@ -515,7 +525,7 @@ const ProductCard = ({
         </div>
 
         {/* Content */}
-        <div className="p-3 flex flex-col flex-1">
+        <div className="flex flex-col flex-1" style={{ padding: '14px' }}>
           <h3 className="font-bold text-[var(--black)] text-sm line-clamp-1 group-hover:text-[var(--primary)] transition-colors">
             {product.translation?.title}
           </h3>
@@ -567,11 +577,12 @@ const FloatingCartBar = ({ count, total }: { count: number; total: number }) => 
         <motion.div
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="relative overflow-hidden bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)] text-white rounded-2xl px-4 py-3.5 flex items-center justify-between shadow-[0_8px_32px_rgba(255,61,0,0.4)]"
+          className="relative overflow-hidden bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)] text-white rounded-2xl flex items-center justify-between shadow-[0_8px_32px_rgba(255,61,0,0.4)]"
+          style={{ padding: '14px 18px' }}
         >
           <div className="flex items-center gap-3 relative">
             <div className="relative">
-              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center" style={{ padding: '12px' }}>
                 <ShoppingBag size={22} />
               </div>
               <motion.span
@@ -583,17 +594,17 @@ const FloatingCartBar = ({ count, total }: { count: number; total: number }) => 
               </motion.span>
             </div>
             <div>
-              <p className="font-bold text-sm">عرض السلة</p>
-              <p className="text-white/70 text-xs">{count} منتج</p>
+              <p className="font-bold text-sm" style={{ padding: '0 4px' }}>عرض السلة</p>
+              <p className="text-white/70 text-xs" style={{ padding: '0 4px' }}>{count} منتج</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3 relative">
             <div className="text-end">
-              <p className="text-white/70 text-[10px]">المجموع</p>
-              <p className="font-bold text-lg">{total.toFixed(2)} <span className="text-sm">{tCommon('sar')}</span></p>
+              <p className="text-white/70 text-[10px]" style={{ padding: '0 4px' }}>المجموع</p>
+              <p className="font-bold text-lg" style={{ padding: '0 4px' }}>{total.toFixed(2)} <span className="text-sm">{tCommon('sar')}</span></p>
             </div>
-            <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center" style={{ padding: '10px' }}>
               {isRTL ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}
             </div>
           </div>
@@ -823,45 +834,50 @@ export default function ShopPage({ params }: ShopPageProps) {
           <div className="flex items-center justify-between mb-5 sm:mb-6 lg:mb-8">
             <Link
               href="/shops"
-              className="w-9 h-9 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center transition-all shadow-lg group"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all shadow-lg hover:shadow-xl group border border-white/30"
+              style={{ background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.9) 0%, rgba(0, 188, 212, 0.9) 100%)' }}
             >
               {isRTL ? (
-                <ChevronRight size={20} className="text-white group-hover:scale-110 transition-transform" />
+                <ChevronRight size={22} className="text-white group-hover:scale-110 transition-transform" />
               ) : (
-                <ChevronLeft size={20} className="text-white group-hover:scale-110 transition-transform" />
+                <ChevronLeft size={22} className="text-white group-hover:scale-110 transition-transform" />
               )}
             </Link>
             
             {/* Action Buttons */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-3">
               <motion.button
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => toggleFavoriteShop(shop.id)}
                 className={clsx(
-                  'w-9 h-9 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center transition-all backdrop-blur-sm shadow-lg',
-                  isFav
-                    ? 'bg-[var(--error)]/90 text-white'
-                    : 'bg-white/20 hover:bg-white/30 text-white'
+                  'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all shadow-lg hover:shadow-xl border border-white/30',
+                  isFav && 'ring-2 ring-white'
                 )}
+                style={{ background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.9) 0%, rgba(0, 188, 212, 0.9) 100%)' }}
               >
-                <Heart size={18} className={clsx("sm:w-5 sm:h-5", isFav && 'fill-current')} />
+                <Heart size={20} className={clsx('text-white', isFav && 'fill-current')} />
               </motion.button>
               
               {shop.phone && (
                 <motion.a
+                  whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   href={`tel:${shop.phone}`}
-                  className="w-9 h-9 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-xl sm:rounded-2xl bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center text-white transition-all shadow-lg"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white transition-all shadow-lg hover:shadow-xl border border-white/30"
+                  style={{ background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.9) 0%, rgba(0, 188, 212, 0.9) 100%)' }}
                 >
-                  <Phone size={18} className="sm:w-5 sm:h-5" />
+                  <Phone size={20} />
                 </motion.a>
               )}
               
               <motion.button
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-9 h-9 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-xl sm:rounded-2xl bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center text-white transition-all shadow-lg"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white transition-all shadow-lg hover:shadow-xl border border-white/30"
+                style={{ background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.9) 0%, rgba(0, 188, 212, 0.9) 100%)' }}
               >
-                <Share2 size={18} className="sm:w-5 sm:h-5" />
+                <Share2 size={20} />
               </motion.button>
             </div>
           </div>
@@ -916,9 +932,9 @@ export default function ShopPage({ params }: ShopPageProps) {
             >
               {/* Verified Badge */}
               {shop.verify && (
-                <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-white/20 backdrop-blur-sm rounded-full text-white/90 text-[10px] sm:text-xs font-medium mb-2">
+                <div className="inline-flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full text-white/90 text-[10px] sm:text-xs font-medium mb-2" style={{ padding: '6px 12px' }}>
                   <CheckCircle2 size={12} />
-                  <span>متجر موثق</span>
+                  <span style={{ padding: '0 4px' }}>متجر موثق</span>
                 </div>
               )}
               
@@ -937,7 +953,7 @@ export default function ShopPage({ params }: ShopPageProps) {
               {/* Quick Stats */}
               <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-4">
                 {shop.rating_avg !== undefined && shop.rating_avg > 0 && (
-                  <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm px-2.5 sm:px-3 py-1.5 rounded-xl">
+                  <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm rounded-xl" style={{ padding: '10px 14px' }}>
                     <Star size={14} className="text-[var(--star)] fill-[var(--star)]" />
                     <span className="font-semibold text-xs sm:text-sm">{shop.rating_avg.toFixed(1)}</span>
                     {shop.reviews_count && (
@@ -947,14 +963,14 @@ export default function ShopPage({ params }: ShopPageProps) {
                 )}
                 
                 {deliveryTime && (
-                  <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm px-2.5 sm:px-3 py-1.5 rounded-xl">
+                  <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm rounded-xl" style={{ padding: '10px 14px' }}>
                     <Bike size={14} className="text-white/80" />
                     <span className="text-xs sm:text-sm">{deliveryTime} د</span>
                   </div>
                 )}
                 
                 {shop.min_amount !== undefined && shop.min_amount > 0 && (
-                  <div className="bg-white/20 backdrop-blur-sm px-2.5 sm:px-3 py-1.5 rounded-xl">
+                  <div className="bg-white/20 backdrop-blur-sm rounded-xl" style={{ padding: '10px 14px' }}>
                     <span className="text-xs sm:text-sm">الحد الأدنى {shop.min_amount} {tCommon('sar')}</span>
                   </div>
                 )}
@@ -962,50 +978,10 @@ export default function ShopPage({ params }: ShopPageProps) {
             </motion.div>
           </div>
 
-          {/* Stats Cards - Same style as shops page */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="flex items-center justify-center gap-3 sm:gap-6 lg:gap-10 mt-8 sm:mt-10"
-          >
-            <div className="flex items-center gap-2 sm:gap-2.5 lg:gap-3 text-white/90">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 rounded-lg sm:rounded-xl bg-white/20 flex items-center justify-center">
-                <Star size={14} className="fill-[var(--star)] text-[var(--star)] sm:hidden" />
-                <Star size={16} className="fill-[var(--star)] text-[var(--star)] hidden sm:block lg:hidden" />
-                <Star size={18} className="fill-[var(--star)] text-[var(--star)] hidden lg:block" />
-              </div>
-              <div className="text-start">
-                <div className="text-base sm:text-lg lg:text-xl font-bold">{shop.rating_avg?.toFixed(1) || '0.0'}</div>
-                <div className="text-[9px] sm:text-[10px] lg:text-xs text-white/70">التقييم</div>
-              </div>
-            </div>
-            <div className="w-px h-7 sm:h-8 lg:h-10 bg-white/20" />
-            <div className="flex items-center gap-2 sm:gap-2.5 lg:gap-3 text-white/90">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 rounded-lg sm:rounded-xl bg-white/20 flex items-center justify-center">
-                <Clock size={14} className="sm:hidden" />
-                <Clock size={16} className="hidden sm:block lg:hidden" />
-                <Clock size={18} className="hidden lg:block" />
-              </div>
-              <div className="text-start">
-                <div className="text-base sm:text-lg lg:text-xl font-bold">{deliveryTime || '-'}</div>
-                <div className="text-[9px] sm:text-[10px] lg:text-xs text-white/70">دقيقة توصيل</div>
-              </div>
-            </div>
-            <div className="w-px h-7 sm:h-8 lg:h-10 bg-white/20 hidden xs:block" />
-            <div className="hidden xs:flex items-center gap-2 sm:gap-2.5 lg:gap-3 text-white/90">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 rounded-lg sm:rounded-xl bg-white/20 flex items-center justify-center">
-                <Utensils size={14} className="sm:hidden" />
-                <Utensils size={16} className="hidden sm:block lg:hidden" />
-                <Utensils size={18} className="hidden lg:block" />
-              </div>
-              <div className="text-start">
-                <div className="text-base sm:text-lg lg:text-xl font-bold">{products.length || '-'}</div>
-                <div className="text-[9px] sm:text-[10px] lg:text-xs text-white/70">منتج</div>
-              </div>
-            </div>
-          </motion.div>
         </div>
+        
+        {/* Spacer to increase orange area height */}
+        <div className="h-16 sm:h-20 lg:h-24" />
         
         {/* Wave Bottom - Same as shops page */}
         <div className="absolute bottom-0 left-0 right-0">
@@ -1015,56 +991,59 @@ export default function ShopPage({ params }: ShopPageProps) {
         </div>
       </div>
 
-      {/* ===== SEARCH BAR ===== */}
-      <div className="container px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="relative group"
-        >
-          <div className={clsx(
-            "absolute inset-0 rounded-xl sm:rounded-2xl transition-opacity duration-300",
-            searchFocused ? "opacity-100 shadow-lg shadow-[var(--primary)]/10" : "opacity-0"
-          )} />
-          <div className={clsx(
-            'relative flex items-center bg-white rounded-xl sm:rounded-2xl shadow-sm overflow-hidden border-2 transition-all duration-300',
-            searchFocused
-              ? 'border-[var(--primary)]'
-              : 'border-transparent hover:shadow-md'
-          )}>
-            <div className="flex items-center justify-center w-10 sm:w-12 lg:w-14 h-11 sm:h-12 lg:h-14">
-              <Search size={18} className={clsx("transition-colors", searchFocused ? "text-[var(--primary)]" : "text-[var(--text-grey)]")} />
+      {/* ===== SEARCH & CATEGORIES SECTION ===== */}
+      <div style={{ background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.05) 0%, rgba(0, 188, 212, 0.05) 100%)' }}>
+        {/* ===== SEARCH BAR ===== */}
+        <div className="container px-4 sm:px-6 lg:px-8" style={{ paddingTop: '24px', paddingBottom: '20px' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="relative group"
+          >
+            <div className={clsx(
+              "absolute inset-0 rounded-xl sm:rounded-2xl transition-opacity duration-300",
+              searchFocused ? "opacity-100 shadow-lg shadow-[var(--primary)]/10" : "opacity-0"
+            )} />
+            <div className={clsx(
+              'relative flex items-center bg-white rounded-xl sm:rounded-2xl shadow-sm overflow-hidden border-2 transition-all duration-300',
+              searchFocused
+                ? 'border-[var(--primary)]'
+                : 'border-transparent hover:shadow-md'
+            )}>
+              <div className="flex items-center justify-center w-10 sm:w-12 lg:w-14 h-11 sm:h-12 lg:h-14">
+                <Search size={18} className={clsx("transition-colors", searchFocused ? "text-[var(--primary)]" : "text-[var(--text-grey)]")} />
+              </div>
+              <input
+                type="text"
+                placeholder="ابحث في المنتجات..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setSearchFocused(false)}
+                className="flex-1 h-11 sm:h-12 lg:h-14 pe-4 bg-transparent text-[var(--black)] text-sm placeholder:text-[var(--text-grey)] focus:outline-none"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch('')}
+                  className="w-8 h-8 me-2 rounded-lg bg-white/80 hover:bg-white flex items-center justify-center transition-colors"
+                  style={{ padding: '8px' }}
+                >
+                  <X size={14} className="text-[var(--text-grey)]" />
+                </button>
+              )}
             </div>
-            <input
-              type="text"
-              placeholder="ابحث في المنتجات..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onFocus={() => setSearchFocused(true)}
-              onBlur={() => setSearchFocused(false)}
-              className="flex-1 h-11 sm:h-12 lg:h-14 pe-4 bg-transparent text-[var(--black)] text-sm placeholder:text-[var(--text-grey)] focus:outline-none"
-            />
-            {search && (
-              <button
-                onClick={() => setSearch('')}
-                className="w-8 h-8 me-2 rounded-lg bg-[var(--main-bg)] hover:bg-[var(--border)] flex items-center justify-center transition-colors"
-              >
-                <X size={14} className="text-[var(--text-grey)]" />
-              </button>
-            )}
-          </div>
-        </motion.div>
-      </div>
+          </motion.div>
+        </div>
 
-      {/* ===== CATEGORIES BAR ===== */}
-      <div className="sticky top-14 sm:top-16 lg:top-20 z-20 bg-white border-y border-[var(--border)] shadow-sm">
+        {/* ===== CATEGORIES BAR ===== */}
+        <div className="sticky top-14 sm:top-16 lg:top-20 z-20 border-y border-[var(--border)]/30 shadow-sm" style={{ background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.03) 0%, rgba(0, 188, 212, 0.03) 100%)' }}>
         <div className="container px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2 sm:gap-3 h-12 sm:h-14 lg:h-16">
+          <div className="flex items-center gap-3 sm:gap-4" style={{ padding: '16px 0' }}>
             {/* Scroll Left */}
             <button
               onClick={() => scrollCategories('left')}
-              className="hidden lg:flex w-9 h-9 rounded-xl bg-[var(--main-bg)] hover:bg-[var(--border)] items-center justify-center text-[var(--text-grey)] hover:text-[var(--black)] transition-colors shrink-0"
+              className="hidden lg:flex w-9 h-9 rounded-full bg-gradient-to-r from-[var(--primary)]/10 to-cyan-500/10 border border-[var(--primary)]/20 items-center justify-center text-[var(--primary)] hover:from-[var(--primary)]/20 hover:to-cyan-500/20 transition-all duration-300 shrink-0"
             >
               {isRTL ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
             </button>
@@ -1080,17 +1059,20 @@ export default function ShopPage({ params }: ShopPageProps) {
                     key={cat.id ?? 'all'}
                     onClick={() => setSelectedCat(cat.id)}
                     className={clsx(
-                      'px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all duration-300',
+                      'flex items-center gap-2 text-sm font-semibold whitespace-nowrap transition-all duration-300 rounded-full',
                       selectedCat === cat.id
-                        ? 'bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/30 scale-105'
-                        : 'bg-[var(--main-bg)] text-[var(--text-grey)] hover:bg-[var(--border)] hover:text-[var(--black)]'
+                        ? 'bg-gradient-to-r from-[var(--primary)]/15 to-cyan-500/15 border border-[var(--primary)]/30 text-[var(--primary)]'
+                        : 'bg-gradient-to-r from-[var(--primary)]/5 to-cyan-500/5 border border-[var(--border)]/30 text-[var(--text-grey)] hover:from-[var(--primary)]/10 hover:to-cyan-500/10 hover:text-[var(--black)]'
                     )}
+                    style={{ padding: '10px 18px' }}
                   >
-                    {cat.title}
+                    <span>{cat.title}</span>
                     {cat.count > 0 && (
                       <span className={clsx(
-                        'ms-1.5 text-[10px] px-1.5 py-0.5 rounded-md',
-                        selectedCat === cat.id ? 'bg-white/20' : 'bg-white'
+                        'text-[11px] font-bold rounded-full min-w-[22px] h-[22px] flex items-center justify-center',
+                        selectedCat === cat.id 
+                          ? 'bg-[var(--primary)]/20 text-[var(--primary)]' 
+                          : 'bg-white/80 text-[var(--text-grey)]'
                       )}>
                         {cat.count}
                       </span>
@@ -1103,23 +1085,24 @@ export default function ShopPage({ params }: ShopPageProps) {
             {/* Scroll Right */}
             <button
               onClick={() => scrollCategories('right')}
-              className="hidden lg:flex w-9 h-9 rounded-xl bg-[var(--main-bg)] hover:bg-[var(--border)] items-center justify-center text-[var(--text-grey)] hover:text-[var(--black)] transition-colors shrink-0"
+              className="hidden lg:flex w-9 h-9 rounded-full bg-gradient-to-r from-[var(--primary)]/10 to-cyan-500/10 border border-[var(--primary)]/20 items-center justify-center text-[var(--primary)] hover:from-[var(--primary)]/20 hover:to-cyan-500/20 transition-all duration-300 shrink-0"
             >
               {isRTL ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
             </button>
 
             {/* Products Count */}
-            <div className="hidden sm:flex items-center gap-1.5 text-sm text-[var(--text-grey)] bg-[var(--main-bg)] px-3 py-1.5 rounded-xl shrink-0">
-              <Utensils size={14} />
-              <span className="font-bold text-[var(--black)]">{filtered.length}</span>
-              <span>منتج</span>
+            <div className="hidden sm:flex items-center gap-2 text-sm bg-gradient-to-r from-[var(--primary)]/10 to-cyan-500/10 rounded-full shrink-0 border border-[var(--primary)]/20" style={{ padding: '10px 18px' }}>
+              <Utensils size={16} className="text-[var(--primary)]" />
+              <span className="font-bold text-[var(--primary)]">{filtered.length}</span>
+              <span className="text-[var(--text-grey)]">منتج</span>
             </div>
           </div>
         </div>
       </div>
+      </div>
 
       {/* ===== PRODUCTS GRID ===== */}
-      <main className="container px-4 sm:px-6 lg:px-8 py-5 sm:py-6 pb-28">
+      <main className="container px-4 sm:px-6 lg:px-8 pb-28" style={{ paddingTop: '32px' }}>
         {productsLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
             {[...Array(10)].map((_, i) => (
@@ -1143,7 +1126,8 @@ export default function ShopPage({ params }: ShopPageProps) {
               <Button
                 onClick={() => setSearch('')}
                 variant="outline"
-                className="mt-5 px-6 py-2.5 rounded-xl border-2"
+                className="mt-5 rounded-xl border-2"
+                style={{ padding: '12px 24px' }}
               >
                 مسح البحث
               </Button>

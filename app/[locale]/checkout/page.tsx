@@ -31,6 +31,9 @@ import {
   X,
   Home,
   CheckCircle2,
+  User,
+  Phone,
+  AlertTriangle,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -103,6 +106,11 @@ const CheckoutPage = () => {
   const [otpVerifying, setOtpVerifying] = useState(false);
   const [pendingOrderId, setPendingOrderId] = useState<number | null>(null);
   const [otpVerificationUrl, setOtpVerificationUrl] = useState<string | null>(null);
+
+  // Recipient Info States (for ordering for someone else)
+  const [orderForOther, setOrderForOther] = useState(false);
+  const [recipientName, setRecipientName] = useState('');
+  const [recipientPhone, setRecipientPhone] = useState(user?.phone || '');
 
   // Fetch initial data
   useEffect(() => {
@@ -306,14 +314,27 @@ const CheckoutPage = () => {
   const handlePlaceOrder = async () => {
     if (!cart?.id) return;
     
-    // Validate
+    // Validate delivery address
     if (deliveryType === 'delivery' && !selectedAddressId) {
       setError(t('selectAddressError'));
       return;
     }
     
+    // Validate payment method
     if (!selectedPaymentId) {
       setError(t('selectPaymentError'));
+      return;
+    }
+
+    // Validate phone number
+    if (!recipientPhone.trim()) {
+      setError(t('phoneRequired'));
+      return;
+    }
+
+    // Validate minimum order amount
+    if (cart?.shop?.min_amount && subtotal < cart.shop.min_amount) {
+      setError(`${t('minOrderRequired')} ${cart.shop.min_amount.toFixed(2)} ${tCommon('sar')}`);
       return;
     }
 
@@ -364,6 +385,7 @@ const CheckoutPage = () => {
         shop_id?: number;
         location?: { latitude: number; longitude: number };
         phone?: string;
+        username?: string;
         // Multiple URL parameter names for better backend compatibility
         success_url?: string;
         cancel_url?: string;
@@ -382,7 +404,8 @@ const CheckoutPage = () => {
         payment_id: selectedPaymentId!,
         shop_id: cart.shop_id,
         location: formattedLocation,
-        phone: user?.phone || undefined,
+        phone: recipientPhone || user?.phone || undefined,
+        username: orderForOther && recipientName ? recipientName : undefined,
         // Payment callback URLs - use API routes that will redirect to frontend
         // API route format: /api/payment/success?o_id=xxx will redirect to /[locale]/payment/result
         success_url: `${baseUrl}/api/payment/success`,
@@ -769,6 +792,7 @@ const CheckoutPage = () => {
               <button
                 onClick={() => router.back()}
                 className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center hover:bg-white/20 transition-all group"
+                style={{ padding: '10px' }}
               >
                 {isRTL ? (
                   <ChevronRight size={18} className="text-white group-hover:translate-x-0.5 transition-transform" />
@@ -791,10 +815,11 @@ const CheckoutPage = () => {
             <motion.div
               initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/10"
+              className="hidden sm:flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10"
+              style={{ padding: '8px 14px' }}
             >
               <Shield size={14} className="text-emerald-400" />
-              <span className="text-xs text-white/70">{t('secureCheckout') || 'دفع آمن'}</span>
+              <span className="text-xs text-white/70" style={{ padding: '0 4px' }}>{t('secureCheckout') || 'دفع آمن'}</span>
             </motion.div>
           </div>
 
@@ -869,15 +894,17 @@ const CheckoutPage = () => {
               initial={{ opacity: 0, y: -10, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.98 }}
-              className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 shadow-sm"
+              className="mb-6 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 shadow-sm"
+              style={{ padding: '16px 20px' }}
             >
-              <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center shrink-0" style={{ padding: '10px' }}>
                 <AlertCircle size={20} className="text-red-500" />
               </div>
-              <p className="text-red-600 font-medium text-sm flex-1">{error}</p>
+              <p className="text-red-600 font-medium text-sm flex-1" style={{ padding: '0 8px' }}>{error}</p>
               <button 
                 onClick={() => setError('')}
                 className="w-8 h-8 rounded-lg hover:bg-red-100 flex items-center justify-center transition-colors"
+                style={{ padding: '8px' }}
               >
                 <X size={16} className="text-red-400" />
               </button>
@@ -906,30 +933,31 @@ const CheckoutPage = () => {
                   </div>
                 </div>
               </div>
-              <div className="p-5">
+              <div style={{ padding: '20px' }}>
                 <div className="grid grid-cols-2 gap-3">
                   {/* Home Delivery */}
                   <button
                     onClick={() => setDeliveryType('delivery')}
                     className={clsx(
-                      'relative p-4 sm:p-5 rounded-xl border-2 text-center transition-all duration-300 group',
+                      'relative rounded-xl border-2 text-center transition-all duration-300 group',
                       deliveryType === 'delivery'
                         ? 'border-[var(--primary)] bg-gradient-to-br from-[var(--primary)]/5 to-[var(--primary)]/10 shadow-lg shadow-[var(--primary)]/10'
                         : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50/50'
                     )}
+                    style={{ padding: '18px 16px' }}
                   >
                     <div className={clsx(
                       'w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center transition-all',
                       deliveryType === 'delivery'
                         ? 'bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] text-white shadow-lg shadow-[var(--primary)]/30'
                         : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200'
-                    )}>
+                    )} style={{ padding: '12px' }}>
                       <Truck size={22} />
                     </div>
                     <p className={clsx(
                       'font-semibold text-sm transition-colors',
                       deliveryType === 'delivery' ? 'text-[var(--primary)]' : 'text-gray-700'
-                    )}>
+                    )} style={{ padding: '4px 8px' }}>
                       {t('homeDelivery')}
                     </p>
                     {deliveryType === 'delivery' && (
@@ -947,24 +975,25 @@ const CheckoutPage = () => {
                   <button
                     onClick={() => setDeliveryType('pickup')}
                     className={clsx(
-                      'relative p-4 sm:p-5 rounded-xl border-2 text-center transition-all duration-300 group',
+                      'relative rounded-xl border-2 text-center transition-all duration-300 group',
                       deliveryType === 'pickup'
                         ? 'border-[var(--primary)] bg-gradient-to-br from-[var(--primary)]/5 to-[var(--primary)]/10 shadow-lg shadow-[var(--primary)]/10'
                         : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50/50'
                     )}
+                    style={{ padding: '18px 16px' }}
                   >
                     <div className={clsx(
                       'w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center transition-all',
                       deliveryType === 'pickup'
                         ? 'bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] text-white shadow-lg shadow-[var(--primary)]/30'
                         : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200'
-                    )}>
+                    )} style={{ padding: '12px' }}>
                       <Store size={22} />
                     </div>
                     <p className={clsx(
                       'font-semibold text-sm transition-colors',
                       deliveryType === 'pickup' ? 'text-[var(--primary)]' : 'text-gray-700'
-                    )}>
+                    )} style={{ padding: '4px 8px' }}>
                       {t('pickup')}
                     </p>
                     {deliveryType === 'pickup' && (
@@ -1002,14 +1031,14 @@ const CheckoutPage = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="p-5">
+                  <div style={{ padding: '20px' }}>
                     {addresses.length === 0 ? (
-                      <div className="text-center py-8 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl border-2 border-dashed border-gray-200">
-                        <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gray-200 flex items-center justify-center">
+                      <div className="text-center bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl border-2 border-dashed border-gray-200" style={{ padding: '32px 20px' }}>
+                        <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gray-200 flex items-center justify-center" style={{ padding: '14px' }}>
                           <MapPin size={24} className="text-gray-400" />
                         </div>
-                        <p className="text-gray-500 mb-4 text-sm">{t('noAddresses')}</p>
-                        <Button variant="outline" leftIcon={<Plus size={16} />} size="sm">
+                        <p className="text-gray-500 mb-4 text-sm" style={{ padding: '0 12px' }}>{t('noAddresses')}</p>
+                        <Button variant="outline" leftIcon={<Plus size={16} />} size="sm" style={{ padding: '10px 18px' }}>
                           {t('addAddress')}
                         </Button>
                       </div>
@@ -1023,11 +1052,12 @@ const CheckoutPage = () => {
                             transition={{ delay: index * 0.05 }}
                             onClick={() => setSelectedAddressId(address.id)}
                             className={clsx(
-                              'w-full p-4 rounded-xl border-2 text-start transition-all duration-200',
+                              'w-full rounded-xl border-2 text-start transition-all duration-200',
                               selectedAddressId === address.id
                                 ? 'border-emerald-500 bg-gradient-to-br from-emerald-50 to-emerald-100/50 shadow-lg shadow-emerald-500/10'
                                 : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50/50'
                             )}
+                            style={{ padding: '16px 18px' }}
                           >
                             <div className="flex items-start justify-between gap-3">
                               <div className="flex items-start gap-3">
@@ -1036,7 +1066,7 @@ const CheckoutPage = () => {
                                   selectedAddressId === address.id
                                     ? 'bg-emerald-500 text-white'
                                     : 'bg-gray-100 text-gray-400'
-                                )}>
+                                )} style={{ padding: '10px' }}>
                                   <Home size={18} />
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -1068,9 +1098,9 @@ const CheckoutPage = () => {
                         ))}
                         
                         {/* Add New Address Button */}
-                        <button className="w-full p-4 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all flex items-center justify-center gap-2 group">
+                        <button className="w-full border-2 border-dashed border-gray-200 rounded-xl text-gray-500 hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all flex items-center justify-center gap-2 group" style={{ padding: '16px 18px' }}>
                           <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
-                          <span className="text-sm font-medium">{t('addAddress')}</span>
+                          <span className="text-sm font-medium" style={{ padding: '0 4px' }}>{t('addAddress')}</span>
                         </button>
                       </div>
                     )}
@@ -1092,10 +1122,10 @@ const CheckoutPage = () => {
                   </div>
                 </div>
               </div>
-              <div className="p-5">
+              <div style={{ padding: '20px' }}>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-semibold text-gray-600 mb-2 block flex items-center gap-1.5">
+                    <label className="text-xs font-semibold text-gray-600 mb-2 block flex items-center gap-1.5" style={{ padding: '0 4px' }}>
                       <Calendar size={12} className="text-violet-500" />
                       {t('selectDate')}
                     </label>
@@ -1103,7 +1133,8 @@ const CheckoutPage = () => {
                       <select
                         value={deliveryDate}
                         onChange={(e) => setDeliveryDate(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all appearance-none cursor-pointer"
+                        className="w-full border border-gray-200 rounded-xl bg-white text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all appearance-none cursor-pointer"
+                        style={{ padding: '14px 18px' }}
                       >
                         <option value="">{t('asap')}</option>
                         {getAvailableDates().map(date => (
@@ -1114,7 +1145,7 @@ const CheckoutPage = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-gray-600 mb-2 block flex items-center gap-1.5">
+                    <label className="text-xs font-semibold text-gray-600 mb-2 block flex items-center gap-1.5" style={{ padding: '0 4px' }}>
                       <Clock size={12} className="text-violet-500" />
                       {t('selectTime')}
                     </label>
@@ -1123,7 +1154,8 @@ const CheckoutPage = () => {
                         value={deliveryTime}
                         onChange={(e) => setDeliveryTime(e.target.value)}
                         disabled={!deliveryDate}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all appearance-none cursor-pointer disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
+                        className="w-full border border-gray-200 rounded-xl bg-white text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all appearance-none cursor-pointer disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
+                        style={{ padding: '14px 18px' }}
                       >
                         <option value="">{deliveryDate ? t('selectTimeSlot') : t('selectDateFirst')}</option>
                         {deliveryDate && getAvailableTimes().map(time => (
@@ -1150,7 +1182,7 @@ const CheckoutPage = () => {
                   </div>
                 </div>
               </div>
-              <div className="p-5">
+              <div style={{ padding: '20px' }}>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {paymentMethods.map((method, index) => (
                     <motion.button
@@ -1160,11 +1192,12 @@ const CheckoutPage = () => {
                       transition={{ delay: index * 0.05 }}
                       onClick={() => setSelectedPaymentId(method.id)}
                       className={clsx(
-                        'relative p-4 rounded-xl border-2 text-center transition-all duration-200 group',
+                        'relative rounded-xl border-2 text-center transition-all duration-200 group',
                         selectedPaymentId === method.id
                           ? 'border-amber-500 bg-gradient-to-br from-amber-50 to-amber-100/50 shadow-lg shadow-amber-500/10'
                           : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50/50'
                       )}
+                      style={{ padding: '16px 14px' }}
                     >
                       <div className={clsx(
                         'mx-auto mb-2 transition-colors',
@@ -1175,7 +1208,7 @@ const CheckoutPage = () => {
                       <span className={clsx(
                         'text-xs font-semibold transition-colors',
                         selectedPaymentId === method.id ? 'text-amber-600' : 'text-gray-600'
-                      )}>
+                      )} style={{ padding: '0 4px' }}>
                         {method.name}
                       </span>
                       {selectedPaymentId === method.id && (
@@ -1211,9 +1244,9 @@ const CheckoutPage = () => {
                       <h3 className="font-bold text-gray-800">{t('selectPaymentCard')}</h3>
                     </div>
                   </div>
-                  <div className="p-5">
+                  <div style={{ padding: '20px' }}>
                     {loadingCards ? (
-                      <div className="flex items-center justify-center py-8">
+                      <div className="flex items-center justify-center" style={{ padding: '32px 0' }}>
                         <Loader2 size={24} className="animate-spin text-blue-500" />
                       </div>
                     ) : (
@@ -1222,21 +1255,22 @@ const CheckoutPage = () => {
                         <button
                           onClick={() => { setUseNewCard(true); setSelectedCardId(null); }}
                           className={clsx(
-                            'w-full p-4 rounded-xl border-2 text-start transition-all',
+                            'w-full rounded-xl border-2 text-start transition-all',
                             useNewCard
                               ? 'border-blue-500 bg-blue-50'
                               : 'border-gray-100 hover:border-gray-200'
                           )}
+                          style={{ padding: '16px 18px' }}
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <div className={clsx(
                                 'w-10 h-10 rounded-xl flex items-center justify-center',
                                 useNewCard ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-400'
-                              )}>
+                              )} style={{ padding: '10px' }}>
                                 <Plus size={18} />
                               </div>
-                              <span className={clsx('font-medium text-sm', useNewCard ? 'text-blue-600' : 'text-gray-700')}>
+                              <span className={clsx('font-medium text-sm', useNewCard ? 'text-blue-600' : 'text-gray-700')} style={{ padding: '0 4px' }}>
                                 {t('useNewCard')}
                               </span>
                             </div>
@@ -1254,11 +1288,12 @@ const CheckoutPage = () => {
                             key={card.id}
                             onClick={() => { setUseNewCard(false); setSelectedCardId(card.id); }}
                             className={clsx(
-                              'w-full p-4 rounded-xl border-2 text-start transition-all',
+                              'w-full rounded-xl border-2 text-start transition-all',
                               !useNewCard && selectedCardId === card.id
                                 ? 'border-blue-500 bg-blue-50'
                                 : 'border-gray-100 hover:border-gray-200'
                             )}
+                            style={{ padding: '16px 18px' }}
                           >
                             <div className="flex items-center justify-between">
                               <div>
@@ -1283,7 +1318,7 @@ const CheckoutPage = () => {
                         ))}
 
                         {savedCards.length === 0 && (
-                          <p className="text-center text-xs text-gray-400 py-4 bg-gray-50 rounded-xl">{t('noSavedCards')}</p>
+                          <p className="text-center text-xs text-gray-400 bg-gray-50 rounded-xl" style={{ padding: '16px 12px' }}>{t('noSavedCards')}</p>
                         )}
                       </div>
                     )}
@@ -1291,6 +1326,92 @@ const CheckoutPage = () => {
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {/* Recipient Info Card */}
+            <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="px-5 py-4 border-b border-gray-50 bg-gradient-to-r from-cyan-50/80 to-transparent">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                      <User size={18} className="text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-800">{t('recipientInfo')}</h3>
+                      <p className="text-xs text-gray-400">{t('recipientPhone') || 'معلومات المستلم'}</p>
+                    </div>
+                  </div>
+                  {/* Toggle for ordering for someone else */}
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <span className="text-xs text-gray-500">{t('orderForSomeoneElse')}</span>
+                    <button
+                      type="button"
+                      onClick={() => setOrderForOther(!orderForOther)}
+                      className={clsx(
+                        'relative w-11 h-6 rounded-full transition-colors duration-200',
+                        orderForOther ? 'bg-cyan-500' : 'bg-gray-200'
+                      )}
+                    >
+                      <span
+                        className={clsx(
+                          'absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200',
+                          orderForOther ? 'start-[22px]' : 'start-0.5'
+                        )}
+                      />
+                    </button>
+                  </label>
+                </div>
+              </div>
+              <div style={{ padding: '20px' }}>
+                <div className="space-y-4">
+                  {/* Phone Number - Always shown */}
+                  <div>
+                    <label className="text-xs font-semibold text-gray-600 mb-2 block flex items-center gap-1.5" style={{ padding: '0 4px' }}>
+                      <Phone size={12} className="text-cyan-500" />
+                      {t('recipientPhone')} <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Phone size={16} className="absolute start-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <input
+                        type="tel"
+                        value={recipientPhone}
+                        onChange={(e) => setRecipientPhone(e.target.value)}
+                        placeholder={t('recipientPhonePlaceholder')}
+                        className="w-full border border-gray-200 rounded-xl bg-white text-sm focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all"
+                        style={{ padding: '14px 18px', paddingInlineStart: '44px' }}
+                        dir="ltr"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Recipient Name - Only shown when ordering for someone else */}
+                  <AnimatePresence>
+                    {orderForOther && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                      >
+                        <label className="text-xs font-semibold text-gray-600 mb-2 block flex items-center gap-1.5" style={{ padding: '0 4px' }}>
+                          <User size={12} className="text-cyan-500" />
+                          {t('recipientName')}
+                        </label>
+                        <div className="relative">
+                          <User size={16} className="absolute start-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                          <input
+                            type="text"
+                            value={recipientName}
+                            onChange={(e) => setRecipientName(e.target.value)}
+                            placeholder={t('recipientNamePlaceholder')}
+                            className="w-full border border-gray-200 rounded-xl bg-white text-sm focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all"
+                            style={{ padding: '14px 18px', paddingInlineStart: '44px' }}
+                          />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            </motion.div>
 
             {/* Order Notes Card */}
             <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -1305,13 +1426,14 @@ const CheckoutPage = () => {
                   </div>
                 </div>
               </div>
-              <div className="p-5">
+              <div style={{ padding: '20px' }}>
                 <textarea
                   value={orderNote}
                   onChange={(e) => setOrderNote(e.target.value)}
                   placeholder={t('orderNotesPlaceholder')}
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white resize-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 outline-none transition-all text-sm placeholder:text-gray-400"
+                  className="w-full border border-gray-200 rounded-xl bg-white resize-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 outline-none transition-all text-sm placeholder:text-gray-400"
+                  style={{ padding: '14px 18px' }}
                 />
               </div>
             </motion.div>
@@ -1326,16 +1448,16 @@ const CheckoutPage = () => {
               className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden lg:sticky lg:top-24"
             >
               {/* Summary Header */}
-              <div className="bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] text-white p-5">
+              <div className="bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] text-white" style={{ padding: '20px' }}>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center" style={{ padding: '10px' }}>
                     <ShoppingBag size={20} />
                   </div>
-                  <h2 className="font-bold text-lg">{t('orderSummary')}</h2>
+                  <h2 className="font-bold text-lg" style={{ padding: '0 4px' }}>{t('orderSummary')}</h2>
                 </div>
                 
                 {cart.shop && (
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm">
+                  <div className="flex items-center gap-3 rounded-xl bg-white/10 backdrop-blur-sm" style={{ padding: '14px 16px' }}>
                     {cart.shop.logo_img && (
                       <Image
                         src={cart.shop.logo_img}
@@ -1353,7 +1475,7 @@ const CheckoutPage = () => {
                 )}
               </div>
 
-              <div className="p-5">
+              <div style={{ padding: '20px' }}>
                 {/* Cart Items Preview */}
                 <div className="space-y-2.5 mb-5 max-h-28 overflow-y-auto custom-scrollbar">
                   {cartItems.slice(0, 3).map((item) => (
@@ -1370,23 +1492,24 @@ const CheckoutPage = () => {
                     </div>
                   ))}
                   {cartItems.length > 3 && (
-                    <p className="text-xs text-gray-400 text-center pt-1">+{cartItems.length - 3} {t('moreItems')}</p>
+                    <p className="text-xs text-gray-400 text-center" style={{ paddingTop: '4px' }}>+{cartItems.length - 3} {t('moreItems')}</p>
                   )}
                 </div>
 
                 {/* Coupon Section */}
-                <div className="py-4 border-y border-gray-100">
+                <div className="border-y border-gray-100" style={{ padding: '16px 0' }}>
                   {appliedCoupon ? (
-                    <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                    <div className="flex items-center justify-between bg-emerald-50 rounded-xl border border-emerald-100" style={{ padding: '14px 16px' }}>
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center" style={{ padding: '8px' }}>
                           <Ticket size={14} className="text-emerald-600" />
                         </div>
-                        <span className="text-sm font-semibold text-emerald-700">{appliedCoupon}</span>
+                        <span className="text-sm font-semibold text-emerald-700" style={{ padding: '0 4px' }}>{appliedCoupon}</span>
                       </div>
                       <button 
                         onClick={handleRemoveCoupon} 
-                        className="text-xs text-red-500 hover:text-red-600 font-medium px-2 py-1 hover:bg-red-50 rounded-lg transition-colors"
+                        className="text-xs text-red-500 hover:text-red-600 font-medium hover:bg-red-50 rounded-lg transition-colors"
+                        style={{ padding: '6px 10px' }}
                       >
                         {tCommon('delete')}
                       </button>
@@ -1400,21 +1523,23 @@ const CheckoutPage = () => {
                           placeholder={tCart('couponCode')}
                           value={couponCode}
                           onChange={(e) => setCouponCode(e.target.value)}
-                          className="w-full ps-9 pe-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all"
+                          className="w-full border border-gray-200 rounded-xl text-sm focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all"
+                          style={{ padding: '12px 14px', paddingInlineStart: '36px' }}
                         />
                       </div>
                       <Button
                         variant="outline"
                         onClick={handleApplyCoupon}
                         isLoading={couponLoading}
-                        className="shrink-0 text-sm px-4"
+                        className="shrink-0 text-sm"
+                        style={{ padding: '12px 18px' }}
                       >
                         {tCart('apply')}
                       </Button>
                     </div>
                   )}
                   {couponError && (
-                    <p className="text-xs text-red-500 mt-2 flex items-center gap-1">
+                    <p className="text-xs text-red-500 mt-2 flex items-center gap-1" style={{ padding: '4px 8px' }}>
                       <AlertCircle size={12} />
                       {couponError}
                     </p>
@@ -1423,47 +1548,108 @@ const CheckoutPage = () => {
 
                 {/* Price Breakdown */}
                 <div className="py-4 space-y-3 text-sm">
+                  {/* Subtotal */}
                   <div className="flex justify-between">
                     <span className="text-gray-500">{tCart('subtotal')}</span>
-                    <span className="text-gray-700 font-medium">{subtotal.toFixed(2)} {tCommon('sar')}</span>
+                    <span className="text-gray-700 font-medium">
+                      {(calculatedPrices?.price ?? subtotal).toFixed(2)} {tCommon('sar')}
+                    </span>
                   </div>
 
+                  {/* Delivery Fee */}
                   {deliveryType === 'delivery' && (
                     <div className="flex justify-between">
                       <span className="text-gray-500">{tCart('deliveryFee')}</span>
                       <span className="text-gray-700 font-medium">
-                        {(cart?.shop?.price || 0).toFixed(2)} {tCommon('sar')}
+                        {(calculatedPrices?.delivery_fee ?? calculatedPrices?.deliveryFee ?? cart?.shop?.price ?? 0).toFixed(2)} {tCommon('sar')}
                       </span>
                     </div>
                   )}
 
-                  {(calculatedPrices?.discount || calculatedPrices?.totalDiscount || calculatedPrices?.coupon_price || calculatedPrices?.couponPrice) && (
+                  {/* Tax */}
+                  {(calculatedPrices?.tax || calculatedPrices?.total_tax || calculatedPrices?.totalTax) && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">{t('tax')}</span>
+                      <span className="text-gray-700 font-medium">
+                        {(calculatedPrices?.tax ?? calculatedPrices?.total_tax ?? calculatedPrices?.totalTax ?? 0).toFixed(2)} {tCommon('sar')}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Service Fee */}
+                  {(calculatedPrices?.service_fee || calculatedPrices?.serviceFee) && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">{t('serviceFee') || tCart('serviceFee')}</span>
+                      <span className="text-gray-700 font-medium">
+                        {(calculatedPrices?.service_fee ?? calculatedPrices?.serviceFee ?? 0).toFixed(2)} {tCommon('sar')}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Discount */}
+                  {(calculatedPrices?.discount || calculatedPrices?.total_discount || calculatedPrices?.totalDiscount) && (
                     <div className="flex justify-between text-emerald-600">
                       <span className="flex items-center gap-1">
                         <Sparkles size={14} />
                         {tCart('discount')}
                       </span>
                       <span className="font-semibold">
-                        -{((calculatedPrices?.discount ?? calculatedPrices?.totalDiscount ?? 0) + (calculatedPrices?.coupon_price ?? calculatedPrices?.couponPrice ?? 0)).toFixed(2)} {tCommon('sar')}
+                        -{(calculatedPrices?.discount ?? calculatedPrices?.total_discount ?? calculatedPrices?.totalDiscount ?? 0).toFixed(2)} {tCommon('sar')}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Coupon Discount */}
+                  {(calculatedPrices?.coupon_price || calculatedPrices?.couponPrice) && (
+                    <div className="flex justify-between text-emerald-600">
+                      <span className="flex items-center gap-1">
+                        <Ticket size={14} />
+                        {tCart('couponApplied')}
+                      </span>
+                      <span className="font-semibold">
+                        -{(calculatedPrices?.coupon_price ?? calculatedPrices?.couponPrice ?? 0).toFixed(2)} {tCommon('sar')}
                       </span>
                     </div>
                   )}
                 </div>
 
+                {/* Minimum Order Warning */}
+                {cart?.shop?.min_amount && subtotal < cart.shop.min_amount && (
+                  <div className="mb-4 bg-amber-50 border border-amber-100 rounded-xl" style={{ padding: '14px 16px' }}>
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center shrink-0" style={{ padding: '8px' }}>
+                        <AlertTriangle size={14} className="text-amber-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-amber-700">{t('minOrderNotMet')}</p>
+                        <p className="text-xs text-amber-600 mt-0.5">
+                          {t('minOrderRequired')} {cart.shop.min_amount.toFixed(2)} {tCommon('sar')}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Total */}
                 <div className="flex justify-between items-center py-4 px-4 -mx-5 bg-gradient-to-r from-gray-50 to-gray-100/50 border-t border-gray-100">
                   <span className="font-bold text-gray-800">{tCart('total')}</span>
                   <div className="text-end">
-                    <span className="text-2xl font-black text-[var(--primary)]">
-                      {(subtotal + (deliveryType === 'delivery' ? (cart?.shop?.price || 0) : 0)).toFixed(2)}
-                    </span>
-                    <span className="text-sm font-medium text-gray-500 ms-1">{tCommon('sar')}</span>
+                    {calculateLoading ? (
+                      <Loader2 size={20} className="animate-spin text-[var(--primary)]" />
+                    ) : (
+                      <>
+                        <span className="text-2xl font-black text-[var(--primary)]">
+                          {(calculatedPrices?.total_price ?? calculatedPrices?.totalPrice ?? (subtotal + (deliveryType === 'delivery' ? (cart?.shop?.price || 0) : 0))).toFixed(2)}
+                        </span>
+                        <span className="text-sm font-medium text-gray-500 ms-1">{tCommon('sar')}</span>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
 
               {/* Place Order Button */}
-              <div className="p-5 pt-0">
+              <div style={{ padding: '0 20px 20px 20px' }}>
                 <motion.button
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
@@ -1471,30 +1657,33 @@ const CheckoutPage = () => {
                   disabled={
                     (deliveryType === 'delivery' && !selectedAddressId) ||
                     !selectedPaymentId ||
+                    !recipientPhone.trim() ||
+                    (cart?.shop?.min_amount && subtotal < cart.shop.min_amount) ||
                     submitting
                   }
                   className={clsx(
-                    'w-full py-4 rounded-xl font-bold text-base flex items-center justify-center gap-3 transition-all shadow-xl',
-                    (submitting || (deliveryType === 'delivery' && !selectedAddressId) || !selectedPaymentId)
+                    'w-full rounded-xl font-bold text-base flex items-center justify-center gap-3 transition-all shadow-xl',
+                    (submitting || (deliveryType === 'delivery' && !selectedAddressId) || !selectedPaymentId || !recipientPhone.trim() || (cart?.shop?.min_amount && subtotal < cart.shop.min_amount))
                       ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
                       : 'bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] text-white hover:shadow-[var(--primary)]/30 hover:shadow-2xl'
                   )}
+                  style={{ padding: '16px 24px' }}
                 >
                   {submitting ? (
                     <Loader2 size={22} className="animate-spin" />
                   ) : (
                     <>
                       <ShoppingBag size={20} />
-                      <span>{t('placeOrder')}</span>
+                      <span style={{ padding: '0 4px' }}>{t('placeOrder')}</span>
                       {isRTL ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}
                     </>
                   )}
                 </motion.button>
                 
                 {/* Security Note */}
-                <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
+                <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400" style={{ padding: '8px 12px' }}>
                   <Shield size={14} className="text-emerald-500" />
-                  <span>{t('securePayment') || 'دفع آمن ومشفر 100%'}</span>
+                  <span style={{ padding: '0 4px' }}>{t('securePayment') || 'دفع آمن ومشفر 100%'}</span>
                 </div>
               </div>
             </motion.div>
@@ -1504,37 +1693,57 @@ const CheckoutPage = () => {
 
       {/* Mobile Fixed Bottom Bar */}
       <div className="fixed bottom-0 left-0 right-0 lg:hidden z-50 bg-white border-t border-gray-200 shadow-2xl shadow-black/10 safe-area-bottom">
-        <div className="p-4">
+        <div style={{ padding: '16px 20px' }}>
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-gray-500">{tCart('total')}</span>
+            <span className="text-sm text-gray-500" style={{ padding: '0 4px' }}>{tCart('total')}</span>
             <div className="flex items-baseline gap-1">
-              <span className="text-xl font-black text-[var(--primary)]">
-                {(subtotal + (deliveryType === 'delivery' ? (cart?.shop?.price || 0) : 0)).toFixed(2)}
-              </span>
-              <span className="text-xs font-medium text-gray-500">{tCommon('sar')}</span>
+              {calculateLoading ? (
+                <Loader2 size={16} className="animate-spin text-[var(--primary)]" />
+              ) : (
+                <>
+                  <span className="text-xl font-black text-[var(--primary)]">
+                    {(calculatedPrices?.total_price ?? calculatedPrices?.totalPrice ?? (subtotal + (deliveryType === 'delivery' ? (cart?.shop?.price || 0) : 0))).toFixed(2)}
+                  </span>
+                  <span className="text-xs font-medium text-gray-500">{tCommon('sar')}</span>
+                </>
+              )}
             </div>
           </div>
+          
+          {/* Minimum Order Warning - Mobile */}
+          {cart?.shop?.min_amount && subtotal < cart.shop.min_amount && (
+            <div className="mb-3 bg-amber-50 border border-amber-100 rounded-lg flex items-center gap-2" style={{ padding: '10px 12px' }}>
+              <AlertTriangle size={14} className="text-amber-600 shrink-0" />
+              <p className="text-xs text-amber-700">
+                {t('minOrderRequired')} {cart.shop.min_amount.toFixed(2)} {tCommon('sar')}
+              </p>
+            </div>
+          )}
+          
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={handlePlaceOrder}
             disabled={
               (deliveryType === 'delivery' && !selectedAddressId) ||
               !selectedPaymentId ||
+              !recipientPhone.trim() ||
+              (cart?.shop?.min_amount && subtotal < cart.shop.min_amount) ||
               submitting
             }
             className={clsx(
-              'w-full py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 transition-all',
-              (submitting || (deliveryType === 'delivery' && !selectedAddressId) || !selectedPaymentId)
+              'w-full rounded-xl font-bold text-base flex items-center justify-center gap-2.5 transition-all',
+              (submitting || (deliveryType === 'delivery' && !selectedAddressId) || !selectedPaymentId || !recipientPhone.trim() || (cart?.shop?.min_amount && subtotal < cart.shop.min_amount))
                 ? 'bg-gray-200 text-gray-400'
                 : 'bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] text-white shadow-xl shadow-[var(--primary)]/20'
             )}
+            style={{ padding: '16px 24px' }}
           >
             {submitting ? (
               <Loader2 size={20} className="animate-spin" />
             ) : (
               <>
                 <ShoppingBag size={18} />
-                <span>{t('placeOrder')}</span>
+                <span style={{ padding: '0 4px' }}>{t('placeOrder')}</span>
               </>
             )}
           </motion.button>
@@ -1550,12 +1759,12 @@ const CheckoutPage = () => {
         onClose={handleCancelOtpVerification}
         title={t('otpVerification')}
       >
-        <div className="space-y-6 p-2">
+        <div className="space-y-6" style={{ padding: '8px' }}>
           <div className="text-center">
-            <div className="w-20 h-20 mx-auto mb-5 bg-gradient-to-br from-[var(--primary)]/20 to-[var(--primary)]/10 rounded-2xl flex items-center justify-center">
+            <div className="w-20 h-20 mx-auto mb-5 bg-gradient-to-br from-[var(--primary)]/20 to-[var(--primary)]/10 rounded-2xl flex items-center justify-center" style={{ padding: '20px' }}>
               <CreditCard size={36} className="text-[var(--primary)]" />
             </div>
-            <p className="text-sm text-gray-500 leading-relaxed">{t('enterOtpDescription')}</p>
+            <p className="text-sm text-gray-500 leading-relaxed" style={{ padding: '0 16px' }}>{t('enterOtpDescription')}</p>
           </div>
 
           <div>
@@ -1581,6 +1790,7 @@ const CheckoutPage = () => {
               fullWidth
               onClick={handleCancelOtpVerification}
               disabled={otpVerifying}
+              style={{ padding: '14px 20px' }}
             >
               {tCommon('cancel')}
             </Button>
@@ -1590,14 +1800,15 @@ const CheckoutPage = () => {
               isLoading={otpVerifying}
               disabled={!otpCode.trim() || otpCode.length < 4}
               className="shadow-lg shadow-[var(--primary)]/30"
+              style={{ padding: '14px 20px' }}
             >
               {t('verifyOtp')}
             </Button>
           </div>
 
-          <p className="text-center text-sm text-gray-500">
+          <p className="text-center text-sm text-gray-500" style={{ padding: '8px 12px' }}>
             {t('otpNotReceived')}{' '}
-            <button className="text-[var(--primary)] font-semibold hover:underline">
+            <button className="text-[var(--primary)] font-semibold hover:underline" style={{ padding: '0 4px' }}>
               {t('resendOtp')}
             </button>
           </p>
