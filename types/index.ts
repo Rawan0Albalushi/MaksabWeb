@@ -209,6 +209,9 @@ export interface Order {
   updated_at: string;
   shop?: Shop;
   location?: OrderLocation;
+  // API may return address in different fields
+  my_address?: OrderAddress;
+  address?: OrderAddress;
   delivery_man?: DeliveryMan;
   details?: OrderDetail[];
   transaction?: Transaction;
@@ -226,6 +229,15 @@ export interface OrderLocation {
   latitude: number;
   longitude: number;
   address: string;
+}
+
+// OrderAddress - API may return address in this format
+export interface OrderAddress {
+  id?: number;
+  address?: string | { address?: string; floor?: string; house?: string };
+  location?: [number, number] | { latitude: number; longitude: number };
+  title?: string;
+  active?: boolean;
 }
 
 export interface DeliveryMan {

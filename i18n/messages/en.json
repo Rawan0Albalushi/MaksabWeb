@@ -339,6 +339,7 @@
   },
   "orders": {
     "title": "My Orders",
+    "subtitle": "Track all your orders",
     "active": "Active",
     "completed": "Completed",
     "cancelled": "Cancelled",
@@ -356,7 +357,21 @@
     "delivered": "Delivered",
     "orderNumber": "Order",
     "items": "items",
-    "errorLoadingOrder": "Error loading order"
+    "errorLoadingOrder": "Error loading order",
+    "orderSent": "Order Sent",
+    "shopAccepted": "Shop Accepted",
+    "orderReady": "Order Ready for Pickup",
+    "driverOnWay": "Driver On the Way",
+    "estimatedTime": "Estimated Time",
+    "remainingDistance": "Remaining Distance",
+    "liveTracking": "Live Tracking",
+    "shopLocation": "Shop Location",
+    "deliveryLocation": "Delivery Location",
+    "driverLocation": "Driver Location",
+    "callDriver": "Call Driver",
+    "callShop": "Call Shop",
+    "orderProgress": "Order Progress",
+    "refundInfo": "Refund Info"
   },
   "profile": {
     "title": "Profile",

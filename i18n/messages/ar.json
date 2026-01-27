@@ -339,6 +339,7 @@
   },
   "orders": {
     "title": "طلباتي",
+    "subtitle": "تتبع جميع طلباتك",
     "active": "النشطة",
     "completed": "المكتملة",
     "cancelled": "الملغاة",
@@ -356,7 +357,21 @@
     "delivered": "تم التوصيل",
     "orderNumber": "طلب رقم",
     "items": "منتجات",
-    "errorLoadingOrder": "خطأ في تحميل الطلب"
+    "errorLoadingOrder": "خطأ في تحميل الطلب",
+    "orderSent": "تم إرسال الطلب",
+    "shopAccepted": "المطعم قبل الطلب",
+    "orderReady": "الطلب جاهز للاستلام",
+    "driverOnWay": "السائق في الطريق",
+    "estimatedTime": "الوقت المتوقع",
+    "remainingDistance": "المسافة المتبقية",
+    "liveTracking": "تتبع مباشر",
+    "shopLocation": "موقع المتجر",
+    "deliveryLocation": "موقع التوصيل",
+    "driverLocation": "موقع السائق",
+    "callDriver": "اتصل بالسائق",
+    "callShop": "اتصل بالمتجر",
+    "orderProgress": "تقدم الطلب",
+    "refundInfo": "معلومات الاسترجاع"
   },
   "profile": {
     "title": "الملف الشخصي",
