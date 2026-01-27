@@ -3,7 +3,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Locale, locales, localeDirections } from '@/i18n/config';
-import { Header, Footer, LocaleSync, ScrollToTop } from '@/components/layout';
+import { Header, Footer, LocaleSync, ScrollToTop, NavigationProgress } from '@/components/layout';
 import { AddressInitializer } from '@/components/address';
 import '../globals.css';
 
@@ -46,6 +46,7 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
       </head>
       <body className="min-h-screen flex flex-col">
         <NextIntlClientProvider messages={messages}>
+          <NavigationProgress />
           <ScrollToTop />
           <LocaleSync />
           <AddressInitializer>

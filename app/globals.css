@@ -46,6 +46,10 @@
 }
 
 @theme inline {
+  /* Breakpoints */
+  --breakpoint-xs: 480px;
+  
+  /* Colors */
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-light: var(--primary-light);
@@ -1844,4 +1848,129 @@ footer {
 /* Custom transition duration */
 .duration-400 {
   transition-duration: 400ms;
+}
+
+/* ===== NAVIGATION TRANSITIONS ===== */
+
+/* Page transition animations */
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes page-fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.animate-page-in {
+  animation: page-fade-in 0.2s ease-out forwards;
+}
+
+.animate-page-out {
+  animation: page-fade-out 0.15s ease-in forwards;
+}
+
+/* Navigation progress bar glow */
+@keyframes progress-glow {
+  0%, 100% {
+    box-shadow: 0 0 8px var(--primary), 0 0 16px var(--primary);
+  }
+  50% {
+    box-shadow: 0 0 12px var(--primary), 0 0 24px var(--primary);
+  }
+}
+
+.animate-progress-glow {
+  animation: progress-glow 1s ease-in-out infinite;
+}
+
+/* Skeleton loading shimmer - enhanced */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--border) 0%,
+    var(--border-light) 50%,
+    var(--border) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+/* Loading spinner */
+@keyframes loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-loading-spin {
+  animation: loading-spin 0.6s linear infinite;
+}
+
+/* Smooth content reveal */
+@keyframes content-reveal {
+  from {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.animate-content-reveal {
+  animation: content-reveal 0.4s ease-out forwards;
+}
+
+/* Link hover transition optimization */
+a {
+  transition: color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+}
+
+/* Optimize button transitions */
+button {
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+/* GPU acceleration for animations */
+.will-animate {
+  will-change: transform, opacity;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
 }

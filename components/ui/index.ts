@@ -8,4 +8,5 @@ export { default as Rating } from './Rating';
 export { default as QuantitySelector } from './QuantitySelector';
 export { default as Avatar } from './Avatar';
 export { default as EmptyState } from './EmptyState';
+export { default as LinkWithLoading } from './LinkWithLoading';
 

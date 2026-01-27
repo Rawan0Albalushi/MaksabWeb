@@ -104,7 +104,7 @@ const CartItemCard = ({
       )}
     >
       {/* Card Content */}
-      <div className="p-4 sm:p-5 lg:p-6">
+      <div style={{ padding: '20px' }}>
         <div className="flex gap-4 sm:gap-5">
           {/* Product Image */}
           <div className="relative shrink-0">
@@ -123,12 +123,15 @@ const CartItemCard = ({
                 </div>
               )}
               
-              {/* Discount Badge */}
-              {item.discount && item.discount > 0 && (
-                <div className="absolute top-2 start-2 bg-red-500 text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-md">
-                  -{Math.round((item.discount / (item.price + item.discount)) * 100)}%
-                </div>
-              )}
+                              {/* Discount Badge */}
+                              {item.discount && item.discount > 0 && (
+                                <div 
+                                  className="absolute top-2 start-2 bg-red-500 text-white text-[10px] sm:text-xs font-bold rounded-md"
+                                  style={{ padding: '6px 10px' }}
+                                >
+                                  -{Math.round((item.discount / (item.price + item.discount)) * 100)}%
+                                </div>
+                              )}
             </div>
           </div>
 
@@ -144,15 +147,16 @@ const CartItemCard = ({
                 {/* Extras/Variants */}
                 {item.stock?.extras && item.stock.extras.length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
-                    {item.stock.extras.map((extra) => (
-                      <span
-                        key={extra.id}
-                        className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md"
-                      >
-                        <span className="text-gray-400">{extra.group?.translation?.title}:</span>
-                        <span className="ms-1 font-medium">{extra.value}</span>
-                      </span>
-                    ))}
+                                {item.stock.extras.map((extra) => (
+                                      <span
+                                        key={extra.id}
+                                        className="inline-flex items-center bg-gray-100 text-gray-600 text-xs rounded-md"
+                                        style={{ padding: '6px 10px' }}
+                                      >
+                                        <span className="text-gray-400">{extra.group?.translation?.title}:</span>
+                                        <span className="ms-1 font-medium">{extra.value}</span>
+                                      </span>
+                                    ))}
                   </div>
                 )}
               </div>
@@ -428,7 +432,7 @@ const CartPage = () => {
           </p>
           
           <Link href="/auth/login?redirect=/cart">
-            <Button size="lg" className="px-8 py-3.5 text-base font-semibold">
+            <Button size="lg" className="text-base font-semibold" style={{ padding: '14px 32px' }}>
               {tCommon('login')}
               <ArrowIcon className="w-5 h-5 ms-2" />
             </Button>
@@ -463,7 +467,7 @@ const CartPage = () => {
           </p>
           
           <Link href="/shops">
-            <Button size="lg" className="px-8 py-3.5 text-base font-semibold">
+            <Button size="lg" className="text-base font-semibold" style={{ padding: '14px 32px' }}>
               <Store className="w-5 h-5 me-2" />
               {t('browsShops')}
             </Button>
@@ -476,7 +480,7 @@ const CartPage = () => {
               { icon: Truck, text: t('delivery') },
               { icon: Shield, text: t('secure') },
             ].map((item, index) => (
-              <div key={index} className="flex flex-col items-center p-3 bg-white rounded-xl border border-gray-100">
+              <div key={index} className="flex flex-col items-center bg-white rounded-xl border border-gray-100" style={{ padding: '14px 12px' }}>
                 <item.icon className="w-5 h-5 text-[var(--primary)] mb-1.5" />
                 <span className="text-[10px] text-gray-600 text-center">{item.text}</span>
               </div>
@@ -491,19 +495,19 @@ const CartPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] relative overflow-hidden min-h-[160px] sm:min-h-[180px] lg:min-h-[200px] flex flex-col">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 start-1/4 w-48 h-48 bg-[var(--primary)]/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 end-1/4 w-40 h-40 bg-[var(--primary-dark)]/15 rounded-full blur-3xl" />
         </div>
 
-        <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative z-10">
-          <div className="flex items-center justify-between">
+        <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-10 flex-1 flex items-center">
+          <div className="flex items-center justify-between w-full">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
                 {t('title')}
               </h1>
-              <p className="text-white/60 text-sm sm:text-base">
+              <p className="text-white/60 text-sm sm:text-base lg:text-lg">
                 {itemCount} {t('item')}
                 {cart.shop && (
                   <span className="text-white/80">
@@ -517,7 +521,8 @@ const CartPage = () => {
             <Button
               variant="ghost"
               onClick={handleClearCart}
-              className="text-white/70 hover:text-red-400 hover:bg-red-500/10 border border-white/10 hover:border-red-400/30 px-3 sm:px-4 py-2"
+              className="text-white/70 hover:text-red-400 hover:bg-red-500/10 border border-white/10 hover:border-red-400/30"
+              style={{ padding: '10px 16px' }}
             >
               <Trash2 className="w-4 h-4 me-1.5 sm:me-2" />
               <span className="hidden sm:inline">{t('clearCart')}</span>
@@ -527,7 +532,7 @@ const CartPage = () => {
 
         {/* Wave */}
         <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
-          <svg viewBox="0 0 1440 40" fill="none" className="w-full h-6 sm:h-8" preserveAspectRatio="none">
+          <svg viewBox="0 0 1440 40" fill="none" className="w-full h-10 sm:h-12" preserveAspectRatio="none">
             <path d="M0 40L60 36C120 32 240 24 360 20C480 16 600 16 720 18C840 20 960 26 1080 30C1200 34 1320 36 1380 37L1440 38V40H0Z" fill="#f9fafb" />
           </svg>
         </div>
@@ -543,7 +548,8 @@ const CartPage = () => {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-200/60 shadow-sm"
+                className="bg-white rounded-2xl border border-gray-200/60 shadow-sm"
+                style={{ padding: '20px' }}
               >
                 <div className="flex items-center gap-4">
                   {/* Shop Logo */}
@@ -577,7 +583,7 @@ const CartPage = () => {
                   
                   {/* View Shop Button */}
                   <Link href={`/shops/${cart.shop.uuid}`} className="hidden sm:block">
-                    <Button variant="outline" size="sm" className="px-4 py-2 rounded-lg text-sm">
+                    <Button variant="outline" size="sm" className="rounded-lg text-sm" style={{ padding: '10px 18px' }}>
                       {t('viewShop')}
                       <ChevronIcon className="w-4 h-4 ms-1" />
                     </Button>
@@ -610,7 +616,7 @@ const CartPage = () => {
             {/* Continue Shopping - Mobile */}
             <div className="lg:hidden">
               <Link href="/shops">
-                <Button variant="ghost" fullWidth className="text-gray-500 py-3">
+                <Button variant="ghost" fullWidth className="text-gray-500" style={{ padding: '14px 20px' }}>
                   <Store className="w-5 h-5 me-2" />
                   {t('continueShopping')}
                 </Button>
@@ -624,7 +630,8 @@ const CartPage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-white rounded-2xl p-5 sm:p-6 border border-gray-200/60 shadow-sm lg:sticky lg:top-24"
+              className="bg-white rounded-2xl border border-gray-200/60 shadow-sm lg:sticky lg:top-24"
+              style={{ padding: '24px' }}
             >
               {/* Header */}
               <div className="flex items-center gap-3 mb-5 pb-5 border-b border-gray-100">
@@ -671,7 +678,8 @@ const CartPage = () => {
                   <Button
                     onClick={handleApplyCoupon}
                     disabled={couponLoading || !couponCode.trim()}
-                    className="h-11 sm:h-12 px-4 sm:px-5 rounded-xl shrink-0"
+                    className="h-11 sm:h-12 rounded-xl shrink-0"
+                    style={{ padding: '10px 20px' }}
                   >
                     {couponLoading ? (
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -686,7 +694,8 @@ const CartPage = () => {
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center gap-2 mt-2 px-3 py-2 bg-red-50 rounded-lg"
+                    className="flex items-center gap-2 mt-2 bg-red-50 rounded-lg"
+                    style={{ padding: '10px 14px' }}
                   >
                     <AlertCircle className="w-4 h-4 text-red-500" />
                     <p className="text-xs text-red-600">{couponError}</p>
@@ -696,7 +705,8 @@ const CartPage = () => {
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center gap-2 mt-2 px-3 py-2 bg-green-50 rounded-lg"
+                    className="flex items-center gap-2 mt-2 bg-green-50 rounded-lg"
+                    style={{ padding: '10px 14px' }}
                   >
                     <Check className="w-4 h-4 text-green-600" />
                     <p className="text-xs text-green-600">
@@ -716,7 +726,7 @@ const CartPage = () => {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500 text-sm">{t('deliveryFee')}</span>
-                  <span className="text-xs font-medium text-gray-400 bg-gray-100 px-2 py-1 rounded">
+                  <span className="text-xs font-medium text-gray-400 bg-gray-100 rounded" style={{ padding: '6px 10px' }}>
                     {t('toBeCalculated')}
                   </span>
                 </div>
@@ -747,7 +757,8 @@ const CartPage = () => {
                 fullWidth
                 size="lg"
                 onClick={handleCheckout}
-                className="h-12 sm:h-14 text-base font-semibold rounded-xl !bg-gradient-to-r !from-orange-500 !to-orange-600 hover:!from-orange-600 hover:!to-orange-700 shadow-lg shadow-orange-500/25 hover:shadow-xl transition-all"
+                className="text-base font-semibold rounded-xl !bg-gradient-to-r !from-orange-500 !to-orange-600 hover:!from-orange-600 hover:!to-orange-700 shadow-lg shadow-orange-500/25 hover:shadow-xl transition-all"
+                style={{ padding: '16px 24px' }}
               >
                 <CreditCard className="w-5 h-5 me-2" />
                 {t('checkout')}
@@ -762,7 +773,7 @@ const CartPage = () => {
 
               {/* Continue Shopping - Desktop */}
               <Link href="/shops" className="hidden lg:block mt-3">
-                <Button variant="ghost" fullWidth className="text-gray-500 hover:text-[var(--primary)] py-2.5 text-sm">
+                <Button variant="ghost" fullWidth className="text-gray-500 hover:text-[var(--primary)] text-sm" style={{ padding: '12px 20px' }}>
                   <Store className="w-4 h-4 me-2" />
                   {t('continueShopping')}
                 </Button>
@@ -775,7 +786,7 @@ const CartPage = () => {
                 { icon: Truck, text: t('fastDelivery'), subtext: t('deliveryTime'), color: 'text-green-600', bg: 'bg-green-50' },
                 { icon: Shield, text: t('guarantee'), subtext: t('moneyBack'), color: 'text-blue-600', bg: 'bg-blue-50' },
               ].map((badge, index) => (
-                <div key={index} className="flex items-center gap-3 p-3 sm:p-4 bg-white rounded-xl border border-gray-200/60">
+                <div key={index} className="flex items-center gap-3 bg-white rounded-xl border border-gray-200/60" style={{ padding: '14px 16px' }}>
                   <div className={clsx('w-9 h-9 rounded-lg flex items-center justify-center', badge.bg)}>
                     <badge.icon className={clsx('w-4 h-4', badge.color)} />
                   </div>

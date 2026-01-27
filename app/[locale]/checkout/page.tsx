@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -29,12 +28,15 @@ import {
   Package,
   Sparkles,
   FileText,
+  X,
+  Home,
+  CheckCircle2,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
-import { Button, Card, Input, Badge, EmptyState, Modal } from '@/components/ui';
+import { Button, Input, Badge, EmptyState, Modal } from '@/components/ui';
 import { cartService, orderService, userService, settingsService } from '@/services';
-import { Cart, CartDetail, Address, CalculateResult, SavedCard, Currency } from '@/types';
+import type { CartDetail, Address, CalculateResult, SavedCard, Currency } from '@/types';
 import { useCartStore, useAuthStore, useSettingsStore } from '@/store';
 
 interface PaymentMethod {
@@ -47,10 +49,10 @@ interface PaymentMethod {
 
 // Checkout Steps
 const CHECKOUT_STEPS = [
-  { id: 'delivery', icon: Truck },
-  { id: 'address', icon: MapPin },
-  { id: 'payment', icon: CreditCard },
-  { id: 'confirm', icon: Check },
+  { id: 'delivery', icon: Truck, label: 'deliveryType' },
+  { id: 'address', icon: MapPin, label: 'address' },
+  { id: 'time', icon: Clock, label: 'time' },
+  { id: 'payment', icon: CreditCard, label: 'payment' },
 ];
 
 const CheckoutPage = () => {
@@ -555,13 +557,13 @@ const CheckoutPage = () => {
   const getPaymentIcon = (tag: string): React.ReactNode => {
     switch (tag) {
       case 'cash':
-        return <Banknote size={24} />;
+        return <Banknote size={22} />;
       case 'wallet':
-        return <Wallet size={24} />;
+        return <Wallet size={22} />;
       case 'thawani':
-        return <CreditCard size={24} />;
+        return <CreditCard size={22} />;
       default:
-        return <CreditCard size={24} />;
+        return <CreditCard size={22} />;
     }
   };
 
@@ -635,51 +637,50 @@ const CheckoutPage = () => {
     return times;
   };
 
-  // Calculate current step - shows which step user is currently on
+  // Calculate current step
   const getCurrentStep = () => {
-    // Step 0: Delivery Type - always accessible
-    // Step 1: Address - only if delivery type is 'delivery'
-    // Step 2: Payment Method
-    // Step 3: Review/Confirm - reached when all required info is filled
-    
     if (!deliveryType) return 0;
-    
-    if (deliveryType === 'delivery') {
-      if (!selectedAddressId) return 1;
-    }
-    
-    if (!selectedPaymentId) return 2;
-    
-    // All required fields filled - show confirm step as active, not completed
-    return 3;
+    if (deliveryType === 'delivery' && !selectedAddressId) return 1;
+    if (!deliveryDate && !deliveryTime) return 2;
+    if (!selectedPaymentId) return 3;
+    return 4;
   };
 
   // Check if a step is completed
   const isStepCompleted = (stepIndex: number) => {
     switch (stepIndex) {
-      case 0: // Delivery Type
-        return !!deliveryType;
-      case 1: // Address
-        return deliveryType === 'pickup' || !!selectedAddressId;
-      case 2: // Payment
-        return !!selectedPaymentId;
-      case 3: // Confirm - never completed until order is placed
-        return false;
-      default:
-        return false;
+      case 0: return !!deliveryType;
+      case 1: return deliveryType === 'pickup' || !!selectedAddressId;
+      case 2: return true; // Time is optional
+      case 3: return !!selectedPaymentId;
+      default: return false;
     }
   };
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.08 }
+    }
+  } as const;
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+  } as const;
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
-        {/* Loading Header Skeleton */}
-        <div className="bg-gradient-to-r from-[#0a1628] via-[#1a3a4a] to-[#0d2233] py-8 sm:py-12 px-4">
-          <div className="container max-w-6xl mx-auto">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100/50">
+        {/* Loading Header */}
+        <div className="bg-gradient-to-br from-[#0a1628] via-[#1a3a5c] to-[#0d2233]">
+          <div className="container max-w-6xl mx-auto px-4 py-6">
             <div className="animate-pulse flex items-center gap-4">
-              <div className="w-12 h-12 bg-white/10 rounded-xl" />
-              <div>
-                <div className="h-7 w-40 bg-white/10 rounded-lg mb-2" />
+              <div className="w-10 h-10 bg-white/10 rounded-xl" />
+              <div className="flex-1">
+                <div className="h-6 w-40 bg-white/10 rounded-lg mb-2" />
                 <div className="h-4 w-56 bg-white/10 rounded-lg" />
               </div>
             </div>
@@ -687,32 +688,34 @@ const CheckoutPage = () => {
         </div>
         
         <div className="container max-w-6xl mx-auto px-4 py-8">
-          <div className="animate-pulse space-y-6">
-            {/* Steps Skeleton */}
-            <div className="flex justify-center gap-4 mb-8">
+          <div className="animate-pulse">
+            {/* Steps skeleton */}
+            <div className="flex justify-center gap-3 mb-8">
               {[1, 2, 3, 4].map(i => (
                 <div key={i} className="flex items-center gap-2">
-                  <div className="w-10 h-10 bg-slate-200 rounded-xl" />
-                  {i < 4 && <div className="w-12 h-1 bg-slate-200 rounded-full hidden sm:block" />}
+                  <div className="w-12 h-12 bg-gray-200 rounded-2xl" />
+                  {i < 4 && <div className="w-8 h-0.5 bg-gray-200" />}
                 </div>
               ))}
             </div>
             
-            <div className="grid lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-6">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-                    <div className="h-6 w-44 bg-slate-200 rounded-lg mb-5" />
-                    <div className="h-32 w-full bg-slate-100 rounded-xl" />
+            <div className="grid lg:grid-cols-5 gap-6">
+              <div className="lg:col-span-3 space-y-4">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="bg-white rounded-2xl p-6 shadow-sm">
+                    <div className="h-6 w-36 bg-gray-200 rounded-lg mb-4" />
+                    <div className="h-24 bg-gray-100 rounded-xl" />
                   </div>
                 ))}
               </div>
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 h-fit">
-                <div className="h-6 w-32 bg-slate-200 rounded-lg mb-5" />
-                <div className="space-y-4">
-                  {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="h-5 w-full bg-slate-100 rounded-lg" />
-                  ))}
+              <div className="lg:col-span-2">
+                <div className="bg-white rounded-2xl p-6 shadow-sm">
+                  <div className="h-6 w-32 bg-gray-200 rounded-lg mb-4" />
+                  <div className="space-y-3">
+                    {[1, 2, 3, 4, 5].map(i => (
+                      <div key={i} className="h-5 bg-gray-100 rounded-lg" />
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -728,7 +731,7 @@ const CheckoutPage = () => {
 
   if (!cart || cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center py-16 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100/50 flex items-center justify-center py-16 px-4">
         <EmptyState
           type="cart"
           title={tCart('empty')}
@@ -745,488 +748,696 @@ const CheckoutPage = () => {
   const currentStep = getCurrentStep();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100/80">
-      {/* Header Section with Gradient Background */}
-      <div className="relative bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] overflow-hidden">
-        {/* Decorative Elements */}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100/50">
+      {/* Elegant Header */}
+      <div className="relative bg-gradient-to-br from-[#0a1628] via-[#1a3a5c] to-[#0d2233] overflow-hidden">
+        {/* Decorative Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 start-1/4 w-72 h-72 bg-[var(--primary)]/10 rounded-full blur-[100px]" />
-          <div className="absolute bottom-0 end-1/4 w-96 h-96 bg-[var(--primary-dark)]/15 rounded-full blur-[120px]" />
+          <div className="absolute -top-24 start-1/4 w-96 h-96 bg-[var(--primary)]/8 rounded-full blur-[120px]" />
+          <div className="absolute -bottom-32 end-1/3 w-80 h-80 bg-cyan-500/10 rounded-full blur-[100px]" />
+          <div className="absolute top-0 end-0 w-64 h-64 bg-white/5 rounded-full blur-[80px]" />
         </div>
         
-        <div className="container max-w-6xl mx-auto px-4 py-6 sm:py-10 relative z-10">
-          {/* Back Button & Title */}
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-4 mb-6 sm:mb-8"
-          >
-            <button
-              onClick={() => router.back()}
-              className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white/20 transition-all duration-200 group"
+        <div className="container max-w-6xl mx-auto px-4 py-5 sm:py-6 relative z-10">
+          {/* Back & Title Row */}
+          <div className="flex items-center justify-between mb-6">
+            <motion.div 
+              initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-3"
             >
-              {isRTL ? <ChevronRight size={20} className="text-white group-hover:scale-110 transition-transform" /> : <ChevronLeft size={20} className="text-white group-hover:scale-110 transition-transform" />}
-            </button>
-            <div>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">{t('title')}</h1>
-              <p className="text-xs sm:text-sm text-white/60 mt-0.5">
-                {itemCount} {tCart('items')} • {cart.shop?.translation?.title}
-              </p>
-            </div>
-          </motion.div>
+              <button
+                onClick={() => router.back()}
+                className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center hover:bg-white/20 transition-all group"
+              >
+                {isRTL ? (
+                  <ChevronRight size={18} className="text-white group-hover:translate-x-0.5 transition-transform" />
+                ) : (
+                  <ChevronLeft size={18} className="text-white group-hover:-translate-x-0.5 transition-transform" />
+                )}
+              </button>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold text-white">{t('title')}</h1>
+                <p className="text-xs sm:text-sm text-white/50 mt-0.5 flex items-center gap-1.5">
+                  <Package size={14} />
+                  <span>{itemCount} {tCart('items')}</span>
+                  <span className="text-white/30">•</span>
+                  <span className="truncate max-w-[120px]">{cart.shop?.translation?.title}</span>
+                </p>
+              </div>
+            </motion.div>
 
-          {/* Checkout Steps Indicator - Simple numbered steps */}
-          <div className="flex items-center justify-center gap-0">
-            {[1, 2, 3, 4].map((stepNum, index) => {
+            {/* Security Badge */}
+            <motion.div
+              initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/10"
+            >
+              <Shield size={14} className="text-emerald-400" />
+              <span className="text-xs text-white/70">{t('secureCheckout') || 'دفع آمن'}</span>
+            </motion.div>
+          </div>
+
+          {/* Modern Step Indicator */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="flex items-center justify-center gap-1 sm:gap-2"
+          >
+            {CHECKOUT_STEPS.map((step, index) => {
+              const StepIcon = step.icon;
               const isActive = index === currentStep;
+              const isCompleted = isStepCompleted(index);
               const isPast = index < currentStep;
               
               return (
-                <div key={stepNum} className="flex items-center">
-                  <div
+                <div key={step.id} className="flex items-center">
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
                     className={clsx(
-                      'w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold transition-all',
-                      isPast && 'bg-[var(--primary)] text-white',
-                      isActive && 'bg-white text-[var(--primary)]',
-                      !isPast && !isActive && 'bg-white/20 text-white/50'
+                      'relative flex flex-col items-center',
                     )}
                   >
-                    {isPast ? <Check size={16} /> : stepNum}
-                  </div>
+                    <div
+                      className={clsx(
+                        'w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center transition-all duration-300',
+                        isCompleted && 'bg-gradient-to-br from-emerald-400 to-emerald-500 text-white shadow-lg shadow-emerald-500/30',
+                        isActive && !isCompleted && 'bg-white text-[var(--primary)] shadow-xl shadow-white/20',
+                        !isActive && !isCompleted && 'bg-white/10 text-white/40 border border-white/10'
+                      )}
+                    >
+                      {isCompleted ? (
+                        <CheckCircle2 size={18} className="sm:w-5 sm:h-5" />
+                      ) : (
+                        <StepIcon size={18} className="sm:w-5 sm:h-5" />
+                      )}
+                    </div>
+                    <span className={clsx(
+                      'text-[10px] sm:text-xs mt-1.5 font-medium transition-colors',
+                      isActive ? 'text-white' : 'text-white/40'
+                    )}>
+                      {t(step.label)}
+                    </span>
+                  </motion.div>
                   
-                  {index < 3 && (
-                    <div className={clsx(
-                      'w-8 sm:w-12 h-1 transition-colors',
-                      index < currentStep ? 'bg-[var(--primary)]' : 'bg-white/20'
-                    )} />
+                  {index < CHECKOUT_STEPS.length - 1 && (
+                    <div className="relative w-6 sm:w-10 h-0.5 mx-1 sm:mx-2 -mt-4">
+                      <div className="absolute inset-0 bg-white/10 rounded-full" />
+                      <motion.div
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: isCompleted ? 1 : 0 }}
+                        transition={{ duration: 0.4 }}
+                        className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full origin-left"
+                        style={{ transformOrigin: isRTL ? 'right' : 'left' }}
+                      />
+                    </div>
                   )}
                 </div>
               );
             })}
-          </div>
-        </div>
-        
-        {/* Wave Decoration */}
-        <div className="absolute bottom-0 left-0 right-0 z-10">
-          <svg viewBox="0 0 1440 50" fill="none" className="w-full h-6 sm:h-10" preserveAspectRatio="none">
-            <path d="M0 50L60 46C120 42 240 34 360 30C480 26 600 26 720 28C840 30 960 34 1080 36C1200 38 1320 38 1380 38L1440 38V50H0Z" fill="#f8fafc" />
-          </svg>
+          </motion.div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="container max-w-6xl mx-auto px-4 py-6 sm:py-10 -mt-2">
-        {/* Error Message */}
+      <div className="container max-w-6xl mx-auto px-4 py-6 sm:py-8">
+        {/* Error Alert */}
         <AnimatePresence>
           {error && (
             <motion.div
               initial={{ opacity: 0, y: -10, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.98 }}
-              className="mb-6 px-4 sm:px-5 py-4 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-3 sm:gap-4 shadow-sm"
+              className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 shadow-sm"
             >
               <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
                 <AlertCircle size={20} className="text-red-500" />
               </div>
-              <p className="text-red-600 font-medium text-sm sm:text-base flex-1">{error}</p>
+              <p className="text-red-600 font-medium text-sm flex-1">{error}</p>
               <button 
                 onClick={() => setError('')}
-                className="text-red-400 hover:text-red-600 transition-colors p-1"
+                className="w-8 h-8 rounded-lg hover:bg-red-100 flex items-center justify-center transition-colors"
               >
-                <ChevronRight size={18} className={isRTL ? '' : 'rotate-180'} />
+                <X size={16} className="text-red-400" />
               </button>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Main Content - Takes 8 columns on large screens */}
-          <div className="lg:col-span-8 space-y-4">
+        <div className="grid lg:grid-cols-5 gap-6">
+          {/* Form Section - 3 columns */}
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="lg:col-span-3 space-y-4"
+          >
             {/* Delivery Type Card */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-              <div className="px-4 py-3 bg-slate-50 border-b border-slate-200">
-                <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                  <Truck size={18} className="text-[var(--primary)]" />
-                  {t('deliveryType')}
-                </h3>
+            <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="px-5 py-4 border-b border-gray-50 bg-gradient-to-r from-gray-50/80 to-transparent">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] flex items-center justify-center shadow-lg shadow-[var(--primary)]/20">
+                    <Truck size={18} className="text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-800">{t('deliveryType')}</h3>
+                    <p className="text-xs text-gray-400">{t('chooseDeliveryMethod') || 'اختر طريقة التوصيل'}</p>
+                  </div>
+                </div>
               </div>
-              <div className="p-4">
+              <div className="p-5">
                 <div className="grid grid-cols-2 gap-3">
+                  {/* Home Delivery */}
                   <button
                     onClick={() => setDeliveryType('delivery')}
                     className={clsx(
-                      'p-4 rounded-lg border-2 text-center transition-all',
+                      'relative p-4 sm:p-5 rounded-xl border-2 text-center transition-all duration-300 group',
                       deliveryType === 'delivery'
-                        ? 'border-[var(--primary)] bg-[var(--primary)]/5'
-                        : 'border-slate-200 hover:border-slate-300'
+                        ? 'border-[var(--primary)] bg-gradient-to-br from-[var(--primary)]/5 to-[var(--primary)]/10 shadow-lg shadow-[var(--primary)]/10'
+                        : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50/50'
                     )}
                   >
-                    <Truck size={24} className={clsx('mx-auto mb-2', deliveryType === 'delivery' ? 'text-[var(--primary)]' : 'text-slate-400')} />
-                    <p className={clsx('font-semibold text-sm', deliveryType === 'delivery' ? 'text-[var(--primary)]' : 'text-slate-700')}>
+                    <div className={clsx(
+                      'w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center transition-all',
+                      deliveryType === 'delivery'
+                        ? 'bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] text-white shadow-lg shadow-[var(--primary)]/30'
+                        : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200'
+                    )}>
+                      <Truck size={22} />
+                    </div>
+                    <p className={clsx(
+                      'font-semibold text-sm transition-colors',
+                      deliveryType === 'delivery' ? 'text-[var(--primary)]' : 'text-gray-700'
+                    )}>
                       {t('homeDelivery')}
                     </p>
                     {deliveryType === 'delivery' && (
-                      <div className="w-5 h-5 rounded-full bg-[var(--primary)] mx-auto mt-2 flex items-center justify-center">
-                        <Check size={12} className="text-white" />
-                      </div>
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute top-2 end-2 w-6 h-6 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] flex items-center justify-center shadow-lg shadow-[var(--primary)]/30"
+                      >
+                        <Check size={12} className="text-white" strokeWidth={3} />
+                      </motion.div>
                     )}
                   </button>
 
+                  {/* Store Pickup */}
                   <button
                     onClick={() => setDeliveryType('pickup')}
                     className={clsx(
-                      'p-4 rounded-lg border-2 text-center transition-all',
+                      'relative p-4 sm:p-5 rounded-xl border-2 text-center transition-all duration-300 group',
                       deliveryType === 'pickup'
-                        ? 'border-[var(--primary)] bg-[var(--primary)]/5'
-                        : 'border-slate-200 hover:border-slate-300'
+                        ? 'border-[var(--primary)] bg-gradient-to-br from-[var(--primary)]/5 to-[var(--primary)]/10 shadow-lg shadow-[var(--primary)]/10'
+                        : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50/50'
                     )}
                   >
-                    <Store size={24} className={clsx('mx-auto mb-2', deliveryType === 'pickup' ? 'text-[var(--primary)]' : 'text-slate-400')} />
-                    <p className={clsx('font-semibold text-sm', deliveryType === 'pickup' ? 'text-[var(--primary)]' : 'text-slate-700')}>
+                    <div className={clsx(
+                      'w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center transition-all',
+                      deliveryType === 'pickup'
+                        ? 'bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] text-white shadow-lg shadow-[var(--primary)]/30'
+                        : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200'
+                    )}>
+                      <Store size={22} />
+                    </div>
+                    <p className={clsx(
+                      'font-semibold text-sm transition-colors',
+                      deliveryType === 'pickup' ? 'text-[var(--primary)]' : 'text-gray-700'
+                    )}>
                       {t('pickup')}
                     </p>
                     {deliveryType === 'pickup' && (
-                      <div className="w-5 h-5 rounded-full bg-[var(--primary)] mx-auto mt-2 flex items-center justify-center">
-                        <Check size={12} className="text-white" />
-                      </div>
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute top-2 end-2 w-6 h-6 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] flex items-center justify-center shadow-lg shadow-[var(--primary)]/30"
+                      >
+                        <Check size={12} className="text-white" strokeWidth={3} />
+                      </motion.div>
                     )}
                   </button>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Delivery Address - Only show for delivery type */}
-            {deliveryType === 'delivery' && (
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="px-4 py-3 bg-slate-50 border-b border-slate-200">
-                  <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                    <MapPin size={18} className="text-emerald-500" />
-                    {t('deliveryAddress')}
-                  </h3>
-                </div>
-                <div className="p-4">
-                  {addresses.length === 0 ? (
-                    <div className="text-center py-6 bg-slate-50 rounded-lg border-2 border-dashed border-slate-200">
-                      <MapPin size={24} className="text-slate-400 mx-auto mb-2" />
-                      <p className="text-slate-500 mb-3 text-sm">{t('noAddresses')}</p>
-                      <Button variant="outline" leftIcon={<Plus size={16} />} size="sm">
-                        {t('addAddress')}
-                      </Button>
+            {/* Delivery Address Card - Only show for delivery */}
+            <AnimatePresence>
+              {deliveryType === 'delivery' && (
+                <motion.div 
+                  variants={itemVariants}
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+                >
+                  <div className="px-5 py-4 border-b border-gray-50 bg-gradient-to-r from-emerald-50/80 to-transparent">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                        <MapPin size={18} className="text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-800">{t('deliveryAddress')}</h3>
+                        <p className="text-xs text-gray-400">{t('selectDeliveryAddress') || 'اختر عنوان التوصيل'}</p>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {addresses.map((address) => (
-                        <button
-                          key={address.id}
-                          onClick={() => setSelectedAddressId(address.id)}
-                          className={clsx(
-                            'w-full p-3 rounded-lg border-2 text-start transition-all',
-                            selectedAddressId === address.id
-                              ? 'border-[var(--primary)] bg-[var(--primary)]/5'
-                              : 'border-slate-200 hover:border-slate-300'
-                          )}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <span className={clsx('font-semibold text-sm', selectedAddressId === address.id ? 'text-[var(--primary)]' : 'text-slate-700')}>
-                                {address.title || t('address')}
-                              </span>
-                              {address.active && <Badge variant="primary" size="sm">{tCommon('default')}</Badge>}
-                            </div>
-                            {selectedAddressId === address.id && (
-                              <div className="w-5 h-5 rounded-full bg-[var(--primary)] flex items-center justify-center">
-                                <Check size={12} className="text-white" />
-                              </div>
+                  </div>
+                  <div className="p-5">
+                    {addresses.length === 0 ? (
+                      <div className="text-center py-8 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl border-2 border-dashed border-gray-200">
+                        <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gray-200 flex items-center justify-center">
+                          <MapPin size={24} className="text-gray-400" />
+                        </div>
+                        <p className="text-gray-500 mb-4 text-sm">{t('noAddresses')}</p>
+                        <Button variant="outline" leftIcon={<Plus size={16} />} size="sm">
+                          {t('addAddress')}
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2.5">
+                        {addresses.map((address, index) => (
+                          <motion.button
+                            key={address.id}
+                            initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            onClick={() => setSelectedAddressId(address.id)}
+                            className={clsx(
+                              'w-full p-4 rounded-xl border-2 text-start transition-all duration-200',
+                              selectedAddressId === address.id
+                                ? 'border-emerald-500 bg-gradient-to-br from-emerald-50 to-emerald-100/50 shadow-lg shadow-emerald-500/10'
+                                : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50/50'
                             )}
-                          </div>
-                          <p className="text-xs text-slate-500 mt-1 line-clamp-1">{formatAddress(address)}</p>
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex items-start gap-3">
+                                <div className={clsx(
+                                  'w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all',
+                                  selectedAddressId === address.id
+                                    ? 'bg-emerald-500 text-white'
+                                    : 'bg-gray-100 text-gray-400'
+                                )}>
+                                  <Home size={18} />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className={clsx(
+                                      'font-semibold text-sm',
+                                      selectedAddressId === address.id ? 'text-emerald-600' : 'text-gray-700'
+                                    )}>
+                                      {address.title || t('address')}
+                                    </span>
+                                    {address.active && (
+                                      <Badge variant="primary" size="sm" className="!text-[10px]">{tCommon('default')}</Badge>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">{formatAddress(address)}</p>
+                                </div>
+                              </div>
+                              {selectedAddressId === address.id && (
+                                <motion.div
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center shrink-0"
+                                >
+                                  <Check size={12} className="text-white" strokeWidth={3} />
+                                </motion.div>
+                              )}
+                            </div>
+                          </motion.button>
+                        ))}
+                        
+                        {/* Add New Address Button */}
+                        <button className="w-full p-4 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all flex items-center justify-center gap-2 group">
+                          <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
+                          <span className="text-sm font-medium">{t('addAddress')}</span>
                         </button>
-                      ))}
-                      <button className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 hover:border-[var(--primary)] hover:text-[var(--primary)] transition-all flex items-center justify-center gap-2">
-                        <Plus size={16} />
-                        <span className="text-sm font-medium">{t('addAddress')}</span>
-                      </button>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Delivery Time Card */}
+            <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="px-5 py-4 border-b border-gray-50 bg-gradient-to-r from-violet-50/80 to-transparent">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-violet-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
+                    <Clock size={18} className="text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-800">{t('deliveryTime')}</h3>
+                    <p className="text-xs text-gray-400">{t('chooseDeliveryTime') || 'اختر وقت التوصيل المناسب'}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-5">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-semibold text-gray-600 mb-2 block flex items-center gap-1.5">
+                      <Calendar size={12} className="text-violet-500" />
+                      {t('selectDate')}
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={deliveryDate}
+                        onChange={(e) => setDeliveryDate(e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all appearance-none cursor-pointer"
+                      >
+                        <option value="">{t('asap')}</option>
+                        {getAvailableDates().map(date => (
+                          <option key={date.value} value={date.value}>{date.label}</option>
+                        ))}
+                      </select>
+                      <ChevronLeft size={16} className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 rotate-[-90deg] pointer-events-none" />
                     </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Delivery Time */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-              <div className="px-4 py-3 bg-slate-50 border-b border-slate-200">
-                <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                  <Clock size={18} className="text-violet-500" />
-                  {t('deliveryTime')}
-                </h3>
-              </div>
-              <div className="p-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-medium text-slate-600 mb-1.5 block">{t('selectDate')}</label>
-                    <select
-                      value={deliveryDate}
-                      onChange={(e) => setDeliveryDate(e.target.value)}
-                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-white text-sm focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none"
-                    >
-                      <option value="">{t('asap')}</option>
-                      {getAvailableDates().map(date => (
-                        <option key={date.value} value={date.value}>{date.label}</option>
-                      ))}
-                    </select>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-slate-600 mb-1.5 block">{t('selectTime')}</label>
-                    <select
-                      value={deliveryTime}
-                      onChange={(e) => setDeliveryTime(e.target.value)}
-                      disabled={!deliveryDate}
-                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-white text-sm focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none disabled:bg-slate-100 disabled:text-slate-400"
-                    >
-                      <option value="">{deliveryDate ? t('selectTimeSlot') : t('selectDateFirst')}</option>
-                      {deliveryDate && getAvailableTimes().map(time => (
-                        <option key={time.value} value={time.value}>{time.label}</option>
-                      ))}
-                    </select>
+                    <label className="text-xs font-semibold text-gray-600 mb-2 block flex items-center gap-1.5">
+                      <Clock size={12} className="text-violet-500" />
+                      {t('selectTime')}
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={deliveryTime}
+                        onChange={(e) => setDeliveryTime(e.target.value)}
+                        disabled={!deliveryDate}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all appearance-none cursor-pointer disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
+                      >
+                        <option value="">{deliveryDate ? t('selectTimeSlot') : t('selectDateFirst')}</option>
+                        {deliveryDate && getAvailableTimes().map(time => (
+                          <option key={time.value} value={time.value}>{time.label}</option>
+                        ))}
+                      </select>
+                      <ChevronLeft size={16} className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 rotate-[-90deg] pointer-events-none" />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Payment Method */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-              <div className="px-4 py-3 bg-slate-50 border-b border-slate-200">
-                <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                  <CreditCard size={18} className="text-amber-500" />
-                  {t('paymentMethod')}
-                </h3>
+            {/* Payment Method Card */}
+            <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="px-5 py-4 border-b border-gray-50 bg-gradient-to-r from-amber-50/80 to-transparent">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                    <CreditCard size={18} className="text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-800">{t('paymentMethod')}</h3>
+                    <p className="text-xs text-gray-400">{t('choosePaymentMethod') || 'اختر طريقة الدفع'}</p>
+                  </div>
+                </div>
               </div>
-              <div className="p-4">
-                <div className="grid grid-cols-2 gap-2">
-                  {paymentMethods.map((method) => (
-                    <button
+              <div className="p-5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {paymentMethods.map((method, index) => (
+                    <motion.button
                       key={method.id}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.05 }}
                       onClick={() => setSelectedPaymentId(method.id)}
                       className={clsx(
-                        'p-3 rounded-lg border-2 text-center transition-all',
+                        'relative p-4 rounded-xl border-2 text-center transition-all duration-200 group',
                         selectedPaymentId === method.id
-                          ? 'border-[var(--primary)] bg-[var(--primary)]/5'
-                          : 'border-slate-200 hover:border-slate-300'
+                          ? 'border-amber-500 bg-gradient-to-br from-amber-50 to-amber-100/50 shadow-lg shadow-amber-500/10'
+                          : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50/50'
                       )}
                     >
-                      <div className={clsx('mx-auto mb-1', selectedPaymentId === method.id ? 'text-[var(--primary)]' : 'text-slate-400')}>
+                      <div className={clsx(
+                        'mx-auto mb-2 transition-colors',
+                        selectedPaymentId === method.id ? 'text-amber-600' : 'text-gray-400 group-hover:text-gray-500'
+                      )}>
                         {method.icon}
                       </div>
-                      <span className={clsx('text-sm font-medium', selectedPaymentId === method.id ? 'text-[var(--primary)]' : 'text-slate-700')}>
+                      <span className={clsx(
+                        'text-xs font-semibold transition-colors',
+                        selectedPaymentId === method.id ? 'text-amber-600' : 'text-gray-600'
+                      )}>
                         {method.name}
                       </span>
                       {selectedPaymentId === method.id && (
-                        <div className="w-4 h-4 rounded-full bg-[var(--primary)] mx-auto mt-1.5 flex items-center justify-center">
-                          <Check size={10} className="text-white" />
-                        </div>
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="absolute top-1.5 end-1.5 w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center"
+                        >
+                          <Check size={10} className="text-white" strokeWidth={3} />
+                        </motion.div>
                       )}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Saved Cards Section (Thawani) */}
-            {isThawaniPayment() && (
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="px-4 py-3 bg-slate-50 border-b border-slate-200">
-                  <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                    <Wallet size={18} className="text-blue-500" />
-                    {t('selectPaymentCard')}
-                  </h3>
-                </div>
-                <div className="p-4">
-                  {loadingCards ? (
-                    <div className="flex items-center justify-center py-6">
-                      <Loader2 size={24} className="animate-spin text-[var(--primary)]" />
+            {/* Saved Cards (Thawani) */}
+            <AnimatePresence>
+              {isThawaniPayment() && (
+                <motion.div
+                  variants={itemVariants}
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+                >
+                  <div className="px-5 py-4 border-b border-gray-50 bg-gradient-to-r from-blue-50/80 to-transparent">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <Wallet size={18} className="text-white" />
+                      </div>
+                      <h3 className="font-bold text-gray-800">{t('selectPaymentCard')}</h3>
                     </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <button
-                        onClick={() => { setUseNewCard(true); setSelectedCardId(null); }}
-                        className={clsx(
-                          'w-full p-3 rounded-lg border-2 text-start transition-all',
-                          useNewCard ? 'border-[var(--primary)] bg-[var(--primary)]/5' : 'border-slate-200 hover:border-slate-300'
-                        )}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Plus size={18} className={useNewCard ? 'text-[var(--primary)]' : 'text-slate-400'} />
-                            <span className={clsx('font-medium text-sm', useNewCard ? 'text-[var(--primary)]' : 'text-slate-700')}>
-                              {t('useNewCard')}
-                            </span>
-                          </div>
-                          {useNewCard && (
-                            <div className="w-4 h-4 rounded-full bg-[var(--primary)] flex items-center justify-center">
-                              <Check size={10} className="text-white" />
-                            </div>
-                          )}
-                        </div>
-                      </button>
-
-                      {savedCards.map((card) => (
+                  </div>
+                  <div className="p-5">
+                    {loadingCards ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 size={24} className="animate-spin text-blue-500" />
+                      </div>
+                    ) : (
+                      <div className="space-y-2.5">
+                        {/* New Card Option */}
                         <button
-                          key={card.id}
-                          onClick={() => { setUseNewCard(false); setSelectedCardId(card.id); }}
+                          onClick={() => { setUseNewCard(true); setSelectedCardId(null); }}
                           className={clsx(
-                            'w-full p-3 rounded-lg border-2 text-start transition-all',
-                            !useNewCard && selectedCardId === card.id ? 'border-[var(--primary)] bg-[var(--primary)]/5' : 'border-slate-200 hover:border-slate-300'
+                            'w-full p-4 rounded-xl border-2 text-start transition-all',
+                            useNewCard
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-gray-100 hover:border-gray-200'
                           )}
                         >
                           <div className="flex items-center justify-between">
-                            <div>
-                              <span className={clsx('font-medium text-sm', !useNewCard && selectedCardId === card.id ? 'text-[var(--primary)]' : 'text-slate-700')}>
-                                {getCardBrandIcon(card.brand)}
+                            <div className="flex items-center gap-3">
+                              <div className={clsx(
+                                'w-10 h-10 rounded-xl flex items-center justify-center',
+                                useNewCard ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-400'
+                              )}>
+                                <Plus size={18} />
+                              </div>
+                              <span className={clsx('font-medium text-sm', useNewCard ? 'text-blue-600' : 'text-gray-700')}>
+                                {t('useNewCard')}
                               </span>
-                              <p className="text-xs text-slate-500 font-mono mt-0.5">•••• {card.last_four}</p>
                             </div>
-                            <div className="flex items-center gap-2">
-                              {card.is_default && <Badge variant="primary" size="sm">{tCommon('default')}</Badge>}
-                              {!useNewCard && selectedCardId === card.id && (
-                                <div className="w-4 h-4 rounded-full bg-[var(--primary)] flex items-center justify-center">
-                                  <Check size={10} className="text-white" />
-                                </div>
-                              )}
-                            </div>
+                            {useNewCard && (
+                              <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                                <Check size={10} className="text-white" strokeWidth={3} />
+                              </div>
+                            )}
                           </div>
                         </button>
-                      ))}
 
-                      {savedCards.length === 0 && (
-                        <p className="text-center text-xs text-slate-400 py-4 bg-slate-50 rounded-lg">{t('noSavedCards')}</p>
-                      )}
-                    </div>
-                  )}
+                        {/* Saved Cards */}
+                        {savedCards.map((card) => (
+                          <button
+                            key={card.id}
+                            onClick={() => { setUseNewCard(false); setSelectedCardId(card.id); }}
+                            className={clsx(
+                              'w-full p-4 rounded-xl border-2 text-start transition-all',
+                              !useNewCard && selectedCardId === card.id
+                                ? 'border-blue-500 bg-blue-50'
+                                : 'border-gray-100 hover:border-gray-200'
+                            )}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <span className={clsx(
+                                  'font-medium text-sm',
+                                  !useNewCard && selectedCardId === card.id ? 'text-blue-600' : 'text-gray-700'
+                                )}>
+                                  {getCardBrandIcon(card.brand)}
+                                </span>
+                                <p className="text-xs text-gray-500 font-mono mt-0.5">•••• {card.last_four}</p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                {card.is_default && <Badge variant="primary" size="sm">{tCommon('default')}</Badge>}
+                                {!useNewCard && selectedCardId === card.id && (
+                                  <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                                    <Check size={10} className="text-white" strokeWidth={3} />
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+
+                        {savedCards.length === 0 && (
+                          <p className="text-center text-xs text-gray-400 py-4 bg-gray-50 rounded-xl">{t('noSavedCards')}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Order Notes Card */}
+            <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="px-5 py-4 border-b border-gray-50 bg-gradient-to-r from-rose-50/80 to-transparent">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 flex items-center justify-center shadow-lg shadow-rose-500/20">
+                    <FileText size={18} className="text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-800">{t('orderNotes')}</h3>
+                    <p className="text-xs text-gray-400">{t('addSpecialInstructions') || 'أضف أي ملاحظات خاصة'}</p>
+                  </div>
                 </div>
               </div>
-            )}
-
-            {/* Order Notes */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-              <div className="px-4 py-3 bg-slate-50 border-b border-slate-200">
-                <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                  <FileText size={18} className="text-rose-500" />
-                  {t('orderNotes')}
-                </h3>
-              </div>
-              <div className="p-4">
+              <div className="p-5">
                 <textarea
                   value={orderNote}
                   onChange={(e) => setOrderNote(e.target.value)}
                   placeholder={t('orderNotesPlaceholder')}
                   rows={3}
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-white resize-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none text-sm"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white resize-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 outline-none transition-all text-sm placeholder:text-gray-400"
                 />
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          {/* Order Summary Sidebar - Takes 4 columns on large screens */}
-          <div className="lg:col-span-4">
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden lg:sticky lg:top-24">
-              {/* Header */}
-              <div className="bg-[var(--primary)] text-white px-4 py-4">
-                <div className="flex items-center gap-3">
-                  <ShoppingBag size={20} />
-                  <h2 className="font-bold">{t('orderSummary')}</h2>
+          {/* Order Summary Sidebar - 2 columns */}
+          <div className="lg:col-span-2">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden lg:sticky lg:top-24"
+            >
+              {/* Summary Header */}
+              <div className="bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] text-white p-5">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <ShoppingBag size={20} />
+                  </div>
+                  <h2 className="font-bold text-lg">{t('orderSummary')}</h2>
                 </div>
+                
                 {cart.shop && (
-                  <div className="flex items-center gap-3 mt-3 pt-3 border-t border-white/20">
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm">
                     {cart.shop.logo_img && (
                       <Image
                         src={cart.shop.logo_img}
                         alt={cart.shop.translation?.title || ''}
-                        width={40}
-                        height={40}
-                        className="rounded-lg w-10 h-10 object-cover bg-white"
+                        width={44}
+                        height={44}
+                        className="rounded-xl w-11 h-11 object-cover bg-white"
                       />
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{cart.shop.translation?.title}</p>
-                      <p className="text-xs text-white/70">{itemCount} {tCart('items')}</p>
+                      <p className="font-semibold text-sm truncate">{cart.shop.translation?.title}</p>
+                      <p className="text-xs text-white/60">{itemCount} {tCart('items')}</p>
                     </div>
                   </div>
                 )}
               </div>
 
               <div className="p-5">
-                {/* Cart Items */}
-                <div className="space-y-2 mb-4 max-h-32 overflow-y-auto">
+                {/* Cart Items Preview */}
+                <div className="space-y-2.5 mb-5 max-h-28 overflow-y-auto custom-scrollbar">
                   {cartItems.slice(0, 3).map((item) => (
                     <div key={item.id} className="flex items-center justify-between text-sm">
-                      <span className="text-slate-600 flex items-center gap-2">
-                        <span className="w-5 h-5 bg-slate-100 rounded text-xs font-semibold flex items-center justify-center">
-                          {item.quantity}
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-6 h-6 bg-gray-100 rounded-lg text-xs font-bold flex items-center justify-center text-gray-600">
+                          {item.quantity}×
                         </span>
-                        <span className="truncate max-w-[120px]">{t('item')} #{item.stock?.id}</span>
-                      </span>
-                      <span className="text-slate-800 font-medium">
-                        {tCommon('sar')} {(item.price * item.quantity).toFixed(2)}
+                        <span className="text-gray-600 truncate max-w-[100px]">{t('item')} #{item.stock?.id}</span>
+                      </div>
+                      <span className="text-gray-800 font-semibold">
+                        {(item.price * item.quantity).toFixed(2)} {tCommon('sar')}
                       </span>
                     </div>
                   ))}
                   {cartItems.length > 3 && (
-                    <p className="text-xs text-slate-400 text-center">+{cartItems.length - 3} {t('moreItems')}</p>
+                    <p className="text-xs text-gray-400 text-center pt-1">+{cartItems.length - 3} {t('moreItems')}</p>
                   )}
                 </div>
 
-                {/* Coupon */}
-                <div className="py-4 border-y border-slate-100">
+                {/* Coupon Section */}
+                <div className="py-4 border-y border-gray-100">
                   {appliedCoupon ? (
-                    <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-100">
                       <div className="flex items-center gap-2">
-                        <Ticket size={16} className="text-emerald-600" />
-                        <span className="text-sm font-medium text-emerald-700">{appliedCoupon}</span>
+                        <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                          <Ticket size={14} className="text-emerald-600" />
+                        </div>
+                        <span className="text-sm font-semibold text-emerald-700">{appliedCoupon}</span>
                       </div>
-                      <button onClick={handleRemoveCoupon} className="text-xs text-red-500 hover:text-red-600">
+                      <button 
+                        onClick={handleRemoveCoupon} 
+                        className="text-xs text-red-500 hover:text-red-600 font-medium px-2 py-1 hover:bg-red-50 rounded-lg transition-colors"
+                      >
                         {tCommon('delete')}
                       </button>
                     </div>
                   ) : (
                     <div className="flex gap-2">
-                      <Input
-                        placeholder={tCart('couponCode')}
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value)}
-                        leftIcon={<Ticket size={14} />}
-                        error={couponError}
-                        containerClassName="flex-1"
-                        className="text-sm py-2"
-                      />
+                      <div className="flex-1 relative">
+                        <Ticket size={14} className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input
+                          type="text"
+                          placeholder={tCart('couponCode')}
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value)}
+                          className="w-full ps-9 pe-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all"
+                        />
+                      </div>
                       <Button
                         variant="outline"
                         onClick={handleApplyCoupon}
                         isLoading={couponLoading}
-                        className="shrink-0 text-sm px-3"
+                        className="shrink-0 text-sm px-4"
                       >
                         {tCart('apply')}
                       </Button>
                     </div>
                   )}
+                  {couponError && (
+                    <p className="text-xs text-red-500 mt-2 flex items-center gap-1">
+                      <AlertCircle size={12} />
+                      {couponError}
+                    </p>
+                  )}
                 </div>
 
                 {/* Price Breakdown */}
-                <div className="py-4 space-y-2.5 text-sm">
+                <div className="py-4 space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-slate-500">{tCart('subtotal')}</span>
-                    <span className="text-slate-700 font-medium">{tCommon('sar')} {subtotal.toFixed(2)}</span>
+                    <span className="text-gray-500">{tCart('subtotal')}</span>
+                    <span className="text-gray-700 font-medium">{subtotal.toFixed(2)} {tCommon('sar')}</span>
                   </div>
 
                   {deliveryType === 'delivery' && (
                     <div className="flex justify-between">
-                      <span className="text-slate-500">{tCart('deliveryFee')}</span>
-                      <span className="text-slate-700 font-medium">
+                      <span className="text-gray-500">{tCart('deliveryFee')}</span>
+                      <span className="text-gray-700 font-medium">
                         {calculateLoading ? (
                           <Loader2 size={14} className="animate-spin text-[var(--primary)]" />
                         ) : calculatedPrices?.delivery_fee ? (
-                          `${tCommon('sar')} ${calculatedPrices.delivery_fee.toFixed(2)}`
+                          `${calculatedPrices.delivery_fee.toFixed(2)} ${tCommon('sar')}`
                         ) : (
-                          <span className="text-slate-400 text-xs">{t('calculated')}</span>
+                          <span className="text-gray-400 text-xs">{t('calculated')}</span>
                         )}
                       </span>
                     </div>
@@ -1234,94 +1445,110 @@ const CheckoutPage = () => {
 
                   {(calculatedPrices?.discount || calculatedPrices?.coupon_price) && (
                     <div className="flex justify-between text-emerald-600">
-                      <span>{tCart('discount')}</span>
+                      <span className="flex items-center gap-1">
+                        <Sparkles size={14} />
+                        {tCart('discount')}
+                      </span>
                       <span className="font-semibold">
-                        -{tCommon('sar')} {((calculatedPrices.discount || 0) + (calculatedPrices.coupon_price || 0)).toFixed(2)}
+                        -{((calculatedPrices.discount || 0) + (calculatedPrices.coupon_price || 0)).toFixed(2)} {tCommon('sar')}
                       </span>
                     </div>
                   )}
                 </div>
 
                 {/* Total */}
-                <div className="flex justify-between items-center py-4 border-t-2 border-slate-200 bg-slate-50 -mx-5 px-5">
-                  <span className="text-base font-bold text-slate-800">{tCart('total')}</span>
-                  <span className="text-2xl font-black text-[var(--primary)]">
-                    {(calculatedPrices?.total_price || cart.total_price || subtotal).toFixed(2)} {tCommon('sar')}
-                  </span>
+                <div className="flex justify-between items-center py-4 px-4 -mx-5 bg-gradient-to-r from-gray-50 to-gray-100/50 border-t border-gray-100">
+                  <span className="font-bold text-gray-800">{tCart('total')}</span>
+                  <div className="text-end">
+                    <span className="text-2xl font-black text-[var(--primary)]">
+                      {(calculatedPrices?.total_price || cart.total_price || subtotal).toFixed(2)}
+                    </span>
+                    <span className="text-sm font-medium text-gray-500 ms-1">{tCommon('sar')}</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Place Order Button - FIXED AT BOTTOM */}
-              <div className="p-4 border-t border-slate-200" style={{ backgroundColor: '#f97316' }}>
-                <button
+              {/* Place Order Button */}
+              <div className="p-5 pt-0">
+                <motion.button
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
                   onClick={handlePlaceOrder}
                   disabled={
                     (deliveryType === 'delivery' && !selectedAddressId) ||
                     !selectedPaymentId ||
                     submitting
                   }
-                  style={{
-                    backgroundColor: (submitting || (deliveryType === 'delivery' && !selectedAddressId) || !selectedPaymentId) ? '#cbd5e1' : '#ea580c',
-                    color: (submitting || (deliveryType === 'delivery' && !selectedAddressId) || !selectedPaymentId) ? '#64748b' : '#ffffff',
-                  }}
-                  className="w-full py-5 rounded-xl font-black text-lg flex items-center justify-center gap-3 transition-all shadow-xl hover:opacity-90 active:scale-[0.98]"
+                  className={clsx(
+                    'w-full py-4 rounded-xl font-bold text-base flex items-center justify-center gap-3 transition-all shadow-xl',
+                    (submitting || (deliveryType === 'delivery' && !selectedAddressId) || !selectedPaymentId)
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
+                      : 'bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] text-white hover:shadow-[var(--primary)]/30 hover:shadow-2xl'
+                  )}
                 >
                   {submitting ? (
-                    <Loader2 size={24} className="animate-spin" />
+                    <Loader2 size={22} className="animate-spin" />
                   ) : (
                     <>
-                      <ShoppingBag size={22} />
+                      <ShoppingBag size={20} />
                       <span>{t('placeOrder')}</span>
-                      {isRTL ? <ArrowLeft size={20} /> : <ArrowRight size={20} />}
+                      {isRTL ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}
                     </>
                   )}
-                </button>
+                </motion.button>
                 
-                {/* Security Badge */}
-                <div className="mt-3 flex items-center justify-center gap-2 text-xs text-white">
-                  <Shield size={14} />
-                  <span>دفع آمن ومشفر 100%</span>
+                {/* Security Note */}
+                <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
+                  <Shield size={14} className="text-emerald-500" />
+                  <span>{t('securePayment') || 'دفع آمن ومشفر 100%'}</span>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
 
-      {/* Fixed Bottom Bar for Mobile */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 lg:hidden z-50 shadow-2xl" style={{ backgroundColor: '#ea580c' }}>
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-sm text-white/80">{tCart('total')}</span>
-          <span className="text-xl font-black text-white">
-            {(calculatedPrices?.total_price || cart.total_price || subtotal).toFixed(2)} {tCommon('sar')}
-          </span>
+      {/* Mobile Fixed Bottom Bar */}
+      <div className="fixed bottom-0 left-0 right-0 lg:hidden z-50 bg-white border-t border-gray-200 shadow-2xl shadow-black/10 safe-area-bottom">
+        <div className="p-4">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm text-gray-500">{tCart('total')}</span>
+            <div className="flex items-baseline gap-1">
+              <span className="text-xl font-black text-[var(--primary)]">
+                {(calculatedPrices?.total_price || cart.total_price || subtotal).toFixed(2)}
+              </span>
+              <span className="text-xs font-medium text-gray-500">{tCommon('sar')}</span>
+            </div>
+          </div>
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            onClick={handlePlaceOrder}
+            disabled={
+              (deliveryType === 'delivery' && !selectedAddressId) ||
+              !selectedPaymentId ||
+              submitting
+            }
+            className={clsx(
+              'w-full py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 transition-all',
+              (submitting || (deliveryType === 'delivery' && !selectedAddressId) || !selectedPaymentId)
+                ? 'bg-gray-200 text-gray-400'
+                : 'bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] text-white shadow-xl shadow-[var(--primary)]/20'
+            )}
+          >
+            {submitting ? (
+              <Loader2 size={20} className="animate-spin" />
+            ) : (
+              <>
+                <ShoppingBag size={18} />
+                <span>{t('placeOrder')}</span>
+              </>
+            )}
+          </motion.button>
         </div>
-        <button
-          onClick={handlePlaceOrder}
-          disabled={
-            (deliveryType === 'delivery' && !selectedAddressId) ||
-            !selectedPaymentId ||
-            submitting
-          }
-          style={{
-            backgroundColor: (submitting || (deliveryType === 'delivery' && !selectedAddressId) || !selectedPaymentId) ? '#cbd5e1' : '#ffffff',
-            color: (submitting || (deliveryType === 'delivery' && !selectedAddressId) || !selectedPaymentId) ? '#64748b' : '#ea580c',
-          }}
-          className="w-full py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-all shadow-lg"
-        >
-          {submitting ? (
-            <Loader2 size={20} className="animate-spin" />
-          ) : (
-            <>
-              <ShoppingBag size={20} />
-              <span>{t('placeOrder')}</span>
-            </>
-          )}
-        </button>
       </div>
 
-      {/* Spacer for fixed bottom bar on mobile */}
-      <div className="h-32 lg:hidden" />
+      {/* Spacer for mobile bottom bar */}
+      <div className="h-28 lg:hidden" />
 
       {/* OTP Verification Modal */}
       <Modal
@@ -1329,12 +1556,12 @@ const CheckoutPage = () => {
         onClose={handleCancelOtpVerification}
         title={t('otpVerification')}
       >
-        <div className="space-y-6 sm:space-y-8 p-1 sm:p-2">
+        <div className="space-y-6 p-2">
           <div className="text-center">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-5 bg-gradient-to-br from-[var(--primary)]/20 to-[var(--primary)]/10 rounded-2xl flex items-center justify-center">
-              <CreditCard size={32} className="text-[var(--primary)]" />
+            <div className="w-20 h-20 mx-auto mb-5 bg-gradient-to-br from-[var(--primary)]/20 to-[var(--primary)]/10 rounded-2xl flex items-center justify-center">
+              <CreditCard size={36} className="text-[var(--primary)]" />
             </div>
-            <p className="text-sm sm:text-base text-slate-500 leading-relaxed px-2">{t('enterOtpDescription')}</p>
+            <p className="text-sm text-gray-500 leading-relaxed">{t('enterOtpDescription')}</p>
           </div>
 
           <div>
@@ -1348,19 +1575,18 @@ const CheckoutPage = () => {
               }}
               error={otpError}
               maxLength={6}
-              className="text-center text-xl sm:text-2xl tracking-[0.4em] sm:tracking-[0.5em] font-bold"
+              className="text-center text-2xl tracking-[0.5em] font-bold"
               inputMode="numeric"
               pattern="[0-9]*"
             />
           </div>
 
-          <div className="flex gap-3 sm:gap-4">
+          <div className="flex gap-3">
             <Button
               variant="outline"
               fullWidth
               onClick={handleCancelOtpVerification}
               disabled={otpVerifying}
-              className="border-2 text-sm sm:text-base"
             >
               {tCommon('cancel')}
             </Button>
@@ -1369,15 +1595,15 @@ const CheckoutPage = () => {
               onClick={handleVerifyOtp}
               isLoading={otpVerifying}
               disabled={!otpCode.trim() || otpCode.length < 4}
-              className="shadow-lg shadow-[var(--primary)]/30 text-sm sm:text-base"
+              className="shadow-lg shadow-[var(--primary)]/30"
             >
               {t('verifyOtp')}
             </Button>
           </div>
 
-          <p className="text-center text-xs sm:text-sm text-slate-500">
+          <p className="text-center text-sm text-gray-500">
             {t('otpNotReceived')}{' '}
-            <button className="text-[var(--primary)] font-semibold hover:underline transition-all">
+            <button className="text-[var(--primary)] font-semibold hover:underline">
               {t('resendOtp')}
             </button>
           </p>
