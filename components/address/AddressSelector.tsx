@@ -16,7 +16,6 @@ import {
   Plus,
   Check,
   ChevronRight,
-  Crosshair,
 } from 'lucide-react';
 
 import { useAddressManager } from '@/hooks';
@@ -43,6 +42,7 @@ export const AddressSelector = ({
   const t = useTranslations('common');
   const [isOpen, setIsOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [startWithForm, setStartWithForm] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -151,7 +151,7 @@ export const AddressSelector = ({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className="absolute top-full end-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50"
+              className="absolute top-full end-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[9999]"
             >
               {renderDropdownContent()}
             </motion.div>
@@ -162,8 +162,12 @@ export const AddressSelector = ({
         {/* Address Form (includes saved addresses list) */}
         <AddressForm
           isOpen={isFormOpen}
-          onClose={() => setIsFormOpen(false)}
+          onClose={() => {
+            setIsFormOpen(false);
+            setStartWithForm(false);
+          }}
           onSuccess={handleFormSuccess}
+          startWithForm={startWithForm}
         />
       </>
     );
@@ -338,7 +342,7 @@ export const AddressSelector = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute top-full start-0 mt-3 w-[340px] sm:w-[380px] bg-white rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] border border-gray-200/60 overflow-hidden z-[100]"
+            className="absolute top-full start-0 mt-3 w-[340px] sm:w-[380px] bg-white rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] border border-gray-200/60 overflow-hidden z-[9999]"
           >
             {renderDropdownContent()}
           </motion.div>
@@ -349,8 +353,12 @@ export const AddressSelector = ({
       {/* Address Form (includes saved addresses list) */}
       <AddressForm
         isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
+        onClose={() => {
+          setIsFormOpen(false);
+          setStartWithForm(false);
+        }}
         onSuccess={handleFormSuccess}
+        startWithForm={startWithForm}
       />
     </>
   );
@@ -368,96 +376,6 @@ export const AddressSelector = ({
         {/* Divider */}
         <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
 
-        {/* GPS Detection Card */}
-        <div style={{ padding: '16px 20px' }}>
-          <button
-            type="button"
-            onClick={handleDetectLocation}
-            disabled={isLoading}
-            className={clsx(
-              "w-full flex items-center gap-4 rounded-xl transition-all duration-200",
-              "bg-gradient-to-r from-[var(--primary)]/[0.08] to-[var(--primary)]/[0.03]",
-              "border border-[var(--primary)]/20",
-              "hover:from-[var(--primary)]/[0.12] hover:to-[var(--primary)]/[0.06]",
-              "hover:border-[var(--primary)]/30 hover:shadow-lg hover:shadow-[var(--primary)]/10",
-              "active:scale-[0.98]",
-              "group"
-            )}
-            style={{ padding: '16px 20px' }}
-          >
-            <div className={clsx(
-              "w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200",
-              "bg-gradient-to-br from-[var(--primary)]/20 to-[var(--primary)]/10",
-              "group-hover:from-[var(--primary)]/30 group-hover:to-[var(--primary)]/15",
-              "group-hover:shadow-md group-hover:shadow-[var(--primary)]/20"
-            )}>
-              {isLoading ? (
-                <Loader2 size={24} className="text-[var(--primary)] animate-spin" />
-              ) : (
-                <Crosshair size={24} className="text-[var(--primary)] group-hover:scale-110 transition-transform" />
-              )}
-            </div>
-            <div className="text-start flex-1 min-w-0">
-              <p className="text-[15px] font-bold text-gray-900 leading-relaxed group-hover:text-[var(--primary)] transition-colors">
-                {isLoading ? t('detectingLocation') : t('detectLocation')}
-              </p>
-              <p className="text-[13px] text-gray-500 mt-1 leading-relaxed">{t('useGPSLocation')}</p>
-            </div>
-            <ChevronRight size={20} className="text-gray-300 group-hover:text-[var(--primary)] group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-all flex-shrink-0" />
-          </button>
-        </div>
-
-        {/* Location Error */}
-        {error && (
-          <div style={{ padding: '0 20px 16px 20px' }}>
-            <div className="flex items-center gap-3 bg-red-50 border border-red-100 rounded-xl" style={{ padding: '14px 18px' }}>
-              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-                <X size={18} className="text-red-500" />
-              </div>
-              <p className="text-sm text-red-600 font-medium leading-relaxed">{getLocationErrorMessage()}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Current Location Card */}
-        {currentLocation && selectedAddress?.isCurrentLocation && (
-          <>
-            {/* Section Divider */}
-            <div className="px-4">
-              <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
-            </div>
-
-            <div style={{ padding: '16px 20px' }}>
-              <div className="bg-gradient-to-br from-green-50 via-emerald-50/50 to-teal-50/30 border border-green-200/60 rounded-xl shadow-sm" style={{ padding: '16px 20px' }}>
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-green-500/30">
-                    <MapPinned size={22} className="text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="text-[15px] font-bold text-green-800 leading-relaxed">{t('currentLocation')}</p>
-                      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                    </div>
-                    <p className="text-[13px] text-green-700/80 leading-relaxed line-clamp-2">
-                      {currentLocation.address || `${currentLocation.latitude.toFixed(4)}, ${currentLocation.longitude.toFixed(4)}`}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      clearLocation();
-                      setIsOpen(false);
-                    }}
-                    className="text-[13px] font-semibold text-green-700 hover:text-white hover:bg-green-600 bg-green-100 rounded-lg transition-all flex-shrink-0"
-                    style={{ padding: '8px 14px' }}
-                  >
-                    {t('change')}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
 
         {/* Saved Addresses Section */}
         {savedAddresses.length > 0 && (
@@ -548,9 +466,13 @@ export const AddressSelector = ({
           <div style={{ padding: '16px 20px' }}>
             <button 
               type="button"
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 setIsOpen(false);
-                setIsFormOpen(true);
+                setStartWithForm(true);
+                setTimeout(() => {
+                  setIsFormOpen(true);
+                }, 100);
               }}
               className="w-full flex items-center justify-center gap-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all active:scale-[0.98]"
               style={{ padding: '16px 20px' }}

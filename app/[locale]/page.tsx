@@ -18,6 +18,7 @@ import {
   Play,
   X,
   CreditCard,
+  MapPin,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -43,7 +44,7 @@ const HomePage = () => {
   const tCommon = useTranslations('common');
   const router = useRouter();
   const { locale } = useSettingsStore();
-  const { selectedAddress, refreshTrigger, getLocationForApi } = useLocationStore();
+  const { selectedAddress, refreshTrigger, currentLocation, _hasHydrated } = useLocationStore();
   const { user } = useAuthStore();
   const isRTL = locale === 'ar';
 
@@ -100,48 +101,78 @@ const HomePage = () => {
   const fetchShops = useCallback(async () => {
     setShopsLoading(true);
     try {
-      // Get current location for API
-      const location = getLocationForApi();
+      // Get location from state - priority: selectedAddress > currentLocation > default
+      let lat: number, lng: number;
+      
+      if (selectedAddress?.location) {
+        lat = selectedAddress.location.latitude;
+        lng = selectedAddress.location.longitude;
+      } else if (currentLocation) {
+        lat = currentLocation.latitude;
+        lng = currentLocation.longitude;
+      } else {
+        // Default location (Muscat, Oman)
+        lat = 23.5880;
+        lng = 58.3829;
+      }
+      
+      console.log('📍 Fetching shops with location:', { lat, lng, selectedAddress: selectedAddress?.title });
       
       const results = await Promise.allSettled([
-        shopService.getNearbyShops(location.latitude, location.longitude, { perPage: 8 }),
-        shopService.getFamilyShops(location.latitude, location.longitude, { perPage: 8 }),
+        shopService.getNearbyShops(lat, lng, { perPage: 8 }),
+        shopService.getFamilyShops(lat, lng, { perPage: 8 }),
       ]);
 
       const [recommendedRes, familyRes] = results;
 
-      // Recommended Shops
-      if (recommendedRes.status === 'fulfilled' && recommendedRes.value.data?.length > 0) {
-        setRecommendedShops(recommendedRes.value.data);
+      // Recommended Shops - always update, even if empty
+      if (recommendedRes.status === 'fulfilled') {
+        setRecommendedShops(recommendedRes.value.data || []);
       }
 
-      // Family Shops
-      if (familyRes.status === 'fulfilled' && familyRes.value.data?.length > 0) {
-        setFamilyShops(familyRes.value.data);
+      // Family Shops - always update, even if empty
+      if (familyRes.status === 'fulfilled') {
+        setFamilyShops(familyRes.value.data || []);
       }
     } catch (error) {
       console.error('Error fetching shops:', error);
     } finally {
       setShopsLoading(false);
     }
-  }, [getLocationForApi]);
+  }, [selectedAddress, currentLocation]);
 
-  // Initial data fetch
+  // Initial data fetch - wait for hydration before fetching shops
   useEffect(() => {
     const fetchInitialData = async () => {
       setLoading(true);
-      await Promise.all([fetchStaticData(), fetchShops()]);
+      // Fetch static data immediately
+      await fetchStaticData();
+      
+      // Only fetch shops after hydration is complete
+      if (_hasHydrated) {
+        console.log('📍 Initial fetch - hydrated, selectedAddress:', selectedAddress?.title);
+        await fetchShops();
+      }
       setLoading(false);
     };
     fetchInitialData();
-  }, [fetchStaticData, fetchShops]);
+  }, [fetchStaticData, fetchShops, _hasHydrated, selectedAddress]);
+
+  // Fetch shops when hydration completes (for the first time)
+  useEffect(() => {
+    if (_hasHydrated && !loading) {
+      console.log('📍 Hydration complete, fetching shops with address:', selectedAddress?.title);
+      fetchShops();
+    }
+  }, [_hasHydrated]);
 
   // Refetch shops when location changes
   useEffect(() => {
-    if (refreshTrigger > 0) {
+    if (refreshTrigger > 0 && _hasHydrated) {
+      console.log('🔄 Location changed, refreshTrigger:', refreshTrigger);
       fetchShops();
     }
-  }, [refreshTrigger, fetchShops]);
+  }, [refreshTrigger, fetchShops, _hasHydrated]);
 
   // Handle search form submission
   const handleSearch = (e: React.FormEvent) => {
@@ -173,7 +204,7 @@ const HomePage = () => {
   return (
     <div className="min-h-screen overflow-x-hidden bg-[var(--black)]">
       {/* Hero Section */}
-      <section className="relative min-h-[auto] sm:min-h-[520px] lg:min-h-[580px] flex items-start sm:items-center">
+      <section className="relative min-h-[auto] sm:min-h-[520px] lg:min-h-[580px] flex items-start sm:items-center z-[100]">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] overflow-hidden">
           <div className="absolute top-10 sm:top-20 start-5 sm:start-10 w-32 sm:w-72 h-32 sm:h-72 bg-[var(--primary)]/20 rounded-full blur-3xl animate-pulse pointer-events-none" />
@@ -756,6 +787,23 @@ const HomePage = () => {
                 <ShopCardSkeleton key={i} />
               ))}
             </div>
+          ) : recommendedShops.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col items-center justify-center py-12 sm:py-16 lg:py-20 text-center"
+            >
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4 sm:mb-6">
+                <MapPin size={32} className="text-gray-400 sm:hidden" />
+                <MapPin size={40} className="text-gray-400 hidden sm:block" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-[var(--black)] mb-2">
+                {tCommon('noShopsInArea')}
+              </h3>
+              <p className="text-sm sm:text-base text-[var(--text-grey)] max-w-md">
+                {tCommon('tryChangeAddress')}
+              </p>
+            </motion.div>
           ) : (
             <motion.div
               variants={staggerContainer}
@@ -892,24 +940,6 @@ const HomePage = () => {
                   </div>
                 </div>
 
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.7 }}
-                  className="absolute -bottom-4 sm:-bottom-6 start-1/2 -translate-x-1/2 bg-white rounded-xl sm:rounded-2xl shadow-2xl flex items-center gap-2 sm:gap-3"
-                  style={{ padding: '12px 18px' }}
-                >
-                  <div className="flex -space-x-1.5 sm:-space-x-2 space-x-reverse">
-                    {[1, 2, 3].map((i) => (
-                      <div
-                        key={i}
-                        className="w-6 h-6 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] border-2 border-white"
-                      />
-                    ))}
-                  </div>
-                  <p className="text-[10px] sm:text-xs text-[var(--text-grey)]">+50K {t('stats.users')}</p>
-                </motion.div>
               </div>
             </motion.div>
           </div>

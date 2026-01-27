@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
@@ -12,7 +13,6 @@ import {
   Loader2,
   Home,
   Briefcase,
-  Building2,
   Check,
   ChevronLeft,
   Search,
@@ -44,15 +44,16 @@ interface AddressFormProps {
   onClose: () => void;
   editAddress?: Address | null;
   onSuccess?: (address: Address) => void;
+  /** If true, opens directly to the form instead of showing saved addresses list */
+  startWithForm?: boolean;
 }
-
-type AddressType = 'home' | 'work' | 'other';
 
 export const AddressForm = ({
   isOpen,
   onClose,
   editAddress,
   onSuccess,
+  startWithForm = false,
 }: AddressFormProps) => {
   const t = useTranslations('common');
   const tAddress = useTranslations('address');
@@ -70,6 +71,7 @@ export const AddressForm = ({
     setActiveAddress,
     isLoadingAddresses,
     fetchAddresses,
+    error: locationError,
   } = useAddressManager();
 
   // Fetch addresses when modal opens (for authenticated users)
@@ -79,14 +81,18 @@ export const AddressForm = ({
     }
   }, [isOpen, isAuthenticated, fetchAddresses]);
 
+  // For portal - ensure we're on client side
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // View mode: 'list' shows saved addresses, 'form' shows the add/edit form
   const [viewMode, setViewMode] = useState<'list' | 'form'>('list');
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [settingActiveId, setSettingActiveId] = useState<number | null>(null);
 
   // Form state
-  const [addressType, setAddressType] = useState<AddressType>('home');
-  const [customTitle, setCustomTitle] = useState('');
   const [address, setAddress] = useState('');
   const [house, setHouse] = useState(''); // رقم المبنى/الشقة
   const [floor, setFloor] = useState(''); // رقم الطابق
@@ -96,6 +102,8 @@ export const AddressForm = ({
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+  const [locationDetectError, setLocationDetectError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -110,17 +118,6 @@ export const AddressForm = ({
     if (editAddress) {
       // Editing mode - go directly to form
       setViewMode('form');
-      
-      // Determine address type from title
-      const title = editAddress.title?.toLowerCase() || '';
-      if (title.includes('home') || title.includes('منزل') || title.includes('بيت')) {
-        setAddressType('home');
-      } else if (title.includes('work') || title.includes('عمل') || title.includes('مكتب')) {
-        setAddressType('work');
-      } else {
-        setAddressType('other');
-        setCustomTitle(editAddress.title || '');
-      }
 
       // Set address and additional fields
       if (typeof editAddress.address === 'string') {
@@ -147,15 +144,16 @@ export const AddressForm = ({
         }
       }
     } else {
-      // New address mode - always start with list view (it will show saved addresses or empty state)
-      // Only go to form view for guests who can't save addresses
-      if (isAuthenticated) {
-        setViewMode('list');
-      } else {
+      // New address mode
+      // If startWithForm is true, go directly to form
+      // Otherwise, show list for authenticated users, form for guests
+      if (startWithForm || !isAuthenticated) {
         setViewMode('form');
+      } else {
+        setViewMode('list');
       }
     }
-  }, [editAddress, isOpen, isAuthenticated]);
+  }, [editAddress, isOpen, isAuthenticated, startWithForm]);
 
   // If user just opened the modal and uses current location, set it
   useEffect(() => {
@@ -170,8 +168,6 @@ export const AddressForm = ({
 
   // Reset form
   const resetForm = () => {
-    setAddressType('home');
-    setCustomTitle('');
     setAddress('');
     setHouse('');
     setFloor('');
@@ -253,16 +249,14 @@ export const AddressForm = ({
     };
   }, [isOpen, onClose]);
 
-  // Get title based on address type
+  // Get title for the address - use the detailed address or first part of it
   const getTitle = (): string => {
-    switch (addressType) {
-      case 'home':
-        return tAddress('home');
-      case 'work':
-        return tAddress('work');
-      case 'other':
-        return customTitle || tAddress('other');
+    if (address) {
+      // Use first part of address (before first comma) or truncate if too long
+      const firstPart = address.split(',')[0].trim();
+      return firstPart.length > 50 ? firstPart.substring(0, 50) + '...' : firstPart;
     }
+    return tAddress('home'); // Default fallback
   };
 
   // Handle map location change - using Google Geocoding
@@ -294,13 +288,25 @@ export const AddressForm = ({
 
   // Handle detect current location
   const handleDetectLocation = async () => {
-    const location = await detectLocation();
-    if (location) {
-      setLocation({
-        latitude: location.latitude,
-        longitude: location.longitude,
-      });
-      setAddress(location.address || '');
+    try {
+      setIsDetectingLocation(true);
+      setLocationDetectError(null);
+      const detectedLocation = await detectLocation();
+      if (detectedLocation) {
+        setLocation({
+          latitude: detectedLocation.latitude,
+          longitude: detectedLocation.longitude,
+        });
+        setAddress(detectedLocation.address || '');
+      } else {
+        // Location detection failed - show error
+        setLocationDetectError('فشل تحديد الموقع. تأكد من تفعيل خدمات الموقع في المتصفح.');
+      }
+    } catch (error) {
+      console.error('Failed to detect location:', error);
+      setLocationDetectError('حدث خطأ أثناء تحديد الموقع');
+    } finally {
+      setIsDetectingLocation(false);
     }
   };
 
@@ -442,14 +448,10 @@ export const AddressForm = ({
     }
   };
 
-  // Address type options
-  const addressTypes: { type: AddressType; icon: typeof Home; label: string }[] = [
-    { type: 'home', icon: Home, label: tAddress('home') },
-    { type: 'work', icon: Briefcase, label: tAddress('work') },
-    { type: 'other', icon: Building2, label: tAddress('other') },
-  ];
+  // Don't render on server side
+  if (!mounted) return null;
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -458,7 +460,7 @@ export const AddressForm = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[99999] bg-black/60 backdrop-blur-sm"
             onClick={onClose}
           />
 
@@ -468,7 +470,7 @@ export const AddressForm = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed inset-0 z-[200] bg-white flex flex-col sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-2xl sm:w-full sm:rounded-3xl sm:max-h-[90vh]"
+            className="fixed inset-0 z-[99999] bg-white flex flex-col sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-2xl sm:w-full sm:rounded-3xl sm:max-h-[90vh]"
           >
             {/* Header */}
             <div className="flex-shrink-0 bg-white border-b border-gray-100">
@@ -692,17 +694,24 @@ export const AddressForm = ({
                     </p>
                     <button
                       onClick={handleDetectLocation}
-                      disabled={isLoading}
-                      className="flex items-center gap-2 text-sm text-[var(--primary)] font-medium hover:underline"
+                      disabled={isDetectingLocation}
+                      className="flex items-center gap-2 text-sm text-[var(--primary)] font-medium hover:underline disabled:opacity-50"
                     >
-                      {isLoading ? (
+                      {isDetectingLocation ? (
                         <Loader2 size={16} className="animate-spin" />
                       ) : (
                         <Crosshair size={16} />
                       )}
-                      <span>موقعي الحالي</span>
+                      <span>{isDetectingLocation ? 'جاري التحديد...' : 'موقعي الحالي'}</span>
                     </button>
                   </div>
+
+                  {/* Location Error */}
+                  {locationDetectError && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <p className="text-sm text-red-600">{locationDetectError}</p>
+                    </div>
+                  )}
 
                   {/* Search Input */}
                   <div className="relative">
@@ -756,61 +765,6 @@ export const AddressForm = ({
                   </div>
 
                 </div>
-
-                {/* Address Type Selection */}
-                <div className="space-y-3">
-                  <p className="text-sm font-semibold text-[var(--black)]">نوع العنوان</p>
-                  <div className="flex gap-3">
-                    {addressTypes.map(({ type, icon: Icon, label }) => (
-                      <button
-                        key={type}
-                        onClick={() => setAddressType(type)}
-                        className={clsx(
-                          "flex-1 flex flex-col items-center gap-2 rounded-xl border-2 transition-all",
-                          addressType === type
-                            ? "border-[var(--primary)] bg-[var(--primary)]/5"
-                            : "border-gray-200 hover:border-gray-300"
-                        )}
-                        style={{ padding: '16px 12px' }}
-                      >
-                        <div className={clsx(
-                          "w-10 h-10 rounded-full flex items-center justify-center",
-                          addressType === type
-                            ? "bg-[var(--primary)]/15"
-                            : "bg-gray-100"
-                        )}>
-                          <Icon size={20} className={addressType === type ? "text-[var(--primary)]" : "text-gray-500"} />
-                        </div>
-                        <span className={clsx(
-                          "text-sm font-medium",
-                          addressType === type ? "text-[var(--primary)]" : "text-gray-600"
-                        )}>
-                          {label}
-                        </span>
-                        {addressType === type && (
-                          <div className="absolute -top-1 -end-1 w-5 h-5 bg-[var(--primary)] rounded-full flex items-center justify-center">
-                            <Check size={12} className="text-white" />
-                          </div>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Custom Title (for "other" type) */}
-                {addressType === 'other' && (
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-[var(--black)]">
-                      {tAddress('addressTitle')}
-                    </label>
-                    <Input
-                      value={customTitle}
-                      onChange={(e) => setCustomTitle(e.target.value)}
-                      placeholder="مثال: بيت الجدة"
-                      className="w-full"
-                    />
-                  </div>
-                )}
 
                 {/* Address Text Input */}
                 <div className="space-y-2">
@@ -896,7 +850,8 @@ export const AddressForm = ({
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
 

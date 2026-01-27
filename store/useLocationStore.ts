@@ -27,6 +27,9 @@ export interface SelectedAddress {
 }
 
 interface LocationState {
+  // Hydration state
+  _hasHydrated: boolean;
+  
   // Current browser location (from geolocation)
   currentLocation: UserLocation | null;
   
@@ -44,6 +47,7 @@ interface LocationState {
   error: string | null;
   
   // Actions
+  setHasHydrated: (state: boolean) => void;
   setCurrentLocation: (location: UserLocation | null) => void;
   setSelectedAddress: (address: SelectedAddress | null) => void;
   setSavedAddresses: (addresses: Address[]) => void;
@@ -75,6 +79,7 @@ interface LocationState {
 export const useLocationStore = create<LocationState>()(
   persist(
     (set, get) => ({
+      _hasHydrated: false,
       currentLocation: null,
       selectedAddress: null,
       savedAddresses: [],
@@ -82,6 +87,8 @@ export const useLocationStore = create<LocationState>()(
       isLoadingAddresses: false,
       error: null,
       refreshTrigger: 0,
+
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
 
       setCurrentLocation: (location) => {
         set({ currentLocation: location, error: null });
@@ -136,19 +143,22 @@ export const useLocationStore = create<LocationState>()(
 
       selectSavedAddress: (address) => {
         const location = getAddressLocation(address);
+        console.log('📍 selectSavedAddress called:', { address, extractedLocation: location });
         if (location) {
-          set({
-            selectedAddress: {
-              id: address.id,
-              title: address.title,
-              address: getAddressDisplayString(address),
-              location: {
-                latitude: location.latitude,
-                longitude: location.longitude,
-              },
-              active: address.active,
-              isCurrentLocation: false,
+          const newSelectedAddress = {
+            id: address.id,
+            title: address.title,
+            address: getAddressDisplayString(address),
+            location: {
+              latitude: location.latitude,
+              longitude: location.longitude,
             },
+            active: address.active,
+            isCurrentLocation: false,
+          };
+          console.log('📍 Setting selectedAddress:', newSelectedAddress);
+          set({
+            selectedAddress: newSelectedAddress,
             error: null,
           });
           get().triggerRefresh();
@@ -305,6 +315,9 @@ export const useLocationStore = create<LocationState>()(
         selectedAddress: state.selectedAddress,
         currentLocation: state.currentLocation,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

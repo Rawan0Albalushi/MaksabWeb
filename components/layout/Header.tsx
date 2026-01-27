@@ -447,7 +447,7 @@ const Header = () => {
       {/* Mobile Menu Overlay - Full Screen Drawer */}
       <div
         className={clsx(
-          'fixed inset-0 z-50 lg:hidden transition-all duration-400',
+          'fixed inset-0 z-[200] lg:hidden transition-all duration-400',
           isMobileMenuOpen
             ? 'opacity-100 pointer-events-auto'
             : 'opacity-0 pointer-events-none'
