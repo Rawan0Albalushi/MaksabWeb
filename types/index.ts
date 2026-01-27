@@ -111,6 +111,7 @@ export interface Stock {
   discount?: number;
   extras?: Extra[];
   addons?: Addon[];
+  product?: Product;
 }
 
 export interface Extra {

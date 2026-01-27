@@ -30,7 +30,6 @@ import {
   FileText,
   X,
   Home,
-  CheckCircle2,
   User,
   Phone,
   AlertTriangle,
@@ -49,14 +48,6 @@ interface PaymentMethod {
   icon: React.ReactNode;
   input?: number;
 }
-
-// Checkout Steps
-const CHECKOUT_STEPS = [
-  { id: 'delivery', icon: Truck, label: 'deliveryType' },
-  { id: 'address', icon: MapPin, label: 'address' },
-  { id: 'time', icon: Clock, label: 'time' },
-  { id: 'payment', icon: CreditCard, label: 'payment' },
-];
 
 const CheckoutPage = () => {
   const t = useTranslations('checkout');
@@ -660,26 +651,6 @@ const CheckoutPage = () => {
     return times;
   };
 
-  // Calculate current step
-  const getCurrentStep = () => {
-    if (!deliveryType) return 0;
-    if (deliveryType === 'delivery' && !selectedAddressId) return 1;
-    if (!deliveryDate && !deliveryTime) return 2;
-    if (!selectedPaymentId) return 3;
-    return 4;
-  };
-
-  // Check if a step is completed
-  const isStepCompleted = (stepIndex: number) => {
-    switch (stepIndex) {
-      case 0: return !!deliveryType;
-      case 1: return deliveryType === 'pickup' || !!selectedAddressId;
-      case 2: return true; // Time is optional
-      case 3: return !!selectedPaymentId;
-      default: return false;
-    }
-  };
-
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -696,43 +667,45 @@ const CheckoutPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100/50">
+      <div className="min-h-screen bg-gray-50">
         {/* Loading Header */}
-        <div className="bg-gradient-to-br from-[#0a1628] via-[#1a3a5c] to-[#0d2233]">
-          <div className="container max-w-6xl mx-auto px-4 py-6">
+        <div className="bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] relative overflow-hidden min-h-[160px] sm:min-h-[180px] lg:min-h-[200px] flex flex-col">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-0 start-1/4 w-48 h-48 bg-[var(--primary)]/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 end-1/4 w-40 h-40 bg-[var(--primary-dark)]/15 rounded-full blur-3xl" />
+          </div>
+          
+          <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-10 flex-1 flex items-center">
             <div className="animate-pulse flex items-center gap-4">
-              <div className="w-10 h-10 bg-white/10 rounded-xl" />
+              <div className="w-10 h-10 sm:w-11 sm:h-11 bg-white/10 rounded-xl" />
               <div className="flex-1">
-                <div className="h-6 w-40 bg-white/10 rounded-lg mb-2" />
-                <div className="h-4 w-56 bg-white/10 rounded-lg" />
+                <div className="h-8 sm:h-10 w-40 bg-white/10 rounded-lg mb-2" />
+                <div className="h-5 w-56 bg-white/10 rounded-lg" />
               </div>
             </div>
           </div>
+          
+          {/* Wave */}
+          <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
+            <svg viewBox="0 0 1440 40" fill="none" className="w-full h-10 sm:h-12" preserveAspectRatio="none">
+              <path d="M0 40L60 36C120 32 240 24 360 20C480 16 600 16 720 18C840 20 960 26 1080 30C1200 34 1320 36 1380 37L1440 38V40H0Z" fill="#f9fafb" />
+            </svg>
+          </div>
         </div>
         
-        <div className="container max-w-6xl mx-auto px-4 py-8">
+        <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           <div className="animate-pulse">
-            {/* Steps skeleton */}
-            <div className="flex justify-center gap-3 mb-8">
-              {[1, 2, 3, 4].map(i => (
-                <div key={i} className="flex items-center gap-2">
-                  <div className="w-12 h-12 bg-gray-200 rounded-2xl" />
-                  {i < 4 && <div className="w-8 h-0.5 bg-gray-200" />}
-                </div>
-              ))}
-            </div>
-            
-            <div className="grid lg:grid-cols-5 gap-6">
+            <div className="grid lg:grid-cols-5 gap-6 lg:gap-8">
               <div className="lg:col-span-3 space-y-4">
-                {[1, 2, 3, 4].map(i => (
-                  <div key={i} className="bg-white rounded-2xl p-6 shadow-sm">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                     <div className="h-6 w-36 bg-gray-200 rounded-lg mb-4" />
                     <div className="h-24 bg-gray-100 rounded-xl" />
                   </div>
                 ))}
               </div>
               <div className="lg:col-span-2">
-                <div className="bg-white rounded-2xl p-6 shadow-sm">
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                   <div className="h-6 w-32 bg-gray-200 rounded-lg mb-4" />
                   <div className="space-y-3">
                     {[1, 2, 3, 4, 5].map(i => (
@@ -768,125 +741,65 @@ const CheckoutPage = () => {
     );
   }
 
-  const currentStep = getCurrentStep();
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100/50">
-      {/* Elegant Header */}
-      <div className="relative bg-gradient-to-br from-[#0a1628] via-[#1a3a5c] to-[#0d2233] overflow-hidden">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header - Similar to Cart Page */}
+      <div className="bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] relative overflow-hidden min-h-[160px] sm:min-h-[180px] lg:min-h-[200px] flex flex-col">
         {/* Decorative Background Elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-24 start-1/4 w-96 h-96 bg-[var(--primary)]/8 rounded-full blur-[120px]" />
-          <div className="absolute -bottom-32 end-1/3 w-80 h-80 bg-cyan-500/10 rounded-full blur-[100px]" />
-          <div className="absolute top-0 end-0 w-64 h-64 bg-white/5 rounded-full blur-[80px]" />
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 start-1/4 w-48 h-48 bg-[var(--primary)]/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 end-1/4 w-40 h-40 bg-[var(--primary-dark)]/15 rounded-full blur-3xl" />
         </div>
-        
-        <div className="container max-w-6xl mx-auto px-4 py-5 sm:py-6 relative z-10">
-          {/* Back & Title Row */}
-          <div className="flex items-center justify-between mb-6">
-            <motion.div 
-              initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-3"
-            >
+
+        <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-10 flex-1 flex items-center">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-3 sm:gap-4">
+              {/* Back Button */}
               <button
                 onClick={() => router.back()}
-                className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center hover:bg-white/20 transition-all group"
-                style={{ padding: '10px' }}
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center hover:bg-white/20 transition-all group"
               >
                 {isRTL ? (
-                  <ChevronRight size={18} className="text-white group-hover:translate-x-0.5 transition-transform" />
+                  <ChevronRight size={20} className="text-white group-hover:translate-x-0.5 transition-transform" />
                 ) : (
-                  <ChevronLeft size={18} className="text-white group-hover:-translate-x-0.5 transition-transform" />
+                  <ChevronLeft size={20} className="text-white group-hover:-translate-x-0.5 transition-transform" />
                 )}
               </button>
+              
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-white">{t('title')}</h1>
-                <p className="text-xs sm:text-sm text-white/50 mt-0.5 flex items-center gap-1.5">
-                  <Package size={14} />
-                  <span>{itemCount} {tCart('items')}</span>
-                  <span className="text-white/30">•</span>
-                  <span className="truncate max-w-[120px]">{cart.shop?.translation?.title}</span>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2">
+                  {t('title')}
+                </h1>
+                <p className="text-white/60 text-sm sm:text-base lg:text-lg">
+                  {itemCount} {tCart('items')}
+                  {cart.shop && (
+                    <span className="text-white/80">
+                      {' '}{tCart('from')}{' '}
+                      <span className="text-[var(--primary-light)] font-medium">{cart.shop.translation?.title}</span>
+                    </span>
+                  )}
                 </p>
               </div>
-            </motion.div>
-
+            </div>
+            
             {/* Security Badge */}
-            <motion.div
-              initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="hidden sm:flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10"
-              style={{ padding: '8px 14px' }}
-            >
-              <Shield size={14} className="text-emerald-400" />
-              <span className="text-xs text-white/70" style={{ padding: '0 4px' }}>{t('secureCheckout') || 'دفع آمن'}</span>
-            </motion.div>
+            <div className="hidden sm:flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 px-4 py-2">
+              <Shield size={16} className="text-emerald-400" />
+              <span className="text-sm text-white/70">{t('secureCheckout')}</span>
+            </div>
           </div>
+        </div>
 
-          {/* Modern Step Indicator */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="flex items-center justify-center gap-1 sm:gap-2"
-          >
-            {CHECKOUT_STEPS.map((step, index) => {
-              const StepIcon = step.icon;
-              const isActive = index === currentStep;
-              const isCompleted = isStepCompleted(index);
-              const isPast = index < currentStep;
-              
-              return (
-                <div key={step.id} className="flex items-center">
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className={clsx(
-                      'relative flex flex-col items-center',
-                    )}
-                  >
-                    <div
-                      className={clsx(
-                        'w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center transition-all duration-300',
-                        isCompleted && 'bg-gradient-to-br from-emerald-400 to-emerald-500 text-white shadow-lg shadow-emerald-500/30',
-                        isActive && !isCompleted && 'bg-white text-[var(--primary)] shadow-xl shadow-white/20',
-                        !isActive && !isCompleted && 'bg-white/10 text-white/40 border border-white/10'
-                      )}
-                    >
-                      {isCompleted ? (
-                        <CheckCircle2 size={18} className="sm:w-5 sm:h-5" />
-                      ) : (
-                        <StepIcon size={18} className="sm:w-5 sm:h-5" />
-                      )}
-                    </div>
-                    <span className={clsx(
-                      'text-[10px] sm:text-xs mt-1.5 font-medium transition-colors',
-                      isActive ? 'text-white' : 'text-white/40'
-                    )}>
-                      {t(step.label)}
-                    </span>
-                  </motion.div>
-                  
-                  {index < CHECKOUT_STEPS.length - 1 && (
-                    <div className="relative w-6 sm:w-10 h-0.5 mx-1 sm:mx-2 -mt-4">
-                      <div className="absolute inset-0 bg-white/10 rounded-full" />
-                      <motion.div
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: isCompleted ? 1 : 0 }}
-                        transition={{ duration: 0.4 }}
-                        className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full origin-left"
-                        style={{ transformOrigin: isRTL ? 'right' : 'left' }}
-                      />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </motion.div>
+        {/* Wave */}
+        <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
+          <svg viewBox="0 0 1440 40" fill="none" className="w-full h-10 sm:h-12" preserveAspectRatio="none">
+            <path d="M0 40L60 36C120 32 240 24 360 20C480 16 600 16 720 18C840 20 960 26 1080 30C1200 34 1320 36 1380 37L1440 38V40H0Z" fill="#f9fafb" />
+          </svg>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="container max-w-6xl mx-auto px-4 py-6 sm:py-8">
+      <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Error Alert */}
         <AnimatePresence>
           {error && (
@@ -912,540 +825,397 @@ const CheckoutPage = () => {
           )}
         </AnimatePresence>
 
-        <div className="grid lg:grid-cols-5 gap-6">
-          {/* Form Section - 3 columns */}
+        <div className="grid lg:grid-cols-5 gap-6 lg:gap-8">
+          {/* Form Section - 3 columns - Unified Order Details Card */}
           <motion.div 
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="lg:col-span-3 space-y-4"
+            className="lg:col-span-3 order-2 lg:order-1"
           >
-            {/* Delivery Type Card */}
-            <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="px-5 py-4 border-b border-gray-50 bg-gradient-to-r from-gray-50/80 to-transparent">
+            <motion.div variants={itemVariants} className="bg-gradient-to-br from-white via-white to-[var(--primary)]/[0.03] rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              {/* Card Header */}
+              <div className="px-5 py-4 border-b border-gray-100/80 bg-gradient-to-r from-[var(--primary)]/[0.08] via-[var(--primary)]/[0.03] to-transparent">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] flex items-center justify-center shadow-lg shadow-[var(--primary)]/20">
-                    <Truck size={18} className="text-white" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] flex items-center justify-center shadow-lg shadow-[var(--primary)]/20">
+                    <Package size={20} className="text-white" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-800">{t('deliveryType')}</h3>
-                    <p className="text-xs text-gray-400">{t('chooseDeliveryMethod') || 'اختر طريقة التوصيل'}</p>
+                    <h2 className="font-bold text-gray-800 text-lg">{t('orderDetails') || 'تفاصيل الطلب'}</h2>
+                    <p className="text-xs text-gray-400">{t('fillOrderDetails') || 'أكمل بيانات طلبك'}</p>
                   </div>
                 </div>
               </div>
-              <div style={{ padding: '20px' }}>
-                <div className="grid grid-cols-2 gap-3">
-                  {/* Home Delivery */}
-                  <button
-                    onClick={() => setDeliveryType('delivery')}
-                    className={clsx(
-                      'relative rounded-xl border-2 text-center transition-all duration-300 group',
-                      deliveryType === 'delivery'
-                        ? 'border-[var(--primary)] bg-gradient-to-br from-[var(--primary)]/5 to-[var(--primary)]/10 shadow-lg shadow-[var(--primary)]/10'
-                        : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50/50'
-                    )}
-                    style={{ padding: '18px 16px' }}
-                  >
-                    <div className={clsx(
-                      'w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center transition-all',
-                      deliveryType === 'delivery'
-                        ? 'bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] text-white shadow-lg shadow-[var(--primary)]/30'
-                        : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200'
-                    )} style={{ padding: '12px' }}>
-                      <Truck size={22} />
-                    </div>
-                    <p className={clsx(
-                      'font-semibold text-sm transition-colors',
-                      deliveryType === 'delivery' ? 'text-[var(--primary)]' : 'text-gray-700'
-                    )} style={{ padding: '4px 8px' }}>
-                      {t('homeDelivery')}
-                    </p>
-                    {deliveryType === 'delivery' && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="absolute top-2 end-2 w-6 h-6 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] flex items-center justify-center shadow-lg shadow-[var(--primary)]/30"
-                      >
-                        <Check size={12} className="text-white" strokeWidth={3} />
-                      </motion.div>
-                    )}
-                  </button>
 
-                  {/* Store Pickup */}
-                  <button
-                    onClick={() => setDeliveryType('pickup')}
-                    className={clsx(
-                      'relative rounded-xl border-2 text-center transition-all duration-300 group',
-                      deliveryType === 'pickup'
-                        ? 'border-[var(--primary)] bg-gradient-to-br from-[var(--primary)]/5 to-[var(--primary)]/10 shadow-lg shadow-[var(--primary)]/10'
-                        : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50/50'
-                    )}
-                    style={{ padding: '18px 16px' }}
-                  >
-                    <div className={clsx(
-                      'w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center transition-all',
-                      deliveryType === 'pickup'
-                        ? 'bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] text-white shadow-lg shadow-[var(--primary)]/30'
-                        : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200'
-                    )} style={{ padding: '12px' }}>
-                      <Store size={22} />
+              <div>
+                {/* Section 1: Delivery Type */}
+                <div style={{ padding: '20px' }}>
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-6 h-6 rounded-lg bg-[var(--primary)]/10 flex items-center justify-center">
+                      <Truck size={14} className="text-[var(--primary)]" />
                     </div>
-                    <p className={clsx(
-                      'font-semibold text-sm transition-colors',
-                      deliveryType === 'pickup' ? 'text-[var(--primary)]' : 'text-gray-700'
-                    )} style={{ padding: '4px 8px' }}>
-                      {t('pickup')}
-                    </p>
-                    {deliveryType === 'pickup' && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="absolute top-2 end-2 w-6 h-6 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] flex items-center justify-center shadow-lg shadow-[var(--primary)]/30"
-                      >
-                        <Check size={12} className="text-white" strokeWidth={3} />
-                      </motion.div>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Delivery Address Card - Only show for delivery */}
-            <AnimatePresence>
-              {deliveryType === 'delivery' && (
-                <motion.div 
-                  variants={itemVariants}
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
-                >
-                  <div className="px-5 py-4 border-b border-gray-50 bg-gradient-to-r from-emerald-50/80 to-transparent">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                        <MapPin size={18} className="text-white" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-gray-800">{t('deliveryAddress')}</h3>
-                        <p className="text-xs text-gray-400">{t('selectDeliveryAddress') || 'اختر عنوان التوصيل'}</p>
-                      </div>
-                    </div>
+                    <h3 className="font-semibold text-gray-700 text-sm">{t('deliveryType')}</h3>
                   </div>
-                  <div style={{ padding: '20px' }}>
-                    {addresses.length === 0 ? (
-                      <div className="text-center bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl border-2 border-dashed border-gray-200" style={{ padding: '32px 20px' }}>
-                        <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gray-200 flex items-center justify-center" style={{ padding: '14px' }}>
-                          <MapPin size={24} className="text-gray-400" />
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Home Delivery */}
+                    <button
+                      onClick={() => setDeliveryType('delivery')}
+                      className={clsx(
+                        'relative rounded-2xl border-2 text-start transition-all duration-300 group overflow-hidden',
+                        deliveryType === 'delivery'
+                          ? 'border-[var(--primary)] bg-gradient-to-br from-[var(--primary)]/[0.12] via-[var(--primary)]/[0.06] to-cyan-50 shadow-lg shadow-[var(--primary)]/15'
+                          : 'border-cyan-100 bg-gradient-to-br from-cyan-50/80 to-teal-50/50 hover:border-cyan-200 hover:from-cyan-50 hover:to-teal-50/80'
+                      )}
+                      style={{ padding: '16px' }}
+                    >
+                      {/* Background decoration */}
+                      <div className={clsx(
+                        'absolute top-0 end-0 w-24 h-24 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 transition-all',
+                        deliveryType === 'delivery' ? 'bg-[var(--primary)]/15' : 'bg-cyan-200/30'
+                      )} />
+                      
+                      <div className="relative flex items-center gap-3">
+                        <div className={clsx(
+                          'w-12 h-12 rounded-xl flex items-center justify-center transition-all shrink-0',
+                          deliveryType === 'delivery'
+                            ? 'bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] text-white shadow-lg shadow-[var(--primary)]/30'
+                            : 'bg-gradient-to-br from-cyan-500 to-teal-500 text-white shadow-md shadow-cyan-500/20'
+                        )}>
+                          <Truck size={22} />
                         </div>
-                        <p className="text-gray-500 mb-4 text-sm" style={{ padding: '0 12px' }}>{t('noAddresses')}</p>
-                        <Button variant="outline" leftIcon={<Plus size={16} />} size="sm" style={{ padding: '10px 18px' }}>
-                          {t('addAddress')}
-                        </Button>
+                        <div className="flex-1 min-w-0">
+                          <p className={clsx(
+                            'font-bold text-sm transition-colors',
+                            deliveryType === 'delivery' ? 'text-[var(--primary)]' : 'text-cyan-700'
+                          )}>
+                            {t('homeDelivery')}
+                          </p>
+                          <p className={clsx(
+                            'text-[11px] mt-0.5 transition-colors',
+                            deliveryType === 'delivery' ? 'text-[var(--primary)]/70' : 'text-cyan-500'
+                          )}>
+                            {t('deliverToYou')}
+                          </p>
+                        </div>
                       </div>
-                    ) : (
-                      <div className="space-y-2.5">
-                        {addresses.map((address, index) => (
-                          <motion.button
-                            key={address.id}
-                            initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            onClick={() => setSelectedAddressId(address.id)}
-                            className={clsx(
-                              'w-full rounded-xl border-2 text-start transition-all duration-200',
-                              selectedAddressId === address.id
-                                ? 'border-emerald-500 bg-gradient-to-br from-emerald-50 to-emerald-100/50 shadow-lg shadow-emerald-500/10'
-                                : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50/50'
-                            )}
-                            style={{ padding: '16px 18px' }}
-                          >
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="flex items-start gap-3">
-                                <div className={clsx(
-                                  'w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all',
-                                  selectedAddressId === address.id
-                                    ? 'bg-emerald-500 text-white'
-                                    : 'bg-gray-100 text-gray-400'
-                                )} style={{ padding: '10px' }}>
-                                  <Home size={18} />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <span className={clsx(
-                                      'font-semibold text-sm',
-                                      selectedAddressId === address.id ? 'text-emerald-600' : 'text-gray-700'
-                                    )}>
-                                      {address.title || t('address')}
-                                    </span>
-                                    {address.active && (
-                                      <Badge variant="primary" size="sm" className="!text-[10px]">{tCommon('default')}</Badge>
-                                    )}
+                      
+                      {deliveryType === 'delivery' && (
+                        <motion.div
+                          initial={{ scale: 0, rotate: -180 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                          className="absolute top-3 end-3 w-6 h-6 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] flex items-center justify-center shadow-md shadow-[var(--primary)]/30"
+                        >
+                          <Check size={12} className="text-white" strokeWidth={3} />
+                        </motion.div>
+                      )}
+                    </button>
+
+                    {/* Store Pickup */}
+                    <button
+                      onClick={() => setDeliveryType('pickup')}
+                      className={clsx(
+                        'relative rounded-2xl border-2 text-start transition-all duration-300 group overflow-hidden',
+                        deliveryType === 'pickup'
+                          ? 'border-[var(--primary)] bg-gradient-to-br from-[var(--primary)]/[0.12] via-[var(--primary)]/[0.06] to-amber-50 shadow-lg shadow-[var(--primary)]/15'
+                          : 'border-amber-100 bg-gradient-to-br from-amber-50/80 to-orange-50/50 hover:border-amber-200 hover:from-amber-50 hover:to-orange-50/80'
+                      )}
+                      style={{ padding: '16px' }}
+                    >
+                      {/* Background decoration */}
+                      <div className={clsx(
+                        'absolute top-0 end-0 w-24 h-24 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 transition-all',
+                        deliveryType === 'pickup' ? 'bg-[var(--primary)]/15' : 'bg-amber-200/30'
+                      )} />
+                      
+                      <div className="relative flex items-center gap-3">
+                        <div className={clsx(
+                          'w-12 h-12 rounded-xl flex items-center justify-center transition-all shrink-0',
+                          deliveryType === 'pickup'
+                            ? 'bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] text-white shadow-lg shadow-[var(--primary)]/30'
+                            : 'bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/20'
+                        )}>
+                          <Store size={22} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className={clsx(
+                            'font-bold text-sm transition-colors',
+                            deliveryType === 'pickup' ? 'text-[var(--primary)]' : 'text-amber-700'
+                          )}>
+                            {t('pickup')}
+                          </p>
+                          <p className={clsx(
+                            'text-[11px] mt-0.5 transition-colors',
+                            deliveryType === 'pickup' ? 'text-[var(--primary)]/70' : 'text-amber-500'
+                          )}>
+                            {t('pickupFromStore')}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {deliveryType === 'pickup' && (
+                        <motion.div
+                          initial={{ scale: 0, rotate: -180 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                          className="absolute top-3 end-3 w-6 h-6 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] flex items-center justify-center shadow-md shadow-[var(--primary)]/30"
+                        >
+                          <Check size={12} className="text-white" strokeWidth={3} />
+                        </motion.div>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Section 2: Delivery Address - Only show for delivery */}
+                <AnimatePresence>
+                  {deliveryType === 'delivery' && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      style={{ padding: '20px' }}
+                    >
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="w-6 h-6 rounded-lg bg-emerald-100 flex items-center justify-center">
+                          <MapPin size={14} className="text-emerald-600" />
+                        </div>
+                        <h3 className="font-semibold text-gray-700 text-sm">{t('deliveryAddress')}</h3>
+                      </div>
+                      {addresses.length === 0 ? (
+                        <div className="text-center bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl border-2 border-dashed border-gray-200" style={{ padding: '24px 16px' }}>
+                          <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gray-200 flex items-center justify-center">
+                            <MapPin size={20} className="text-gray-400" />
+                          </div>
+                          <p className="text-gray-500 mb-3 text-sm">{t('noAddresses')}</p>
+                          <Button variant="outline" leftIcon={<Plus size={14} />} size="sm">
+                            {t('addAddress')}
+                          </Button>
+                        </div>
+                      ) : (
+                        <div>
+                          {/* Show only selected address */}
+                          {(() => {
+                            const selectedAddress = addresses.find(a => a.id === selectedAddressId) || addresses[0];
+                            return (
+                              <div
+                                className="rounded-xl border-2 border-emerald-500 bg-gradient-to-br from-emerald-50 to-emerald-100/30"
+                                style={{ padding: '12px 14px' }}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-emerald-500 text-white">
+                                    <Home size={16} />
                                   </div>
-                                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">{formatAddress(address)}</p>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span className="font-semibold text-sm text-emerald-600">
+                                        {selectedAddress.title || t('address')}
+                                      </span>
+                                      {selectedAddress.active && (
+                                        <Badge variant="primary" size="sm" className="!text-[10px] !py-0">{tCommon('default')}</Badge>
+                                      )}
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{formatAddress(selectedAddress)}</p>
+                                  </div>
+                                  <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
+                                    <Check size={10} className="text-white" strokeWidth={3} />
+                                  </div>
                                 </div>
                               </div>
-                              {selectedAddressId === address.id && (
+                            );
+                          })()}
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Section 3: Payment Method */}
+                <div style={{ padding: '20px' }}>
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-6 h-6 rounded-lg bg-violet-100 flex items-center justify-center">
+                      <CreditCard size={14} className="text-violet-600" />
+                    </div>
+                    <h3 className="font-semibold text-gray-700 text-sm">{t('paymentMethod')}</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {paymentMethods.map((method, index) => {
+                      // Define colors and descriptions for each payment method
+                      const getMethodConfig = (tag: string) => {
+                        switch (tag) {
+                          case 'cash':
+                            return {
+                              bg: 'from-emerald-50 via-green-50/70 to-teal-50/50',
+                              bgSelected: 'from-[var(--primary)]/[0.12] via-[var(--primary)]/[0.06] to-emerald-50/50',
+                              border: 'border-emerald-200/70',
+                              borderHover: 'hover:border-emerald-300',
+                              iconBg: 'from-emerald-500 to-teal-500',
+                              iconShadow: 'shadow-emerald-500/25',
+                              text: 'text-emerald-700',
+                              textSub: 'text-emerald-500/80',
+                              blur: 'bg-emerald-300/20',
+                              description: t('cashDescription') || 'ادفع عند استلام طلبك',
+                            };
+                          case 'wallet':
+                            return {
+                              bg: 'from-blue-50 via-indigo-50/70 to-sky-50/50',
+                              bgSelected: 'from-[var(--primary)]/[0.12] via-[var(--primary)]/[0.06] to-blue-50/50',
+                              border: 'border-blue-200/70',
+                              borderHover: 'hover:border-blue-300',
+                              iconBg: 'from-blue-500 to-indigo-500',
+                              iconShadow: 'shadow-blue-500/25',
+                              text: 'text-blue-700',
+                              textSub: 'text-blue-500/80',
+                              blur: 'bg-blue-300/20',
+                              description: t('walletDescription') || 'استخدم رصيد محفظتك',
+                            };
+                          case 'thawani':
+                          default:
+                            return {
+                              bg: 'from-violet-50 via-purple-50/70 to-fuchsia-50/50',
+                              bgSelected: 'from-[var(--primary)]/[0.12] via-[var(--primary)]/[0.06] to-violet-50/50',
+                              border: 'border-violet-200/70',
+                              borderHover: 'hover:border-violet-300',
+                              iconBg: 'from-violet-500 to-purple-500',
+                              iconShadow: 'shadow-violet-500/25',
+                              text: 'text-violet-700',
+                              textSub: 'text-violet-500/80',
+                              blur: 'bg-violet-300/20',
+                              description: t('cardDescription') || 'ادفع ببطاقتك الائتمانية',
+                            };
+                        }
+                      };
+                      const config = getMethodConfig(method.tag);
+                      const isSelected = selectedPaymentId === method.id;
+                      
+                      return (
+                        <motion.button
+                          key={method.id}
+                          initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05, type: 'spring', stiffness: 200 }}
+                          onClick={() => setSelectedPaymentId(method.id)}
+                          className={clsx(
+                            'relative w-full rounded-2xl border-2 text-start transition-all duration-300 group overflow-hidden',
+                            isSelected
+                              ? `border-[var(--primary)] bg-gradient-to-br ${config.bgSelected} shadow-lg shadow-[var(--primary)]/10`
+                              : `${config.border} bg-gradient-to-br ${config.bg} ${config.borderHover} hover:shadow-md`
+                          )}
+                          style={{ padding: '14px 16px' }}
+                        >
+                          {/* Background decorations */}
+                          <div className={clsx(
+                            'absolute top-0 end-0 w-32 h-32 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 transition-all opacity-60',
+                            isSelected ? 'bg-[var(--primary)]/20' : config.blur
+                          )} />
+                          <div className={clsx(
+                            'absolute bottom-0 start-0 w-24 h-24 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 transition-all opacity-40',
+                            isSelected ? 'bg-[var(--primary)]/15' : config.blur
+                          )} />
+                          
+                          <div className="relative flex items-center gap-4">
+                            {/* Icon */}
+                            <div className={clsx(
+                              'w-14 h-14 rounded-xl flex items-center justify-center transition-all shrink-0',
+                              isSelected
+                                ? 'bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] text-white shadow-xl shadow-[var(--primary)]/30 scale-105'
+                                : `bg-gradient-to-br ${config.iconBg} text-white shadow-lg ${config.iconShadow} group-hover:scale-105`
+                            )}>
+                              {method.icon}
+                            </div>
+                            
+                            {/* Text */}
+                            <div className="flex-1 min-w-0">
+                              <p className={clsx(
+                                'font-bold text-sm transition-colors',
+                                isSelected ? 'text-[var(--primary)]' : config.text
+                              )}>
+                                {method.name}
+                              </p>
+                              <p className={clsx(
+                                'text-[11px] mt-0.5 transition-colors',
+                                isSelected ? 'text-[var(--primary)]/70' : config.textSub
+                              )}>
+                                {config.description}
+                              </p>
+                            </div>
+                            
+                            {/* Radio indicator */}
+                            <div className={clsx(
+                              'w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all',
+                              isSelected
+                                ? 'border-[var(--primary)] bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)]'
+                                : 'border-gray-300 bg-white group-hover:border-gray-400'
+                            )}>
+                              {isSelected && (
                                 <motion.div
                                   initial={{ scale: 0 }}
                                   animate={{ scale: 1 }}
-                                  className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center shrink-0"
+                                  transition={{ type: 'spring', stiffness: 400, damping: 15 }}
                                 >
                                   <Check size={12} className="text-white" strokeWidth={3} />
                                 </motion.div>
                               )}
                             </div>
-                          </motion.button>
-                        ))}
-                        
-                        {/* Add New Address Button */}
-                        <button className="w-full border-2 border-dashed border-gray-200 rounded-xl text-gray-500 hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all flex items-center justify-center gap-2 group" style={{ padding: '16px 18px' }}>
-                          <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
-                          <span className="text-sm font-medium" style={{ padding: '0 4px' }}>{t('addAddress')}</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Delivery Time Card */}
-            <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="px-5 py-4 border-b border-gray-50 bg-gradient-to-r from-violet-50/80 to-transparent">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-violet-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
-                    <Clock size={18} className="text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-800">{t('deliveryTime')}</h3>
-                    <p className="text-xs text-gray-400">{t('chooseDeliveryTime') || 'اختر وقت التوصيل المناسب'}</p>
-                  </div>
-                </div>
-              </div>
-              <div style={{ padding: '20px' }}>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-semibold text-gray-600 mb-2 block flex items-center gap-1.5" style={{ padding: '0 4px' }}>
-                      <Calendar size={12} className="text-violet-500" />
-                      {t('selectDate')}
-                    </label>
-                    <div className="relative">
-                      <select
-                        value={deliveryDate}
-                        onChange={(e) => setDeliveryDate(e.target.value)}
-                        className="w-full border border-gray-200 rounded-xl bg-white text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all appearance-none cursor-pointer"
-                        style={{ padding: '14px 18px' }}
-                      >
-                        <option value="">{t('asap')}</option>
-                        {getAvailableDates().map(date => (
-                          <option key={date.value} value={date.value}>{date.label}</option>
-                        ))}
-                      </select>
-                      <ChevronLeft size={16} className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 rotate-[-90deg] pointer-events-none" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-gray-600 mb-2 block flex items-center gap-1.5" style={{ padding: '0 4px' }}>
-                      <Clock size={12} className="text-violet-500" />
-                      {t('selectTime')}
-                    </label>
-                    <div className="relative">
-                      <select
-                        value={deliveryTime}
-                        onChange={(e) => setDeliveryTime(e.target.value)}
-                        disabled={!deliveryDate}
-                        className="w-full border border-gray-200 rounded-xl bg-white text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all appearance-none cursor-pointer disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
-                        style={{ padding: '14px 18px' }}
-                      >
-                        <option value="">{deliveryDate ? t('selectTimeSlot') : t('selectDateFirst')}</option>
-                        {deliveryDate && getAvailableTimes().map(time => (
-                          <option key={time.value} value={time.value}>{time.label}</option>
-                        ))}
-                      </select>
-                      <ChevronLeft size={16} className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 rotate-[-90deg] pointer-events-none" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Payment Method Card */}
-            <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="px-5 py-4 border-b border-gray-50 bg-gradient-to-r from-amber-50/80 to-transparent">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
-                    <CreditCard size={18} className="text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-800">{t('paymentMethod')}</h3>
-                    <p className="text-xs text-gray-400">{t('choosePaymentMethod') || 'اختر طريقة الدفع'}</p>
-                  </div>
-                </div>
-              </div>
-              <div style={{ padding: '20px' }}>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {paymentMethods.map((method, index) => (
-                    <motion.button
-                      key={method.id}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: index * 0.05 }}
-                      onClick={() => setSelectedPaymentId(method.id)}
-                      className={clsx(
-                        'relative rounded-xl border-2 text-center transition-all duration-200 group',
-                        selectedPaymentId === method.id
-                          ? 'border-amber-500 bg-gradient-to-br from-amber-50 to-amber-100/50 shadow-lg shadow-amber-500/10'
-                          : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50/50'
-                      )}
-                      style={{ padding: '16px 14px' }}
-                    >
-                      <div className={clsx(
-                        'mx-auto mb-2 transition-colors',
-                        selectedPaymentId === method.id ? 'text-amber-600' : 'text-gray-400 group-hover:text-gray-500'
-                      )}>
-                        {method.icon}
-                      </div>
-                      <span className={clsx(
-                        'text-xs font-semibold transition-colors',
-                        selectedPaymentId === method.id ? 'text-amber-600' : 'text-gray-600'
-                      )} style={{ padding: '0 4px' }}>
-                        {method.name}
-                      </span>
-                      {selectedPaymentId === method.id && (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="absolute top-1.5 end-1.5 w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center"
-                        >
-                          <Check size={10} className="text-white" strokeWidth={3} />
-                        </motion.div>
-                      )}
-                    </motion.button>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Saved Cards (Thawani) */}
-            <AnimatePresence>
-              {isThawaniPayment() && (
-                <motion.div
-                  variants={itemVariants}
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
-                >
-                  <div className="px-5 py-4 border-b border-gray-50 bg-gradient-to-r from-blue-50/80 to-transparent">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                        <Wallet size={18} className="text-white" />
-                      </div>
-                      <h3 className="font-bold text-gray-800">{t('selectPaymentCard')}</h3>
-                    </div>
-                  </div>
-                  <div style={{ padding: '20px' }}>
-                    {loadingCards ? (
-                      <div className="flex items-center justify-center" style={{ padding: '32px 0' }}>
-                        <Loader2 size={24} className="animate-spin text-blue-500" />
-                      </div>
-                    ) : (
-                      <div className="space-y-2.5">
-                        {/* New Card Option */}
-                        <button
-                          onClick={() => { setUseNewCard(true); setSelectedCardId(null); }}
-                          className={clsx(
-                            'w-full rounded-xl border-2 text-start transition-all',
-                            useNewCard
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-100 hover:border-gray-200'
-                          )}
-                          style={{ padding: '16px 18px' }}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className={clsx(
-                                'w-10 h-10 rounded-xl flex items-center justify-center',
-                                useNewCard ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-400'
-                              )} style={{ padding: '10px' }}>
-                                <Plus size={18} />
-                              </div>
-                              <span className={clsx('font-medium text-sm', useNewCard ? 'text-blue-600' : 'text-gray-700')} style={{ padding: '0 4px' }}>
-                                {t('useNewCard')}
-                              </span>
-                            </div>
-                            {useNewCard && (
-                              <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
-                                <Check size={10} className="text-white" strokeWidth={3} />
-                              </div>
-                            )}
                           </div>
-                        </button>
-
-                        {/* Saved Cards */}
-                        {savedCards.map((card) => (
-                          <button
-                            key={card.id}
-                            onClick={() => { setUseNewCard(false); setSelectedCardId(card.id); }}
-                            className={clsx(
-                              'w-full rounded-xl border-2 text-start transition-all',
-                              !useNewCard && selectedCardId === card.id
-                                ? 'border-blue-500 bg-blue-50'
-                                : 'border-gray-100 hover:border-gray-200'
-                            )}
-                            style={{ padding: '16px 18px' }}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <span className={clsx(
-                                  'font-medium text-sm',
-                                  !useNewCard && selectedCardId === card.id ? 'text-blue-600' : 'text-gray-700'
-                                )}>
-                                  {getCardBrandIcon(card.brand)}
-                                </span>
-                                <p className="text-xs text-gray-500 font-mono mt-0.5">•••• {card.last_four}</p>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                {card.is_default && <Badge variant="primary" size="sm">{tCommon('default')}</Badge>}
-                                {!useNewCard && selectedCardId === card.id && (
-                                  <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
-                                    <Check size={10} className="text-white" strokeWidth={3} />
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </button>
-                        ))}
-
-                        {savedCards.length === 0 && (
-                          <p className="text-center text-xs text-gray-400 bg-gray-50 rounded-xl" style={{ padding: '16px 12px' }}>{t('noSavedCards')}</p>
-                        )}
-                      </div>
-                    )}
+                        </motion.button>
+                      );
+                    })}
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
 
-            {/* Recipient Info Card */}
-            <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="px-5 py-4 border-b border-gray-50 bg-gradient-to-r from-cyan-50/80 to-transparent">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                      <User size={18} className="text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-gray-800">{t('recipientInfo')}</h3>
-                      <p className="text-xs text-gray-400">{t('recipientPhone') || 'معلومات المستلم'}</p>
-                    </div>
-                  </div>
-                  {/* Toggle for ordering for someone else */}
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <span className="text-xs text-gray-500">{t('orderForSomeoneElse')}</span>
-                    <button
-                      type="button"
-                      onClick={() => setOrderForOther(!orderForOther)}
-                      className={clsx(
-                        'relative w-11 h-6 rounded-full transition-colors duration-200',
-                        orderForOther ? 'bg-cyan-500' : 'bg-gray-200'
-                      )}
-                    >
-                      <span
-                        className={clsx(
-                          'absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200',
-                          orderForOther ? 'start-[22px]' : 'start-0.5'
-                        )}
-                      />
-                    </button>
-                  </label>
                 </div>
-              </div>
-              <div style={{ padding: '20px' }}>
-                <div className="space-y-4">
-                  {/* Phone Number - Always shown */}
-                  <div>
-                    <label className="text-xs font-semibold text-gray-600 mb-2 block flex items-center gap-1.5" style={{ padding: '0 4px' }}>
-                      <Phone size={12} className="text-cyan-500" />
-                      {t('recipientPhone')} <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <Phone size={16} className="absolute start-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                      <input
-                        type="tel"
-                        value={recipientPhone}
-                        onChange={(e) => setRecipientPhone(e.target.value)}
-                        placeholder={t('recipientPhonePlaceholder')}
-                        className="w-full border border-gray-200 rounded-xl bg-white text-sm focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all"
-                        style={{ padding: '14px 18px', paddingInlineStart: '44px' }}
-                        dir="ltr"
-                      />
+
+                {/* Section 5: Recipient Info */}
+                <div style={{ padding: '20px' }}>
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-6 h-6 rounded-lg bg-cyan-100 flex items-center justify-center">
+                      <Phone size={14} className="text-cyan-600" />
                     </div>
+                    <h3 className="font-semibold text-gray-700 text-sm">{t('recipientPhone')}</h3>
                   </div>
-
-                  {/* Recipient Name - Only shown when ordering for someone else */}
-                  <AnimatePresence>
-                    {orderForOther && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                      >
-                        <label className="text-xs font-semibold text-gray-600 mb-2 block flex items-center gap-1.5" style={{ padding: '0 4px' }}>
-                          <User size={12} className="text-cyan-500" />
-                          {t('recipientName')}
-                        </label>
-                        <div className="relative">
-                          <User size={16} className="absolute start-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                          <input
-                            type="text"
-                            value={recipientName}
-                            onChange={(e) => setRecipientName(e.target.value)}
-                            placeholder={t('recipientNamePlaceholder')}
-                            className="w-full border border-gray-200 rounded-xl bg-white text-sm focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all"
-                            style={{ padding: '14px 18px', paddingInlineStart: '44px' }}
-                          />
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Order Notes Card */}
-            <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="px-5 py-4 border-b border-gray-50 bg-gradient-to-r from-rose-50/80 to-transparent">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 flex items-center justify-center shadow-lg shadow-rose-500/20">
-                    <FileText size={18} className="text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-800">{t('orderNotes')}</h3>
-                    <p className="text-xs text-gray-400">{t('addSpecialInstructions') || 'أضف أي ملاحظات خاصة'}</p>
+                  <div className="relative">
+                    <Phone size={14} className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                      type="tel"
+                      value={recipientPhone}
+                      onChange={(e) => setRecipientPhone(e.target.value)}
+                      placeholder={t('recipientPhonePlaceholder')}
+                      className="w-full border border-gray-200 rounded-lg bg-white text-sm focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all"
+                      style={{ padding: '10px 14px', paddingInlineStart: '36px' }}
+                      dir="ltr"
+                    />
                   </div>
                 </div>
-              </div>
-              <div style={{ padding: '20px' }}>
-                <textarea
-                  value={orderNote}
-                  onChange={(e) => setOrderNote(e.target.value)}
-                  placeholder={t('orderNotesPlaceholder')}
-                  rows={3}
-                  className="w-full border border-gray-200 rounded-xl bg-white resize-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 outline-none transition-all text-sm placeholder:text-gray-400"
-                  style={{ padding: '14px 18px' }}
-                />
+
+                {/* Section 6: Order Notes */}
+                <div style={{ padding: '20px' }}>
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-6 h-6 rounded-lg bg-rose-100 flex items-center justify-center">
+                      <FileText size={14} className="text-rose-600" />
+                    </div>
+                    <h3 className="font-semibold text-gray-700 text-sm">{t('orderNotes')}</h3>
+                    <span className="text-xs text-gray-400">({tCommon('optional') || 'اختياري'})</span>
+                  </div>
+                  <textarea
+                    value={orderNote}
+                    onChange={(e) => setOrderNote(e.target.value)}
+                    placeholder={t('orderNotesPlaceholder')}
+                    rows={2}
+                    className="w-full border border-gray-200 rounded-lg bg-white resize-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 outline-none transition-all text-sm placeholder:text-gray-400"
+                    style={{ padding: '10px 14px' }}
+                  />
+                </div>
               </div>
             </motion.div>
           </motion.div>
 
           {/* Order Summary Sidebar - 2 columns */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 order-1 lg:order-2">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden lg:sticky lg:top-24"
+              className="bg-white rounded-2xl shadow-sm border border-gray-200/60 overflow-hidden lg:sticky lg:top-24"
             >
               {/* Summary Header */}
               <div className="bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] text-white" style={{ padding: '20px' }}>
@@ -1477,20 +1247,23 @@ const CheckoutPage = () => {
 
               <div style={{ padding: '20px' }}>
                 {/* Cart Items Preview */}
-                <div className="space-y-2.5 mb-5 max-h-28 overflow-y-auto custom-scrollbar">
-                  {cartItems.slice(0, 3).map((item) => (
-                    <div key={item.id} className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2.5">
-                        <span className="w-6 h-6 bg-gray-100 rounded-lg text-xs font-bold flex items-center justify-center text-gray-600">
-                          {item.quantity}×
+                <div className="space-y-2.5 mb-5 max-h-32 overflow-y-auto custom-scrollbar">
+                  {cartItems.slice(0, 3).map((item) => {
+                    const productTitle = item.stock?.product?.translation?.title || `${t('item')} #${item.stock?.id}`;
+                    return (
+                      <div key={item.id} className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                          <span className="w-6 h-6 bg-[var(--primary)]/10 rounded-lg text-xs font-bold flex items-center justify-center text-[var(--primary)] shrink-0">
+                            {item.quantity}×
+                          </span>
+                          <span className="text-gray-700 truncate">{productTitle}</span>
+                        </div>
+                        <span className="text-gray-800 font-semibold shrink-0 ms-2">
+                          {(item.price * item.quantity).toFixed(2)} {tCommon('sar')}
                         </span>
-                        <span className="text-gray-600 truncate max-w-[100px]">{t('item')} #{item.stock?.id}</span>
                       </div>
-                      <span className="text-gray-800 font-semibold">
-                        {(item.price * item.quantity).toFixed(2)} {tCommon('sar')}
-                      </span>
-                    </div>
-                  ))}
+                    );
+                  })}
                   {cartItems.length > 3 && (
                     <p className="text-xs text-gray-400 text-center" style={{ paddingTop: '4px' }}>+{cartItems.length - 3} {t('moreItems')}</p>
                   )}
@@ -1649,41 +1422,51 @@ const CheckoutPage = () => {
               </div>
 
               {/* Place Order Button */}
-              <div style={{ padding: '0 20px 20px 20px' }}>
-                <motion.button
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                  onClick={handlePlaceOrder}
-                  disabled={
+              <div className="px-5 pb-5">
+                {(() => {
+                  const isDisabled = 
                     (deliveryType === 'delivery' && !selectedAddressId) ||
                     !selectedPaymentId ||
                     !recipientPhone.trim() ||
                     (cart?.shop?.min_amount && subtotal < cart.shop.min_amount) ||
-                    submitting
-                  }
-                  className={clsx(
-                    'w-full rounded-xl font-bold text-base flex items-center justify-center gap-3 transition-all shadow-xl',
-                    (submitting || (deliveryType === 'delivery' && !selectedAddressId) || !selectedPaymentId || !recipientPhone.trim() || (cart?.shop?.min_amount && subtotal < cart.shop.min_amount))
-                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
-                      : 'bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] text-white hover:shadow-[var(--primary)]/30 hover:shadow-2xl'
-                  )}
-                  style={{ padding: '16px 24px' }}
-                >
-                  {submitting ? (
-                    <Loader2 size={22} className="animate-spin" />
-                  ) : (
-                    <>
-                      <ShoppingBag size={20} />
-                      <span style={{ padding: '0 4px' }}>{t('placeOrder')}</span>
-                      {isRTL ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}
-                    </>
-                  )}
-                </motion.button>
+                    submitting;
+                  
+                  return (
+                    <motion.button
+                      whileHover={!isDisabled ? { scale: 1.02 } : {}}
+                      whileTap={!isDisabled ? { scale: 0.98 } : {}}
+                      onClick={handlePlaceOrder}
+                      disabled={isDisabled}
+                      className="w-full rounded-2xl font-bold text-base flex items-center justify-center gap-3 transition-all duration-300 py-4"
+                      style={{
+                        backgroundColor: isDisabled ? '#e5e7eb' : '#ef4444',
+                        color: isDisabled ? '#9ca3af' : '#ffffff',
+                        border: isDisabled ? '1px solid #d1d5db' : '1px solid #ef4444',
+                        cursor: isDisabled ? 'not-allowed' : 'pointer',
+                        boxShadow: isDisabled ? 'none' : '0 10px 25px -5px rgba(239, 68, 68, 0.3)',
+                      }}
+                    >
+                      {submitting ? (
+                        <Loader2 size={22} className="animate-spin" style={{ color: isDisabled ? '#9ca3af' : '#ffffff' }} />
+                      ) : (
+                        <>
+                          <ShoppingBag size={20} style={{ color: isDisabled ? '#9ca3af' : '#ffffff' }} />
+                          <span style={{ color: isDisabled ? '#9ca3af' : '#ffffff' }}>{t('placeOrder')}</span>
+                          {isRTL ? (
+                            <ArrowLeft size={18} style={{ color: isDisabled ? '#9ca3af' : '#ffffff' }} />
+                          ) : (
+                            <ArrowRight size={18} style={{ color: isDisabled ? '#9ca3af' : '#ffffff' }} />
+                          )}
+                        </>
+                      )}
+                    </motion.button>
+                  );
+                })()}
                 
                 {/* Security Note */}
-                <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400" style={{ padding: '8px 12px' }}>
-                  <Shield size={14} className="text-emerald-500" />
-                  <span style={{ padding: '0 4px' }}>{t('securePayment') || 'دفع آمن ومشفر 100%'}</span>
+                <div className="mt-4 flex items-center justify-center gap-2 text-xs" style={{ color: '#6b7280' }}>
+                  <Shield size={14} style={{ color: '#10b981' }} />
+                  <span>{t('securePayment') || 'دفع آمن ومشفر 100%'}</span>
                 </div>
               </div>
             </motion.div>
@@ -1720,33 +1503,39 @@ const CheckoutPage = () => {
             </div>
           )}
           
-          <motion.button
-            whileTap={{ scale: 0.98 }}
-            onClick={handlePlaceOrder}
-            disabled={
+          {(() => {
+            const isMobileDisabled = 
               (deliveryType === 'delivery' && !selectedAddressId) ||
               !selectedPaymentId ||
               !recipientPhone.trim() ||
               (cart?.shop?.min_amount && subtotal < cart.shop.min_amount) ||
-              submitting
-            }
-            className={clsx(
-              'w-full rounded-xl font-bold text-base flex items-center justify-center gap-2.5 transition-all',
-              (submitting || (deliveryType === 'delivery' && !selectedAddressId) || !selectedPaymentId || !recipientPhone.trim() || (cart?.shop?.min_amount && subtotal < cart.shop.min_amount))
-                ? 'bg-gray-200 text-gray-400'
-                : 'bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] text-white shadow-xl shadow-[var(--primary)]/20'
-            )}
-            style={{ padding: '16px 24px' }}
-          >
-            {submitting ? (
-              <Loader2 size={20} className="animate-spin" />
-            ) : (
-              <>
-                <ShoppingBag size={18} />
-                <span style={{ padding: '0 4px' }}>{t('placeOrder')}</span>
-              </>
-            )}
-          </motion.button>
+              submitting;
+            
+            return (
+              <motion.button
+                whileTap={{ scale: 0.98 }}
+                onClick={handlePlaceOrder}
+                disabled={isMobileDisabled}
+                className="w-full rounded-2xl font-bold text-base flex items-center justify-center gap-2.5 transition-all duration-300 py-4"
+                style={{
+                  backgroundColor: isMobileDisabled ? '#e5e7eb' : '#ef4444',
+                  color: isMobileDisabled ? '#9ca3af' : '#ffffff',
+                  border: isMobileDisabled ? '1px solid #d1d5db' : '1px solid #ef4444',
+                  cursor: isMobileDisabled ? 'not-allowed' : 'pointer',
+                  boxShadow: isMobileDisabled ? 'none' : '0 10px 25px -5px rgba(239, 68, 68, 0.3)',
+                }}
+              >
+                {submitting ? (
+                  <Loader2 size={20} className="animate-spin" style={{ color: isMobileDisabled ? '#9ca3af' : '#ffffff' }} />
+                ) : (
+                  <>
+                    <ShoppingBag size={18} style={{ color: isMobileDisabled ? '#9ca3af' : '#ffffff' }} />
+                    <span style={{ color: isMobileDisabled ? '#9ca3af' : '#ffffff' }}>{t('placeOrder')}</span>
+                  </>
+                )}
+              </motion.button>
+            );
+          })()}
         </div>
       </div>
 

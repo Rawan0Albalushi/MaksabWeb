@@ -71,6 +71,7 @@
     "loadingAddresses": "جاري تحميل العناوين...",
     "addNewAddress": "إضافة عنوان جديد",
     "default": "الافتراضي",
+    "optional": "اختياري",
     "searchForAddress": "ابحث عن عنوان..."
   },
   "home": {
@@ -258,13 +259,19 @@
   },
   "checkout": {
     "title": "إتمام الطلب",
+    "orderDetails": "تفاصيل الطلب",
+    "fillOrderDetails": "أكمل بيانات طلبك",
     "deliveryAddress": "عنوان التوصيل",
+    "changeAddress": "تغيير",
     "selectAddress": "اختر عنوان التوصيل",
     "addAddress": "إضافة عنوان جديد",
     "paymentMethod": "طريقة الدفع",
     "cash": "الدفع عند الاستلام",
+    "cashDescription": "ادفع نقداً عند استلام طلبك",
     "card": "بطاقة ائتمان",
+    "cardDescription": "ادفع ببطاقتك الائتمانية بأمان",
     "wallet": "المحفظة",
+    "walletDescription": "استخدم رصيد محفظتك للدفع",
     "orderNotes": "ملاحظات الطلب",
     "orderNotesPlaceholder": "أضف أي ملاحظات خاصة بالطلب...",
     "placeOrder": "تأكيد الطلب",

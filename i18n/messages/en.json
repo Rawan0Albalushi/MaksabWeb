@@ -71,6 +71,7 @@
     "loadingAddresses": "Loading addresses...",
     "addNewAddress": "Add new address",
     "default": "Default",
+    "optional": "Optional",
     "searchForAddress": "Search for address..."
   },
   "home": {
@@ -258,13 +259,19 @@
   },
   "checkout": {
     "title": "Checkout",
+    "orderDetails": "Order Details",
+    "fillOrderDetails": "Complete your order details",
     "deliveryAddress": "Delivery Address",
+    "changeAddress": "Change",
     "selectAddress": "Select delivery address",
     "addAddress": "Add new address",
     "paymentMethod": "Payment Method",
     "cash": "Cash on Delivery",
+    "cashDescription": "Pay cash when you receive your order",
     "card": "Credit Card",
+    "cardDescription": "Pay securely with your credit card",
     "wallet": "Wallet",
+    "walletDescription": "Use your wallet balance to pay",
     "orderNotes": "Order Notes",
     "orderNotesPlaceholder": "Add any special notes for your order...",
     "placeOrder": "Place Order",
