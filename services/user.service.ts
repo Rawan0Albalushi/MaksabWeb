@@ -22,8 +22,8 @@ interface AddressData {
     latitude: number;
     longitude: number;
   };
-  street_house_number?: string;
-  additional_details?: string;
+  house?: string; // رقم المبنى/الشقة
+  floor?: string; // رقم الطابق
 }
 
 // Format address data for API (converts to API expected format)
@@ -33,13 +33,11 @@ const formatAddressForApi = (data: AddressData) => {
     // API expects address as object with address, floor, house
     address: {
       address: data.address,
-      floor: '', // Optional field
-      house: data.street_house_number || '',
+      floor: data.floor || '',
+      house: data.house || '',
     },
     // API expects location as array [latitude, longitude]
     location: [data.location.latitude, data.location.longitude],
-    // Additional details can be sent separately if needed
-    ...(data.additional_details && { additional_details: data.additional_details }),
   };
 };
 

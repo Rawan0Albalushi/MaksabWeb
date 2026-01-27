@@ -67,7 +67,8 @@
     "change": "تغيير",
     "loadingAddresses": "جاري تحميل العناوين...",
     "addNewAddress": "إضافة عنوان جديد",
-    "default": "الافتراضي"
+    "default": "الافتراضي",
+    "searchForAddress": "ابحث عن عنوان..."
   },
   "home": {
     "title": "مكسب",

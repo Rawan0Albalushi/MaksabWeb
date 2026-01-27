@@ -19,7 +19,7 @@ interface UseAddressManagerReturn {
   fetchAddresses: () => Promise<void>;
   selectAddress: (address: Address) => void;
   useCurrentLocation: () => Promise<void>;
-  detectLocation: () => Promise<void>;
+  detectLocation: () => Promise<{ latitude: number; longitude: number; address?: string; city?: string } | null>;
   addAddress: (data: AddressFormData) => Promise<Address | null>;
   updateAddress: (addressId: number, data: AddressFormData) => Promise<boolean>;
   deleteAddress: (addressId: number) => Promise<boolean>;
@@ -38,8 +38,8 @@ export interface AddressFormData {
     latitude: number;
     longitude: number;
   };
-  street_house_number?: string;
-  additional_details?: string;
+  house?: string; // رقم المبنى/الشقة
+  floor?: string; // رقم الطابق
 }
 
 export const useAddressManager = (): UseAddressManagerReturn => {
@@ -133,7 +133,8 @@ export const useAddressManager = (): UseAddressManagerReturn => {
 
   // Detect and use current location
   const detectLocation = useCallback(async () => {
-    await getCurrentLocation();
+    const location = await getCurrentLocation();
+    return location;
   }, [getCurrentLocation]);
 
   // Use current location as selected

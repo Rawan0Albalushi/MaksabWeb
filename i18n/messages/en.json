@@ -67,7 +67,8 @@
     "change": "Change",
     "loadingAddresses": "Loading addresses...",
     "addNewAddress": "Add new address",
-    "default": "Default"
+    "default": "Default",
+    "searchForAddress": "Search for address..."
   },
   "home": {
     "title": "Maksab",

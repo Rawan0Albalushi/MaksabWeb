@@ -88,8 +88,8 @@ export const AddressForm = ({
   const [addressType, setAddressType] = useState<AddressType>('home');
   const [customTitle, setCustomTitle] = useState('');
   const [address, setAddress] = useState('');
-  const [streetHouseNumber, setStreetHouseNumber] = useState('');
-  const [additionalDetails, setAdditionalDetails] = useState('');
+  const [house, setHouse] = useState(''); // رقم المبنى/الشقة
+  const [floor, setFloor] = useState(''); // رقم الطابق
   const [location, setLocation] = useState<{ latitude: number; longitude: number }>({
     latitude: DEFAULT_LOCATION.latitude,
     longitude: DEFAULT_LOCATION.longitude,
@@ -122,16 +122,15 @@ export const AddressForm = ({
         setCustomTitle(editAddress.title || '');
       }
 
-      // Set address
+      // Set address and additional fields
       if (typeof editAddress.address === 'string') {
         setAddress(editAddress.address);
       } else if (editAddress.address?.address) {
         setAddress(editAddress.address.address);
+        // Get house and floor from address object
+        setHouse(editAddress.address.house || '');
+        setFloor(editAddress.address.floor || '');
       }
-
-      // Set additional fields
-      setStreetHouseNumber(editAddress.street_house_number || '');
-      setAdditionalDetails(editAddress.additional_details || '');
 
       // Set location
       if (editAddress.location) {
@@ -174,8 +173,8 @@ export const AddressForm = ({
     setAddressType('home');
     setCustomTitle('');
     setAddress('');
-    setStreetHouseNumber('');
-    setAdditionalDetails('');
+    setHouse('');
+    setFloor('');
     setLocation({
       latitude: DEFAULT_LOCATION.latitude,
       longitude: DEFAULT_LOCATION.longitude,
@@ -295,13 +294,13 @@ export const AddressForm = ({
 
   // Handle detect current location
   const handleDetectLocation = async () => {
-    await detectLocation();
-    if (currentLocation) {
+    const location = await detectLocation();
+    if (location) {
       setLocation({
-        latitude: currentLocation.latitude,
-        longitude: currentLocation.longitude,
+        latitude: location.latitude,
+        longitude: location.longitude,
       });
-      setAddress(currentLocation.address || '');
+      setAddress(location.address || '');
     }
   };
 
@@ -404,7 +403,8 @@ export const AddressForm = ({
 
   // Handle save
   const handleSave = async () => {
-    if (!address || !location.latitude || !location.longitude) {
+    // Validation - all required fields must be filled
+    if (!address || !location.latitude || !location.longitude || !house || !floor) {
       return;
     }
 
@@ -417,8 +417,8 @@ export const AddressForm = ({
         latitude: location.latitude,
         longitude: location.longitude,
       },
-      street_house_number: streetHouseNumber || undefined,
-      additional_details: additionalDetails || undefined,
+      house: house,
+      floor: floor,
     };
 
     try {
@@ -706,17 +706,18 @@ export const AddressForm = ({
 
                   {/* Search Input */}
                   <div className="relative">
-                    <div className="relative">
-                      <Search size={18} className="absolute start-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <div className="flex items-center gap-4 px-5 rounded-xl border border-gray-200 bg-gray-50 focus-within:border-[var(--primary)] focus-within:bg-white transition-all !outline-none !ring-0 !shadow-none" style={{ paddingTop: '16px', paddingBottom: '16px', minHeight: '60px' }}>
+                      <Search size={24} className="text-gray-400 flex-shrink-0" />
                       <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="ابحث عن عنوان..."
-                        className="w-full ps-11 pe-4 py-3 rounded-xl border border-gray-200 focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all text-sm"
+                        placeholder={t('searchForAddress')}
+                        style={{ outline: 'none', boxShadow: 'none' }}
+                        className="flex-1 text-base placeholder:text-gray-400 bg-transparent !outline-none !ring-0 !border-none !shadow-none"
                       />
                       {isSearching && (
-                        <Loader2 size={18} className="absolute end-4 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />
+                        <Loader2 size={22} className="text-gray-400 animate-spin flex-shrink-0" />
                       )}
                     </div>
 
@@ -747,20 +748,13 @@ export const AddressForm = ({
                   </div>
 
                   {/* Map */}
-                  <div className="rounded-xl overflow-hidden border border-gray-200">
+                  <div className="rounded-xl overflow-hidden border border-gray-200" style={{ marginTop: '20px' }}>
                     <MapComponent
                       center={[location.latitude, location.longitude]}
                       onLocationChange={handleLocationChange}
                     />
                   </div>
 
-                  {/* Selected Address Display */}
-                  {address && (
-                    <div className="flex items-start gap-3 bg-green-50 rounded-xl border border-green-200" style={{ padding: '14px 18px' }}>
-                      <MapPin size={18} className="text-green-600 flex-shrink-0 mt-0.5" />
-                      <p className="text-sm text-green-700">{address}</p>
-                    </div>
-                  )}
                 </div>
 
                 {/* Address Type Selection */}
@@ -818,29 +812,55 @@ export const AddressForm = ({
                   </div>
                 )}
 
-                {/* Address Details */}
-                <div className="space-y-4">
-                  <p className="text-sm font-semibold text-[var(--black)]">تفاصيل إضافية (اختياري)</p>
-                  
-                  <div className="space-y-2">
-                    <label className="text-xs text-gray-500">{tAddress('street')} / رقم المنزل</label>
-                    <Input
-                      value={streetHouseNumber}
-                      onChange={(e) => setStreetHouseNumber(e.target.value)}
-                      placeholder="شارع 15، منزل رقم 23"
-                      className="w-full"
-                    />
-                  </div>
+                {/* Address Text Input */}
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[var(--black)]">
+                    العنوان التفصيلي <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="يُجلب تلقائياً من الخريطة أو أدخله يدوياً"
+                    rows={2}
+                    style={{ padding: '14px 16px' }}
+                    className="w-full rounded-xl border border-gray-200 focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all text-sm resize-none"
+                  />
+                  {address && (
+                    <p className="text-xs text-green-600 flex items-center gap-1">
+                      <Check size={12} />
+                      تم تحديد العنوان
+                    </p>
+                  )}
+                </div>
 
-                  <div className="space-y-2">
-                    <label className="text-xs text-gray-500">ملاحظات للتوصيل</label>
-                    <textarea
-                      value={additionalDetails}
-                      onChange={(e) => setAdditionalDetails(e.target.value)}
-                      placeholder="مثال: البوابة الزرقاء، الدور الثاني"
-                      rows={3}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all text-sm resize-none"
-                    />
+                {/* Address Details - Required Fields */}
+                <div className="space-y-4">
+                  <p className="text-sm font-semibold text-[var(--black)]">تفاصيل العنوان <span className="text-red-500">*</span></p>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs text-gray-600 font-medium">
+                        رقم المبنى/الشقة <span className="text-red-500">*</span>
+                      </label>
+                      <Input
+                        value={house}
+                        onChange={(e) => setHouse(e.target.value)}
+                        placeholder="مثال: 15"
+                        className={clsx("w-full", !house && "border-gray-200")}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs text-gray-600 font-medium">
+                        رقم الطابق <span className="text-red-500">*</span>
+                      </label>
+                      <Input
+                        value={floor}
+                        onChange={(e) => setFloor(e.target.value)}
+                        placeholder="مثال: 3"
+                        className={clsx("w-full", !floor && "border-gray-200")}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -852,7 +872,7 @@ export const AddressForm = ({
             <div className="flex-shrink-0 bg-white border-t border-gray-100" style={{ padding: '20px 24px' }}>
               <button
                 onClick={handleSave}
-                disabled={isSaving || !address}
+                disabled={isSaving || !address || !house || !floor}
                 style={{ backgroundColor: '#FF3D00', padding: '16px 24px' }}
                 className={clsx(
                   "w-full flex items-center justify-center gap-2 rounded-xl text-base font-bold transition-all",

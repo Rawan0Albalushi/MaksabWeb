@@ -264,17 +264,30 @@ const MapPicker = ({ center, onLocationChange, zoom = MapConfig.defaultZoom, hei
     // Store custom marker reference for updates
     (mapInstanceRef.current as any)._customMarker = customMarker;
 
-  }, [isLoaded, center, zoom, onLocationChange]);
+  }, [isLoaded, zoom, onLocationChange]);
 
   // Update marker position when center changes externally
   useEffect(() => {
-    if (mapInstanceRef.current && (mapInstanceRef.current as any)._customMarker) {
-      const customMarker = (mapInstanceRef.current as any)._customMarker;
+    if (!isLoaded || !window.google?.maps) return;
+    
+    if (mapInstanceRef.current) {
       const newPos = new window.google.maps.LatLng(center[0], center[1]);
-      customMarker.setPosition(newPos);
-      mapInstanceRef.current.setCenter(newPos);
+      
+      // Update map center with animation
+      mapInstanceRef.current.panTo(newPos);
+      
+      // Update custom marker if exists
+      if ((mapInstanceRef.current as any)._customMarker) {
+        const customMarker = (mapInstanceRef.current as any)._customMarker;
+        customMarker.setPosition(newPos);
+      }
+      
+      // Update hidden marker if exists
+      if (markerRef.current) {
+        markerRef.current.setPosition(newPos);
+      }
     }
-  }, [center]);
+  }, [isLoaded, center[0], center[1]]);
 
   if (isLoading) {
     return (
