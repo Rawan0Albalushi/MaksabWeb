@@ -89,14 +89,16 @@ export default function ShopDetailsLoading() {
         {/* Products Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-5">
           {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl overflow-hidden border border-[var(--border)] h-full">
-              <div className="aspect-square bg-gray-100 animate-pulse" />
+            <div key={i} className="bg-white rounded-2xl overflow-hidden border border-gray-100/50 shadow-sm h-full">
+              <div className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100/80 relative overflow-hidden">
+                <div className="absolute inset-0 skeleton" />
+              </div>
               <div className="p-3 space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse" />
-                <div className="h-3 bg-gray-100 rounded w-full animate-pulse" />
-                <div className="h-3 bg-gray-100 rounded w-2/3 animate-pulse" />
-                <div className="flex items-center justify-between pt-2 border-t border-gray-100 mt-2">
-                  <div className="h-5 bg-gray-200 rounded w-16 animate-pulse" />
+                <div className="h-4 bg-gradient-to-r from-gray-100 to-gray-50 rounded-md w-3/4 animate-pulse" />
+                <div className="h-3 bg-gray-50 rounded w-full animate-pulse" />
+                <div className="h-3 bg-gray-50 rounded w-2/3 animate-pulse" />
+                <div className="flex items-center justify-between pt-2 border-t border-gray-50 mt-2">
+                  <div className="h-5 bg-gradient-to-r from-gray-100 to-gray-50 rounded-lg w-16 animate-pulse" />
                 </div>
               </div>
             </div>

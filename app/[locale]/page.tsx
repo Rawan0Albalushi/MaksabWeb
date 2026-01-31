@@ -28,6 +28,7 @@ import {
 } from '@/components/ui';
 import { ShopCard, CategoryCard } from '@/components/cards';
 import { AddressSelector } from '@/components/address';
+import { Footer } from '@/components/layout';
 import { shopService } from '@/services';
 import { Banner, Category, Shop, Story } from '@/types';
 import { useSettingsStore, useLocationStore, useAuthStore } from '@/store';
@@ -896,6 +897,9 @@ const HomePage = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Footer - Only on Home Page */}
+      <Footer />
     </div>
   );
 };

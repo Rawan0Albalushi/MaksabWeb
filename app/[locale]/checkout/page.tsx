@@ -39,7 +39,7 @@ import { clsx } from 'clsx';
 import { Button, Input, Badge, EmptyState, Modal } from '@/components/ui';
 import { cartService, orderService, userService, settingsService } from '@/services';
 import type { CartDetail, Address, CalculateResult, SavedCard, Currency } from '@/types';
-import { useCartStore, useAuthStore, useSettingsStore } from '@/store';
+import { useCartStore, useAuthStore, useSettingsStore, useLocationStore } from '@/store';
 
 interface PaymentMethod {
   id: number;
@@ -59,6 +59,7 @@ const CheckoutPage = () => {
 
   const { user, isAuthenticated } = useAuthStore();
   const { cart, setCart, clearCart } = useCartStore();
+  const { selectedAddress: globalSelectedAddress } = useLocationStore();
 
   // Currency state
   const [activeCurrency, setActiveCurrency] = useState<Currency | null>(null);
@@ -156,12 +157,25 @@ const CheckoutPage = () => {
       const addressResponse = await userService.getAddresses();
       setAddresses(addressResponse.data || []);
       
-      // Auto-select active address
-      const activeAddress = addressResponse.data?.find(a => a.active);
-      if (activeAddress) {
-        setSelectedAddressId(activeAddress.id);
-      } else if (addressResponse.data?.length > 0) {
-        setSelectedAddressId(addressResponse.data[0].id);
+      // Use the globally selected address from home page, or fall back to active/first address
+      if (globalSelectedAddress?.id) {
+        // Use the address selected on home page
+        const matchingAddress = addressResponse.data?.find(a => a.id === globalSelectedAddress.id);
+        if (matchingAddress) {
+          setSelectedAddressId(matchingAddress.id);
+        } else if (addressResponse.data?.length > 0) {
+          // If selected address not found in list, use active or first
+          const activeAddress = addressResponse.data?.find(a => a.active);
+          setSelectedAddressId(activeAddress?.id || addressResponse.data[0].id);
+        }
+      } else {
+        // No globally selected address, use active or first
+        const activeAddress = addressResponse.data?.find(a => a.active);
+        if (activeAddress) {
+          setSelectedAddressId(activeAddress.id);
+        } else if (addressResponse.data?.length > 0) {
+          setSelectedAddressId(addressResponse.data[0].id);
+        }
       }
 
       // Fetch payment methods
@@ -995,7 +1009,7 @@ const CheckoutPage = () => {
                         </div>
                       ) : (
                         <div>
-                          {/* Show only selected address */}
+                          {/* Show only the selected address */}
                           {(() => {
                             const selectedAddress = addresses.find(a => a.id === selectedAddressId) || addresses[0];
                             return (

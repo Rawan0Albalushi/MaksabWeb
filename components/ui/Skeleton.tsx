@@ -16,14 +16,18 @@ const Skeleton = ({
   height,
 }: SkeletonProps) => {
   const variants = {
-    text: 'rounded-[var(--radius-sm)]',
+    text: 'rounded-lg',
     circular: 'rounded-full',
-    rectangular: 'rounded-[var(--radius-md)]',
+    rectangular: 'rounded-xl',
   };
 
   return (
     <div
-      className={clsx('skeleton bg-[var(--border)]', variants[variant], className)}
+      className={clsx(
+        'skeleton bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100',
+        variants[variant], 
+        className
+      )}
       style={{
         width: width,
         height: height || (variant === 'text' ? '1em' : undefined),
@@ -34,53 +38,56 @@ const Skeleton = ({
 
 // Pre-built skeleton components
 export const ShopCardSkeleton = () => (
-  <div className="bg-white rounded-[var(--radius-lg)] overflow-hidden shadow-sm">
-    <Skeleton variant="rectangular" className="w-full aspect-[4/3]" />
-    <div className="p-4 pt-8 space-y-3">
-      <Skeleton width="70%" height={18} />
-      <Skeleton width="50%" height={14} />
+  <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100/50">
+    {/* Image placeholder with subtle gradient */}
+    <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100/80">
+      <div className="absolute inset-0 skeleton" />
+      {/* Decorative elements to mimic actual card */}
+      <div className="absolute top-3 end-3 w-8 h-8 rounded-full bg-white/40 skeleton" />
+      <div className="absolute -bottom-6 start-4 w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-white shadow-lg border border-gray-100/50 skeleton" />
+    </div>
+    <div className="p-4 pt-10 space-y-3">
+      <Skeleton width="75%" height={20} className="rounded-lg" />
+      <Skeleton width="55%" height={14} className="rounded-md" />
       <div className="flex gap-2 pt-2">
-        <Skeleton width={50} height={22} className="rounded-full" />
-        <Skeleton width={70} height={22} className="rounded-full" />
-        <Skeleton width={50} height={22} className="rounded-full" />
+        <Skeleton width={55} height={24} className="rounded-full" />
+        <Skeleton width={75} height={24} className="rounded-full" />
+        <Skeleton width={55} height={24} className="rounded-full" />
       </div>
     </div>
   </div>
 );
 
 export const ProductCardSkeleton = () => (
-  <div className="bg-white rounded-[var(--radius-lg)] overflow-hidden shadow-sm">
-    <Skeleton variant="rectangular" className="w-full aspect-square" />
+  <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100/50">
+    <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100/80">
+      <div className="absolute inset-0 skeleton" />
+    </div>
     <div className="p-3 space-y-2">
-      <Skeleton width="80%" height={16} />
-      <Skeleton width="50%" height={12} />
+      <Skeleton width="80%" height={16} className="rounded-md" />
+      <Skeleton width="50%" height={12} className="rounded-md" />
       <div className="flex justify-between items-center pt-2">
-        <Skeleton width={60} height={20} />
-        <Skeleton variant="circular" width={36} height={36} />
+        <Skeleton width={65} height={22} className="rounded-lg" />
+        <Skeleton variant="circular" width={38} height={38} />
       </div>
     </div>
   </div>
 );
 
 export const CategorySkeleton = () => (
-  <div className="flex flex-col items-center gap-2 p-2">
-    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl skeleton bg-[var(--border)]" />
-    <Skeleton width={50} height={12} />
+  <div className="flex flex-col items-center gap-2.5 p-2">
+    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100/80 skeleton" />
+    <Skeleton width={55} height={12} className="rounded-md" />
   </div>
 );
 
 export const BannerSkeleton = () => (
   <div className="relative">
-    <Skeleton 
-      variant="rectangular" 
-      className="w-full aspect-[4/3] sm:aspect-[16/10] rounded-3xl" 
-    />
-    {/* Floating promo skeleton */}
-    <div className="absolute -bottom-6 -end-6 lg:end-auto lg:-start-12 bg-white rounded-2xl p-4 shadow-xl hidden sm:flex items-center gap-3">
-      <Skeleton variant="rectangular" width={48} height={48} className="rounded-xl" />
-      <div className="space-y-1">
-        <Skeleton width={60} height={12} />
-        <Skeleton width={100} height={16} />
+    <div className="w-full aspect-[4/3] sm:aspect-[16/10] rounded-xl sm:rounded-2xl lg:rounded-3xl bg-gradient-to-br from-white/10 to-white/5 skeleton" />
+    {/* Slide indicator skeleton */}
+    <div className="absolute top-3 sm:top-4 end-3 sm:end-4 z-10">
+      <div className="bg-black/30 backdrop-blur-md rounded-full px-3 py-1.5">
+        <div className="w-8 h-3 rounded bg-white/20" />
       </div>
     </div>
   </div>
@@ -88,9 +95,9 @@ export const BannerSkeleton = () => (
 
 export const StorySkeleton = () => (
   <div className="flex-shrink-0">
-    <div className="w-20 h-20 rounded-full p-[3px] bg-[var(--border)]">
+    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full p-[2px] sm:p-[3px] bg-gradient-to-br from-gray-200 to-gray-100">
       <div className="w-full h-full rounded-full bg-white p-[2px]">
-        <Skeleton variant="circular" className="w-full h-full" />
+        <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-50 to-gray-100 skeleton" />
       </div>
     </div>
   </div>
@@ -100,8 +107,16 @@ export const HeroSkeleton = () => (
   <section className="relative min-h-[auto] sm:min-h-[420px] lg:min-h-[480px] flex items-start sm:items-center z-[100]">
     {/* Background matching the actual hero */}
     <div className="absolute inset-0 bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] overflow-hidden">
-      <div className="absolute top-10 sm:top-20 start-5 sm:start-10 w-32 sm:w-72 h-32 sm:h-72 bg-[var(--primary)]/20 rounded-full blur-3xl opacity-50" />
-      <div className="absolute bottom-20 sm:bottom-24 end-5 sm:end-10 w-32 sm:w-72 h-32 sm:h-72 bg-[var(--primary-dark)]/30 rounded-full blur-3xl opacity-50" />
+      <div className="absolute top-10 sm:top-20 start-5 sm:start-10 w-32 sm:w-72 h-32 sm:h-72 bg-[var(--primary)]/20 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-20 sm:bottom-24 end-5 sm:end-10 w-32 sm:w-72 h-32 sm:h-72 bg-[var(--primary-dark)]/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      {/* Grid pattern like actual hero */}
+      <div
+        className="absolute inset-0 opacity-5 pointer-events-none"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)`,
+          backgroundSize: '40px 40px',
+        }}
+      />
     </div>
 
     <div className="container relative z-10 sm:pt-6 sm:pb-6 lg:py-10" style={{ paddingTop: '70px', paddingBottom: '40px' }}>
@@ -109,35 +124,33 @@ export const HeroSkeleton = () => (
         {/* Hero Content Skeleton */}
         <div className="text-center lg:text-start flex flex-col items-center lg:items-start gap-2 sm:gap-0">
           {/* Title */}
-          <div className="space-y-1.5 sm:space-y-2 w-full flex flex-col items-center lg:items-start">
-            <Skeleton width="85%" height={28} className="!bg-white/10 sm:hidden rounded-lg" />
-            <Skeleton width="65%" height={28} className="!bg-white/10 sm:hidden rounded-lg" />
-            <Skeleton width="80%" height={40} className="!bg-white/10 hidden sm:block lg:hidden rounded-lg" />
-            <Skeleton width="60%" height={40} className="!bg-white/10 hidden sm:block lg:hidden rounded-lg" />
-            <Skeleton width="90%" height={48} className="!bg-white/10 hidden lg:block rounded-lg" />
-            <Skeleton width="70%" height={48} className="!bg-white/10 hidden lg:block rounded-lg" />
-          </div>
-
-          {/* Spacer */}
-          <div className="h-1.5 sm:h-3" />
-          
-          {/* Subtitle */}
-          <div className="w-full flex justify-center lg:justify-start">
-            <Skeleton width="90%" height={16} className="!bg-white/10 max-w-lg rounded-md sm:hidden" />
-            <Skeleton width="85%" height={20} className="!bg-white/10 max-w-lg rounded-md hidden sm:block" />
+          <div className="space-y-2 sm:space-y-3 w-full flex flex-col items-center lg:items-start">
+            <div className="h-7 sm:h-10 lg:h-12 w-[85%] sm:w-[80%] bg-white/10 rounded-lg animate-pulse" />
+            <div className="h-7 sm:h-10 lg:h-12 w-[65%] sm:w-[60%] bg-gradient-to-r from-[var(--primary)]/30 to-[var(--primary-light)]/20 rounded-lg animate-pulse" />
           </div>
 
           {/* Spacer */}
           <div className="h-2 sm:h-4" />
+          
+          {/* Subtitle */}
+          <div className="w-full flex justify-center lg:justify-start">
+            <div className="h-4 sm:h-5 w-[90%] max-w-lg bg-white/8 rounded-md animate-pulse" />
+          </div>
+
+          {/* Spacer */}
+          <div className="h-3 sm:h-5" />
 
           {/* Location Selector Skeleton */}
-          <div className="relative max-w-md mx-auto lg:mx-0 z-[60] w-full px-1 sm:px-0">
-            <div className="relative flex items-center rounded-xl sm:rounded-2xl border transition-all duration-300 bg-gradient-to-r from-white/[0.08] to-white/[0.04] backdrop-blur-xl border-white/[0.12] h-12 sm:h-14">
+          <div className="relative max-w-md mx-auto lg:mx-0 w-full px-1 sm:px-0">
+            {/* Outer glow effect */}
+            <div className="absolute -inset-1 rounded-xl sm:rounded-2xl blur-lg opacity-30 bg-gradient-to-r from-[var(--primary)]/20 via-[#ff6b3d]/10 to-[var(--primary-light)]/20 animate-pulse" />
+            
+            <div className="relative flex items-center rounded-xl sm:rounded-2xl border bg-gradient-to-r from-white/[0.08] to-white/[0.04] backdrop-blur-xl border-white/[0.12] h-12 sm:h-14">
               <div className="flex items-center gap-3 px-4 w-full">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/10 animate-pulse flex-shrink-0" />
-                <div className="flex-1">
-                  <Skeleton width={60} height={10} className="!bg-white/15 rounded mb-1" />
-                  <Skeleton width={120} height={14} className="!bg-white/20 rounded" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[var(--primary)]/20 animate-pulse flex-shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                  <div className="h-2.5 w-16 bg-white/10 rounded animate-pulse" />
+                  <div className="h-3.5 w-28 bg-white/15 rounded animate-pulse" />
                 </div>
                 <div className="w-5 h-5 rounded bg-white/10 animate-pulse" />
               </div>
@@ -145,7 +158,7 @@ export const HeroSkeleton = () => (
           </div>
 
           {/* Spacer */}
-          <div className="h-3 sm:h-5" />
+          <div className="h-4 sm:h-6" />
 
           {/* Stats Skeleton */}
           <div className="flex items-center justify-center lg:justify-start gap-4 sm:gap-10 w-full">
@@ -154,10 +167,8 @@ export const HeroSkeleton = () => (
                 {i > 1 && (
                   <div className="absolute -start-2 sm:-start-5 top-0 h-full w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
                 )}
-                <Skeleton width={50} height={20} className="!bg-white/15 rounded mb-1 sm:hidden mx-auto lg:mx-0" />
-                <Skeleton width={70} height={28} className="!bg-white/15 rounded mb-1 hidden sm:block mx-auto lg:mx-0" />
-                <Skeleton width={45} height={10} className="!bg-white/10 rounded sm:hidden mx-auto lg:mx-0" />
-                <Skeleton width={55} height={12} className="!bg-white/10 rounded hidden sm:block mx-auto lg:mx-0" />
+                <div className="h-5 sm:h-7 w-12 sm:w-16 bg-white/15 rounded mb-1.5 mx-auto lg:mx-0 animate-pulse" />
+                <div className="h-2.5 sm:h-3 w-10 sm:w-14 bg-white/8 rounded mx-auto lg:mx-0 animate-pulse" />
               </div>
             ))}
           </div>
@@ -165,15 +176,15 @@ export const HeroSkeleton = () => (
 
         {/* Hero Banner Skeleton */}
         <div className="relative mt-4 lg:mt-0">
+          {/* Glow effect */}
+          <div className="absolute -inset-2 sm:-inset-4 bg-gradient-to-br from-[var(--primary)]/10 via-transparent to-[var(--primary-dark)]/10 rounded-2xl sm:rounded-3xl blur-xl animate-pulse" />
+          
           <div className="relative overflow-hidden rounded-xl sm:rounded-2xl lg:rounded-3xl">
-            <Skeleton 
-              variant="rectangular" 
-              className="w-full aspect-[16/10] sm:aspect-[16/9] !bg-white/10 rounded-xl sm:rounded-2xl lg:rounded-3xl" 
-            />
+            <div className="w-full aspect-[16/10] sm:aspect-[16/9] bg-white/5 backdrop-blur-sm animate-pulse" />
             {/* Slide indicator skeleton */}
             <div className="absolute top-3 sm:top-4 end-3 sm:end-4 z-10">
-              <div className="bg-black/40 backdrop-blur-md rounded-full px-3 py-1.5 flex items-center gap-1">
-                <Skeleton width={20} height={10} className="!bg-white/20 rounded" />
+              <div className="bg-black/40 backdrop-blur-md rounded-full px-3 py-1.5">
+                <div className="w-8 h-3 rounded bg-white/20 animate-pulse" />
               </div>
             </div>
           </div>

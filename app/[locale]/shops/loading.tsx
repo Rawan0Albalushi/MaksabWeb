@@ -76,9 +76,9 @@ export default function ShopsLoading() {
           <div className="-mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto hide-scrollbar">
             <div className="flex items-stretch gap-2 sm:gap-2.5 lg:gap-3 pb-1">
               {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-                <div key={i} className="flex flex-col items-center gap-1.5 sm:gap-2 p-2.5 sm:p-3 lg:p-4 rounded-xl sm:rounded-2xl min-w-[70px] sm:min-w-[85px] lg:min-w-[100px] bg-white shadow-sm">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg sm:rounded-xl bg-gray-100 animate-pulse" />
-                  <div className="h-3 sm:h-3.5 w-10 sm:w-12 bg-gray-100 rounded animate-pulse" />
+                <div key={i} className="flex flex-col items-center gap-1.5 sm:gap-2 p-2.5 sm:p-3 lg:p-4 rounded-xl sm:rounded-2xl min-w-[70px] sm:min-w-[85px] lg:min-w-[100px] bg-white shadow-sm border border-gray-100/50">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-gray-50 to-gray-100/80 skeleton" />
+                  <div className="h-3 sm:h-3.5 w-10 sm:w-12 bg-gray-50 rounded animate-pulse" />
                 </div>
               ))}
             </div>
