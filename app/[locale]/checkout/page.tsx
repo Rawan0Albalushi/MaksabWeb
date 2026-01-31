@@ -325,7 +325,7 @@ const CheckoutPage = () => {
 
     // Validate minimum order amount
     if (cart?.shop?.min_amount && subtotal < cart.shop.min_amount) {
-      setError(`${t('minOrderRequired')} ${cart.shop.min_amount.toFixed(2)} ${tCommon('sar')}`);
+      setError(`${t('minOrderRequired')} ${cart.shop.min_amount.toFixed(3)} ${tCommon('sar')}`);
       return;
     }
 
@@ -623,7 +623,8 @@ const CheckoutPage = () => {
   // Get cart items
   const cartItems: CartDetail[] = cart?.user_carts?.flatMap(uc => uc.cart_details || uc.cartDetails || []) || [];
   const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  // item.price من الـ API هو السعر الإجمالي للعنصر (سعر الوحدة × الكمية) - لا نضربه في الكمية مرة أخرى
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
 
   // Generate available delivery dates (next 7 days)
   const getAvailableDates = () => {
@@ -831,7 +832,7 @@ const CheckoutPage = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="lg:col-span-3 order-2 lg:order-1"
+            className="lg:col-span-3 order-1 lg:order-1"
           >
             <motion.div variants={itemVariants} className="bg-gradient-to-br from-white via-white to-[var(--primary)]/[0.03] rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
               {/* Card Header */}
@@ -1210,7 +1211,7 @@ const CheckoutPage = () => {
           </motion.div>
 
           {/* Order Summary Sidebar - 2 columns */}
-          <div className="lg:col-span-2 order-1 lg:order-2">
+          <div className="lg:col-span-2 order-2 lg:order-2">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1259,7 +1260,7 @@ const CheckoutPage = () => {
                           <span className="text-gray-700 truncate">{productTitle}</span>
                         </div>
                         <span className="text-gray-800 font-semibold shrink-0 ms-2">
-                          {(item.price * item.quantity).toFixed(2)} {tCommon('sar')}
+                          {item.price.toFixed(3)} {tCommon('sar')}
                         </span>
                       </div>
                     );
@@ -1319,71 +1320,137 @@ const CheckoutPage = () => {
                   )}
                 </div>
 
-                {/* Price Breakdown */}
+                {/* Price Breakdown - تفصيل الأسعار بناءً على GetCalculateModel */}
                 <div className="py-4 space-y-3 text-sm">
-                  {/* Subtotal */}
+                  {/* Subtotal - السعر الأساسي للمنتجات (price) */}
                   <div className="flex justify-between">
                     <span className="text-gray-500">{tCart('subtotal')}</span>
                     <span className="text-gray-700 font-medium">
-                      {(calculatedPrices?.price ?? subtotal).toFixed(2)} {tCommon('sar')}
+                      {(calculatedPrices?.price ?? subtotal).toFixed(3)} {tCommon('sar')}
                     </span>
                   </div>
 
-                  {/* Delivery Fee */}
+                  {/* Delivery Fee - سعر التوصيل (delivery_fee / deliveryFee) */}
                   {deliveryType === 'delivery' && (
                     <div className="flex justify-between">
                       <span className="text-gray-500">{tCart('deliveryFee')}</span>
                       <span className="text-gray-700 font-medium">
-                        {(calculatedPrices?.delivery_fee ?? calculatedPrices?.deliveryFee ?? cart?.shop?.price ?? 0).toFixed(2)} {tCommon('sar')}
+                        {(() => {
+                          const fee = calculatedPrices?.delivery_fee ?? calculatedPrices?.deliveryFee ?? cart?.shop?.price ?? 0;
+                          return fee === 0 ? (
+                            <span className="text-emerald-600">{tCart('freeDelivery') || 'مجاني'}</span>
+                          ) : (
+                            <>{fee.toFixed(3)} {tCommon('sar')}</>
+                          );
+                        })()}
                       </span>
                     </div>
                   )}
 
-                  {/* Tax */}
-                  {(calculatedPrices?.tax || calculatedPrices?.total_tax || calculatedPrices?.totalTax) && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">{t('tax')}</span>
-                      <span className="text-gray-700 font-medium">
-                        {(calculatedPrices?.tax ?? calculatedPrices?.total_tax ?? calculatedPrices?.totalTax ?? 0).toFixed(2)} {tCommon('sar')}
-                      </span>
-                    </div>
-                  )}
+                  {/* Service Fee - رسوم الخدمة (service_fee / serviceFee) */}
+                  {(() => {
+                    const serviceFee = calculatedPrices?.service_fee ?? calculatedPrices?.serviceFee;
+                    if (serviceFee && serviceFee > 0) {
+                      return (
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">{t('serviceFee') || tCart('serviceFee')}</span>
+                          <span className="text-gray-700 font-medium">
+                            {serviceFee.toFixed(3)} {tCommon('sar')}
+                          </span>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
 
-                  {/* Service Fee */}
-                  {(calculatedPrices?.service_fee || calculatedPrices?.serviceFee) && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">{t('serviceFee') || tCart('serviceFee')}</span>
-                      <span className="text-gray-700 font-medium">
-                        {(calculatedPrices?.service_fee ?? calculatedPrices?.serviceFee ?? 0).toFixed(2)} {tCommon('sar')}
-                      </span>
-                    </div>
-                  )}
+                  {/* Tax - الضريبة الإجمالية (total_tax / totalTax) */}
+                  {(() => {
+                    const tax = calculatedPrices?.total_tax ?? calculatedPrices?.totalTax ?? calculatedPrices?.tax;
+                    if (tax && tax > 0) {
+                      return (
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">{t('tax')}</span>
+                          <span className="text-gray-700 font-medium">
+                            {tax.toFixed(3)} {tCommon('sar')}
+                          </span>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
 
-                  {/* Discount */}
-                  {(calculatedPrices?.discount || calculatedPrices?.total_discount || calculatedPrices?.totalDiscount) && (
-                    <div className="flex justify-between text-emerald-600">
-                      <span className="flex items-center gap-1">
-                        <Sparkles size={14} />
-                        {tCart('discount')}
-                      </span>
-                      <span className="font-semibold">
-                        -{(calculatedPrices?.discount ?? calculatedPrices?.total_discount ?? calculatedPrices?.totalDiscount ?? 0).toFixed(2)} {tCommon('sar')}
-                      </span>
-                    </div>
-                  )}
+                  {/* Shop Tax - ضريبة المتجر (total_shop_tax / totalShopTax) */}
+                  {(() => {
+                    const shopTax = calculatedPrices?.total_shop_tax ?? calculatedPrices?.totalShopTax;
+                    if (shopTax && shopTax > 0) {
+                      return (
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">{locale === 'ar' ? 'ضريبة المتجر' : 'Shop Tax'}</span>
+                          <span className="text-gray-700 font-medium">
+                            {shopTax.toFixed(3)} {tCommon('sar')}
+                          </span>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
 
-                  {/* Coupon Discount */}
-                  {(calculatedPrices?.coupon_price || calculatedPrices?.couponPrice) && (
-                    <div className="flex justify-between text-emerald-600">
-                      <span className="flex items-center gap-1">
-                        <Ticket size={14} />
-                        {tCart('couponApplied')}
-                      </span>
-                      <span className="font-semibold">
-                        -{(calculatedPrices?.coupon_price ?? calculatedPrices?.couponPrice ?? 0).toFixed(2)} {tCommon('sar')}
-                      </span>
-                    </div>
-                  )}
+                  {/* Discount - إجمالي الخصومات (total_discount / totalDiscount / discount) */}
+                  {(() => {
+                    const discount = calculatedPrices?.total_discount ?? calculatedPrices?.totalDiscount ?? calculatedPrices?.discount;
+                    if (discount && discount > 0) {
+                      return (
+                        <div className="flex justify-between text-emerald-600">
+                          <span className="flex items-center gap-1">
+                            <Sparkles size={14} />
+                            {tCart('discount')}
+                          </span>
+                          <span className="font-semibold">
+                            -{discount.toFixed(3)} {tCommon('sar')}
+                          </span>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+
+                  {/* Coupon Discount - قيمة خصم الكوبون (coupon_price / couponPrice) */}
+                  {(() => {
+                    const couponDiscount = calculatedPrices?.coupon_price ?? calculatedPrices?.couponPrice;
+                    if (couponDiscount && couponDiscount > 0) {
+                      return (
+                        <div className="flex justify-between text-emerald-600">
+                          <span className="flex items-center gap-1">
+                            <Ticket size={14} />
+                            {tCart('couponApplied')}
+                          </span>
+                          <span className="font-semibold">
+                            -{couponDiscount.toFixed(3)} {tCommon('sar')}
+                          </span>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+
+                  {/* Bonus Shop - بونص المتجر (bonus_shop / bonusShop) */}
+                  {(() => {
+                    const bonus = calculatedPrices?.bonus_shop ?? calculatedPrices?.bonusShop;
+                    if (bonus && typeof bonus === 'number' && bonus > 0) {
+                      return (
+                        <div className="flex justify-between text-blue-600">
+                          <span className="flex items-center gap-1">
+                            <Sparkles size={14} />
+                            {locale === 'ar' ? 'بونص المتجر' : 'Shop Bonus'}
+                          </span>
+                          <span className="font-semibold">
+                            -{bonus.toFixed(3)} {tCommon('sar')}
+                          </span>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
 
                 {/* Minimum Order Warning */}
@@ -1396,7 +1463,7 @@ const CheckoutPage = () => {
                       <div>
                         <p className="text-sm font-semibold text-amber-700">{t('minOrderNotMet')}</p>
                         <p className="text-xs text-amber-600 mt-0.5">
-                          {t('minOrderRequired')} {cart.shop.min_amount.toFixed(2)} {tCommon('sar')}
+                          {t('minOrderRequired')} {cart.shop.min_amount.toFixed(3)} {tCommon('sar')}
                         </p>
                       </div>
                     </div>
@@ -1412,7 +1479,7 @@ const CheckoutPage = () => {
                     ) : (
                       <>
                         <span className="text-2xl font-black text-[var(--primary)]">
-                          {(calculatedPrices?.total_price ?? calculatedPrices?.totalPrice ?? (subtotal + (deliveryType === 'delivery' ? (cart?.shop?.price || 0) : 0))).toFixed(2)}
+                          {(calculatedPrices?.total_price ?? calculatedPrices?.totalPrice ?? (subtotal + (deliveryType === 'delivery' ? (cart?.shop?.price || 0) : 0))).toFixed(3)}
                         </span>
                         <span className="text-sm font-medium text-gray-500 ms-1">{tCommon('sar')}</span>
                       </>
@@ -1421,8 +1488,8 @@ const CheckoutPage = () => {
                 </div>
               </div>
 
-              {/* Place Order Button */}
-              <div className="px-5 pb-5">
+              {/* Place Order Button - Hidden on mobile, shown on desktop */}
+              <div className="hidden lg:block px-5 pb-5">
                 {(() => {
                   const isDisabled = 
                     (deliveryType === 'delivery' && !selectedAddressId) ||
@@ -1485,7 +1552,7 @@ const CheckoutPage = () => {
               ) : (
                 <>
                   <span className="text-xl font-black text-[var(--primary)]">
-                    {(calculatedPrices?.total_price ?? calculatedPrices?.totalPrice ?? (subtotal + (deliveryType === 'delivery' ? (cart?.shop?.price || 0) : 0))).toFixed(2)}
+                    {(calculatedPrices?.total_price ?? calculatedPrices?.totalPrice ?? (subtotal + (deliveryType === 'delivery' ? (cart?.shop?.price || 0) : 0))).toFixed(3)}
                   </span>
                   <span className="text-xs font-medium text-gray-500">{tCommon('sar')}</span>
                 </>
@@ -1498,7 +1565,7 @@ const CheckoutPage = () => {
             <div className="mb-3 bg-amber-50 border border-amber-100 rounded-lg flex items-center gap-2" style={{ padding: '10px 12px' }}>
               <AlertTriangle size={14} className="text-amber-600 shrink-0" />
               <p className="text-xs text-amber-700">
-                {t('minOrderRequired')} {cart.shop.min_amount.toFixed(2)} {tCommon('sar')}
+                {t('minOrderRequired')} {cart.shop.min_amount.toFixed(3)} {tCommon('sar')}
               </p>
             </div>
           )}
@@ -1516,7 +1583,7 @@ const CheckoutPage = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={handlePlaceOrder}
                 disabled={isMobileDisabled}
-                className="w-full rounded-2xl font-bold text-base flex items-center justify-center gap-2.5 transition-all duration-300 py-4"
+                className="w-full rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all duration-300 py-5"
                 style={{
                   backgroundColor: isMobileDisabled ? '#e5e7eb' : '#ef4444',
                   color: isMobileDisabled ? '#9ca3af' : '#ffffff',
@@ -1526,10 +1593,10 @@ const CheckoutPage = () => {
                 }}
               >
                 {submitting ? (
-                  <Loader2 size={20} className="animate-spin" style={{ color: isMobileDisabled ? '#9ca3af' : '#ffffff' }} />
+                  <Loader2 size={24} className="animate-spin" style={{ color: isMobileDisabled ? '#9ca3af' : '#ffffff' }} />
                 ) : (
                   <>
-                    <ShoppingBag size={18} style={{ color: isMobileDisabled ? '#9ca3af' : '#ffffff' }} />
+                    <ShoppingBag size={22} style={{ color: isMobileDisabled ? '#9ca3af' : '#ffffff' }} />
                     <span style={{ color: isMobileDisabled ? '#9ca3af' : '#ffffff' }}>{t('placeOrder')}</span>
                   </>
                 )}

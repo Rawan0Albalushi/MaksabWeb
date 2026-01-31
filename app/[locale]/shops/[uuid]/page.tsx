@@ -186,12 +186,12 @@ const ProductModal = ({
                   )}
                   <div className="mt-3 flex items-baseline gap-2">
                     <span className="text-2xl font-bold text-[var(--primary)]">
-                      {price.toFixed(2)}
+                      {price.toFixed(3)}
                     </span>
                     <span className="text-[var(--text-grey)] text-sm">{tCommon('sar')}</span>
                     {hasDiscount && (
                       <span className="text-sm text-[var(--text-grey)] line-through ms-1">
-                        {oldPrice.toFixed(2)}
+                        {oldPrice.toFixed(3)}
                       </span>
                     )}
                   </div>
@@ -263,7 +263,7 @@ const ProductModal = ({
                     <ShoppingBag size={24} />
                     <span>أضف للسلة</span>
                     <span className="w-[2px] h-7 bg-white/50 rounded-full mx-1" />
-                    <span className="font-bold text-xl">{(price * qty).toFixed(2)} {tCommon('sar')}</span>
+                    <span className="font-bold text-xl">{(price * qty).toFixed(3)} {tCommon('sar')}</span>
                   </>
                 )}
               </button>
@@ -337,13 +337,13 @@ const ProductModal = ({
                   <div className="mt-5 flex items-end gap-3">
                     <div className="flex items-baseline gap-1.5">
                       <span className="text-3xl font-bold text-[var(--primary)]">
-                        {price.toFixed(2)}
+                        {price.toFixed(3)}
                       </span>
                       <span className="text-base font-medium text-[var(--text-grey)]">{tCommon('sar')}</span>
                     </div>
                     {hasDiscount && (
                       <span className="text-base text-[var(--text-grey)] line-through pb-1">
-                        {oldPrice.toFixed(2)}
+                        {oldPrice.toFixed(3)}
                       </span>
                     )}
                   </div>
@@ -422,7 +422,7 @@ const ProductModal = ({
                         <ShoppingBag size={22} />
                         <span>أضف للسلة</span>
                         <span className="w-[2px] h-6 bg-white/50 rounded-full mx-1" />
-                        <span className="font-bold text-xl">{(price * qty).toFixed(2)} {tCommon('sar')}</span>
+                        <span className="font-bold text-xl">{(price * qty).toFixed(3)} {tCommon('sar')}</span>
                       </>
                     )}
                   </motion.button>
@@ -539,13 +539,13 @@ const ProductCard = ({
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-[var(--border-light)]">
             <div className="flex items-baseline gap-1">
               <span className="font-bold text-[var(--primary)] text-base">
-                {price.toFixed(2)}
+                {price.toFixed(3)}
               </span>
               <span className="text-[10px] text-[var(--text-grey)]">{tCommon('sar')}</span>
             </div>
             {hasDiscount && (
               <span className="text-[10px] text-[var(--text-grey)] line-through">
-                {oldPrice.toFixed(2)}
+                {oldPrice.toFixed(3)}
               </span>
             )}
           </div>
@@ -602,7 +602,7 @@ const FloatingCartBar = ({ count, total }: { count: number; total: number }) => 
           <div className="flex items-center gap-3 relative">
             <div className="text-end">
               <p className="text-white/70 text-[10px]" style={{ padding: '0 4px' }}>المجموع</p>
-              <p className="font-bold text-lg" style={{ padding: '0 4px' }}>{total.toFixed(2)} <span className="text-sm">{tCommon('sar')}</span></p>
+              <p className="font-bold text-lg" style={{ padding: '0 4px' }}>{total.toFixed(3)} <span className="text-sm">{tCommon('sar')}</span></p>
             </div>
             <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center" style={{ padding: '10px' }}>
               {isRTL ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}
@@ -829,13 +829,13 @@ export default function ShopPage({ params }: ShopPageProps) {
           </div>
         )}
 
-        <div className="container relative z-10 px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-14">
+        <div className="container relative z-10 px-4 sm:px-6 lg:px-8" style={{ paddingTop: '16px', paddingBottom: '16px' }}>
           {/* Top Navigation */}
-          <div className="flex items-center justify-between mb-5 sm:mb-6 lg:mb-8">
+          <div className="flex items-center justify-between mb-4 sm:mb-5">
             <Link
               href="/shops"
               className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all shadow-lg hover:shadow-xl group border border-white/30"
-              style={{ background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.9) 0%, rgba(0, 188, 212, 0.9) 100%)' }}
+              style={{ background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.9) 0%, rgba(0, 188, 212, 0.9) 100%)', padding: '10px' }}
             >
               {isRTL ? (
                 <ChevronRight size={22} className="text-white group-hover:scale-110 transition-transform" />
@@ -854,7 +854,7 @@ export default function ShopPage({ params }: ShopPageProps) {
                   'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all shadow-lg hover:shadow-xl border border-white/30',
                   isFav && 'ring-2 ring-white'
                 )}
-                style={{ background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.9) 0%, rgba(0, 188, 212, 0.9) 100%)' }}
+                style={{ background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.9) 0%, rgba(0, 188, 212, 0.9) 100%)', padding: '10px' }}
               >
                 <Heart size={20} className={clsx('text-white', isFav && 'fill-current')} />
               </motion.button>
@@ -865,7 +865,7 @@ export default function ShopPage({ params }: ShopPageProps) {
                   whileTap={{ scale: 0.95 }}
                   href={`tel:${shop.phone}`}
                   className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white transition-all shadow-lg hover:shadow-xl border border-white/30"
-                  style={{ background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.9) 0%, rgba(0, 188, 212, 0.9) 100%)' }}
+                  style={{ background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.9) 0%, rgba(0, 188, 212, 0.9) 100%)', padding: '10px' }}
                 >
                   <Phone size={20} />
                 </motion.a>
@@ -875,7 +875,7 @@ export default function ShopPage({ params }: ShopPageProps) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white transition-all shadow-lg hover:shadow-xl border border-white/30"
-                style={{ background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.9) 0%, rgba(0, 188, 212, 0.9) 100%)' }}
+                style={{ background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.9) 0%, rgba(0, 188, 212, 0.9) 100%)', padding: '10px' }}
               >
                 <Share2 size={20} />
               </motion.button>
@@ -981,7 +981,7 @@ export default function ShopPage({ params }: ShopPageProps) {
         </div>
         
         {/* Spacer to increase orange area height */}
-        <div className="h-16 sm:h-20 lg:h-24" />
+        <div className="h-8 sm:h-10 lg:h-12" />
         
         {/* Wave Bottom - Same as shops page */}
         <div className="absolute bottom-0 left-0 right-0">

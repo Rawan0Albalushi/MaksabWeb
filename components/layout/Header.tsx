@@ -124,7 +124,7 @@ const Header = () => {
     <>
       <header
         className={clsx(
-          'fixed top-0 inset-x-0 z-40 transition-all duration-500 ease-out',
+          'fixed top-0 inset-x-0 z-[150] transition-all duration-500 ease-out',
           isScrolled
             ? 'bg-white/80 backdrop-blur-xl shadow-[0_2px_20px_-4px_rgba(0,0,0,0.1)] border-b border-white/50'
             : 'bg-white/60 backdrop-blur-md border-b border-transparent'
@@ -466,23 +466,27 @@ const Header = () => {
         <div
           className={clsx(
             'absolute top-0 bottom-0 w-[85%] max-w-[340px] bg-white shadow-2xl shadow-black/30 transition-all duration-400 ease-out flex flex-col',
-            locale === 'ar' ? 'right-0' : 'left-0',
+            locale === 'ar' ? 'right-0 rounded-l-3xl' : 'left-0 rounded-r-3xl',
             isMobileMenuOpen 
               ? 'translate-x-0' 
               : locale === 'ar' ? 'translate-x-full' : '-translate-x-full'
           )}
         >
           {/* Drawer Header with gradient */}
-          <div className="relative bg-gradient-to-br from-[var(--primary)] via-[var(--primary)] to-[var(--primary-light)] pt-safe-top">
+          <div className={clsx(
+            'relative bg-gradient-to-br from-[var(--primary)] via-[var(--primary)] to-[var(--primary-light)] pt-safe-top',
+            locale === 'ar' ? 'rounded-tl-3xl' : 'rounded-tr-3xl'
+          )}>
             {/* Decorative circles */}
             <div className="absolute top-0 end-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
             <div className="absolute bottom-0 start-0 w-24 h-24 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-xl" />
             
-            <div className="relative p-5 pt-14">
+            <div className="relative" style={{ padding: '14px 16px', paddingTop: '14px', paddingBottom: '14px' }}>
               {/* Close Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="absolute top-4 end-4 w-9 h-9 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 active:scale-95 transition-all"
+                className="absolute end-3 w-7 h-7 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 active:scale-95 transition-all"
+                style={{ top: '14px' }}
               >
                 <svg width="12" height="12" viewBox="0 0 14 14" fill="none" className="text-white">
                   <path d="M1 1L13 13M1 13L13 1" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
@@ -494,32 +498,31 @@ const Header = () => {
                 <Link
                   href="/profile"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3.5 group"
+                  className="flex items-center gap-3 group"
                 >
                   <div className="relative">
-                    <Avatar src={user?.img} fallback={user?.firstname} size="lg" className="ring-2 ring-white/30" />
-                    <div className="absolute -bottom-0.5 -end-0.5 w-4 h-4 bg-green-400 rounded-full border-2 border-white" />
+                    <Avatar src={user?.img} fallback={user?.firstname} size="md" className="ring-2 ring-white/30" />
+                    <div className="absolute -bottom-0.5 -end-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-white text-[17px] truncate group-hover:underline">
+                    <p className="font-bold text-white text-[15px] truncate group-hover:underline">
                       {user?.firstname} {user?.lastname}
                     </p>
-                    <p className="text-white/70 text-sm truncate mt-0.5">
+                    <p className="text-white/70 text-xs truncate">
                       {user?.email || user?.phone}
                     </p>
                   </div>
-                  <ChevronDown size={18} className="text-white/60 -rotate-90 rtl:rotate-90 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" />
                 </Link>
               ) : (
                 <div>
                   <Image
                     src="/images/maksab.png"
                     alt="Maksab"
-                    width={100}
-                    height={32}
-                    className="h-7 w-auto brightness-0 invert opacity-90"
+                    width={90}
+                    height={28}
+                    className="h-6 w-auto brightness-0 invert opacity-90"
                   />
-                  <p className="text-white/70 text-sm mt-2">
+                  <p className="text-white/70 text-xs mt-1">
                     {locale === 'ar' ? 'مرحباً بك في مكسب' : 'Welcome to Maksab'}
                   </p>
                 </div>
@@ -530,7 +533,7 @@ const Header = () => {
           {/* Scrollable Content */}
           <div className="flex-1 overflow-y-auto overscroll-contain">
             {/* Navigation Links */}
-            <nav className="p-4 space-y-1.5">
+            <nav style={{ padding: '16px 18px' }} className="space-y-1.5">
               {navLinks.map((link, index) => {
                 const isActive = pathname === link.href || 
                   (link.href !== '/' && pathname.startsWith(link.href));
@@ -541,12 +544,13 @@ const Header = () => {
                     href={link.href}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={clsx(
-                      'flex items-center gap-3.5 px-4 py-3.5 rounded-2xl font-semibold text-[15px] transition-all duration-200 active:scale-[0.98]',
+                      'flex items-center gap-3.5 rounded-2xl font-semibold text-[15px] transition-all duration-200 active:scale-[0.98]',
                       isActive
                         ? 'text-[var(--primary)] bg-[var(--primary)]/10'
                         : 'text-[var(--black)] hover:bg-[var(--main-bg)]'
                     )}
                     style={{
+                      padding: '14px 16px',
                       transform: isMobileMenuOpen ? 'translateX(0)' : locale === 'ar' ? 'translateX(20px)' : 'translateX(-20px)',
                       opacity: isMobileMenuOpen ? 1 : 0,
                       transition: `all 0.3s ease ${index * 50 + 100}ms`
@@ -572,8 +576,9 @@ const Header = () => {
               <Link
                 href="/favorites"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-[var(--black)] hover:bg-[var(--main-bg)] font-semibold text-[15px] transition-all duration-200 active:scale-[0.98]"
+                className="flex items-center gap-3.5 rounded-2xl text-[var(--black)] hover:bg-[var(--main-bg)] font-semibold text-[15px] transition-all duration-200 active:scale-[0.98]"
                 style={{
+                  padding: '14px 16px',
                   transform: isMobileMenuOpen ? 'translateX(0)' : locale === 'ar' ? 'translateX(20px)' : 'translateX(-20px)',
                   opacity: isMobileMenuOpen ? 1 : 0,
                   transition: `all 0.3s ease ${navLinks.length * 50 + 100}ms`
@@ -587,16 +592,17 @@ const Header = () => {
             </nav>
 
             {/* Divider */}
-            <div className="mx-6 h-px bg-[var(--border)]/60" />
+            <div className="mx-5 h-px bg-[var(--border)]/60" />
 
             {/* Settings Link for Authenticated Users */}
             {_hasHydrated && isAuthenticated && (
               <>
-                <div className="p-4 space-y-1.5">
+                <div style={{ padding: '16px 18px' }} className="space-y-1.5">
                   <Link
                     href="/settings"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-[var(--black)] hover:bg-[var(--main-bg)] font-semibold text-[15px] transition-all duration-200 active:scale-[0.98]"
+                    className="flex items-center gap-3.5 rounded-2xl text-[var(--black)] hover:bg-[var(--main-bg)] font-semibold text-[15px] transition-all duration-200 active:scale-[0.98]"
+                    style={{ padding: '14px 16px' }}
                   >
                     <span className="w-10 h-10 flex items-center justify-center rounded-xl bg-[var(--main-bg)]">
                       <Settings size={20} className="text-[var(--text-grey)]" />
@@ -604,15 +610,15 @@ const Header = () => {
                     <span className="flex-1">{t('settings')}</span>
                   </Link>
                 </div>
-                <div className="mx-6 h-px bg-[var(--border)]/60" />
+                <div className="mx-5 h-px bg-[var(--border)]/60" />
               </>
             )}
 
             {/* Auth Section for Non-Authenticated Users */}
             {_hasHydrated && !isAuthenticated && (
               <>
-                <div className="p-4 space-y-2">
-                  <p className="text-sm text-[var(--text-grey)] px-2 mb-3">
+                <div style={{ padding: '16px 18px' }} className="space-y-2">
+                  <p className="text-sm text-[var(--text-grey)] mb-3" style={{ padding: '0 8px' }}>
                     {locale === 'ar' ? 'سجل دخولك للحصول على تجربة أفضل' : 'Sign in for a better experience'}
                   </p>
                   <div className="flex gap-2">
@@ -620,7 +626,8 @@ const Header = () => {
                       <Button 
                         variant="outline" 
                         fullWidth 
-                        className="rounded-xl h-11 font-semibold text-[14px] border-2"
+                        className="rounded-xl font-semibold text-[14px] border-2"
+                        style={{ padding: '12px 16px' }}
                       >
                         {t('login')}
                       </Button>
@@ -628,20 +635,21 @@ const Header = () => {
                     <Link href="/auth/register" className="flex-1" onClick={() => setIsMobileMenuOpen(false)}>
                       <Button 
                         fullWidth 
-                        className="rounded-xl h-11 shadow-md shadow-[var(--primary)]/20 font-bold text-[14px] !bg-[var(--primary)] !text-white hover:!bg-[var(--primary-hover)]"
+                        className="rounded-xl shadow-md shadow-[var(--primary)]/20 font-bold text-[14px] !bg-[var(--primary)] !text-white hover:!bg-[var(--primary-hover)]"
+                        style={{ padding: '12px 16px' }}
                       >
                         {t('register')}
                       </Button>
                     </Link>
                   </div>
                 </div>
-                <div className="mx-6 h-px bg-[var(--border)]/60" />
+                <div className="mx-5 h-px bg-[var(--border)]/60" />
               </>
             )}
 
             {/* Language Section */}
-            <div className="p-4">
-              <p className="text-xs text-[var(--text-grey)] uppercase tracking-wider mb-3 px-2 font-semibold flex items-center gap-2">
+            <div style={{ padding: '16px 18px' }}>
+              <p className="text-xs text-[var(--text-grey)] uppercase tracking-wider mb-3 font-semibold flex items-center gap-2" style={{ padding: '0 8px' }}>
                 <Globe size={14} />
                 {t('language')}
               </p>
@@ -649,22 +657,24 @@ const Header = () => {
                 <button
                   onClick={() => handleLanguageChange('ar')}
                   className={clsx(
-                    'flex-1 py-3 px-4 rounded-xl text-[14px] font-bold transition-all duration-200 active:scale-[0.98] border-2',
+                    'flex-1 rounded-xl text-[14px] font-bold transition-all duration-200 active:scale-[0.98] border-2',
                     locale === 'ar'
                       ? 'bg-[var(--primary)]/10 text-[var(--primary)] border-[var(--primary)]'
                       : 'bg-[var(--main-bg)] text-[var(--black)] border-transparent hover:bg-[var(--border)]/50'
                   )}
+                  style={{ padding: '12px 16px' }}
                 >
                   العربية
                 </button>
                 <button
                   onClick={() => handleLanguageChange('en')}
                   className={clsx(
-                    'flex-1 py-3 px-4 rounded-xl text-[14px] font-bold transition-all duration-200 active:scale-[0.98] border-2',
+                    'flex-1 rounded-xl text-[14px] font-bold transition-all duration-200 active:scale-[0.98] border-2',
                     locale === 'en'
                       ? 'bg-[var(--primary)]/10 text-[var(--primary)] border-[var(--primary)]'
                       : 'bg-[var(--main-bg)] text-[var(--black)] border-transparent hover:bg-[var(--border)]/50'
                   )}
+                  style={{ padding: '12px 16px' }}
                 >
                   English
                 </button>
@@ -674,11 +684,12 @@ const Header = () => {
 
           {/* Footer - Logout for Authenticated Users */}
           {_hasHydrated && isAuthenticated && (
-            <div className="border-t border-[var(--border)]/60 p-4 pb-safe-bottom bg-white">
+            <div className="border-t border-[var(--border)]/60 pb-safe-bottom bg-white" style={{ padding: '16px 18px' }}>
               <button
                 onClick={handleLogout}
-                className="flex items-center justify-center gap-3 w-full h-14 rounded-xl text-white font-semibold text-[16px] transition-all duration-200 active:scale-[0.98]"
+                className="flex items-center justify-center gap-3 w-full rounded-xl text-white font-semibold text-[16px] transition-all duration-200 active:scale-[0.98]"
                 style={{ 
+                  padding: '14px 20px',
                   backgroundColor: '#E53935',
                   boxShadow: '0 4px 6px -1px rgba(229, 57, 53, 0.3)'
                 }}

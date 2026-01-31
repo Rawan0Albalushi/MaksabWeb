@@ -116,7 +116,7 @@ const OrderCard = ({
           'shadow-sm hover:shadow-xl',
           'transition-all duration-300'
         )}
-        style={{ padding: '20px' }}
+        style={{ padding: '16px 18px' }}
       >
         {/* Status Indicator Line */}
         <div
@@ -131,7 +131,7 @@ const OrderCard = ({
         />
 
         {/* Header: Order Number, Status, Price */}
-        <div className="flex items-start justify-between mb-4">
+        <div className="flex items-start justify-between mb-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center flex-wrap gap-2 mb-2">
               <span className="text-lg font-bold text-gray-900">
@@ -155,7 +155,7 @@ const OrderCard = ({
           </div>
           <div className="text-end shrink-0">
             <p className="text-xl font-bold text-[var(--primary)]">
-              {order.total_price.toFixed(2)}
+              {order.total_price.toFixed(3)}
             </p>
             <p className="text-xs text-gray-400">{tCommon('sar')}</p>
           </div>
@@ -163,7 +163,7 @@ const OrderCard = ({
 
         {/* Shop Info */}
         {order.shop && (
-          <div className="flex items-center gap-3 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-xl mb-4" style={{ padding: '14px 16px' }}>
+          <div className="flex items-center gap-3 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-xl mb-3" style={{ padding: '12px 14px' }}>
             <div className="w-12 h-12 rounded-xl overflow-hidden bg-white shadow-sm shrink-0">
               {order.shop.logo_img ? (
                 <Image
@@ -203,7 +203,7 @@ const OrderCard = ({
         {(() => {
           const deliveryAddress = getDeliveryAddress(order);
           return deliveryAddress ? (
-            <div className="flex items-center gap-2 text-sm text-gray-500 mb-4" style={{ padding: '4px 8px' }}>
+            <div className="flex items-center gap-2 text-sm text-gray-500 mb-3" style={{ padding: '4px 8px' }}>
               <MapPin size={14} className="text-[var(--primary)] shrink-0" />
               <span className="line-clamp-1">{deliveryAddress}</span>
             </div>
@@ -222,7 +222,7 @@ const OrderCard = ({
 
 // Skeleton Loader
 const OrdersSkeleton = () => (
-  <div className="space-y-4">
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
     {[1, 2, 3].map((i) => (
       <div key={i} className="bg-white rounded-2xl p-5 animate-pulse">
         <div className="flex justify-between mb-4">
@@ -456,25 +456,25 @@ const OrdersPage = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-md border border-gray-200 mb-6 flex gap-2"
-          style={{ padding: '10px' }}
+          className="bg-white rounded-2xl shadow-md border border-gray-200 flex gap-1.5"
+          style={{ padding: '8px', marginBottom: '20px' }}
         >
           {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={clsx(
-                'flex-1 flex items-center justify-center gap-2 rounded-xl font-bold transition-all duration-300 text-sm sm:text-base',
+                'flex-1 flex items-center justify-center gap-1.5 rounded-xl font-bold transition-all duration-300 text-sm sm:text-base',
                 activeTab === tab.key
                   ? 'text-white shadow-lg'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
               )}
               style={activeTab === tab.key ? {
-                padding: '14px 16px',
+                padding: '12px 14px',
                 background: 'linear-gradient(135deg, #FF5722 0%, #FF9800 100%)',
                 boxShadow: '0 4px 15px rgba(255, 87, 34, 0.4)'
               } : {
-                padding: '14px 16px'
+                padding: '12px 14px'
               }}
             >
               {tab.icon}
@@ -530,7 +530,7 @@ const OrdersPage = () => {
               variants={staggerContainer}
               initial="hidden"
               animate="visible"
-              className="space-y-4"
+              style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
             >
               {orders.map((order) => (
                 <OrderCard

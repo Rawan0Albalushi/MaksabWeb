@@ -24,7 +24,6 @@ import {
   ShoppingCart,
   Gift,
   Truck,
-  Shield,
   CreditCard,
   Heart,
 } from 'lucide-react';
@@ -165,7 +164,9 @@ const CartItemCard = ({
   const product = item.stock?.product;
   const productImage = product?.img || item.stock?.extras?.find(e => e.group?.type === 'image')?.value;
   const productTitle = product?.translation?.title || `#${item.stock?.id}`;
-  const unitPrice = item.stock?.total_price || item.price;
+  // item.price من الـ API هو السعر الإجمالي (سعر الوحدة × الكمية)
+  // لذا سعر الوحدة = item.price / item.quantity
+  const unitPrice = item.stock?.total_price || (item.quantity > 0 ? item.price / item.quantity : item.price);
   const totalPrice = unitPrice * localQuantity;
 
   const handleQuantityChange = async (newQty: number) => {
@@ -206,11 +207,11 @@ const CartItemCard = ({
       )}
     >
       {/* Card Content */}
-      <div style={{ padding: '20px' }}>
-        <div className="flex gap-4 sm:gap-5">
+      <div style={{ padding: '14px 16px' }} className="sm:!p-5">
+        <div className="flex gap-3 sm:gap-5">
           {/* Product Image */}
           <div className="relative shrink-0">
-            <div className="relative w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-xl overflow-hidden bg-gray-100">
+            <div className="relative w-20 h-20 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-xl overflow-hidden bg-gray-100">
               {productImage ? (
                 <Image
                   src={productImage}
@@ -240,9 +241,9 @@ const CartItemCard = ({
           {/* Product Info */}
           <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
             {/* Top Row: Title & Delete */}
-            <div className="flex items-start justify-between gap-2 mb-3">
+            <div className="flex items-start justify-between gap-2 mb-2 sm:mb-3">
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-gray-900 text-base sm:text-lg line-clamp-2 mb-2">
+                <h3 className="font-bold text-gray-900 text-sm sm:text-lg line-clamp-2 mb-1 sm:mb-2">
                   {productTitle}
                 </h3>
                 
@@ -267,28 +268,28 @@ const CartItemCard = ({
               <button
                 onClick={handleRemove}
                 disabled={isRemoving}
-                className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                className="shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
                 aria-label="Remove item"
               >
-                <Trash2 className="w-5 h-5" />
+                <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
 
             {/* Bottom Row: Quantity & Price */}
             <div className="flex items-center justify-between gap-4 mt-auto">
               {/* Quantity Selector */}
-              <div className="flex items-center rounded-xl overflow-hidden border-2 border-gray-300">
+              <div className="flex items-center rounded-lg sm:rounded-xl overflow-hidden border-2 border-gray-300">
                 <button
                   onClick={() => handleQuantityChange(localQuantity + 1)}
                   disabled={isUpdating}
-                  style={{ backgroundColor: '#f97316', color: 'white', width: '44px', height: '44px' }}
-                  className="flex items-center justify-center hover:opacity-90 transition-all active:scale-95"
+                  style={{ backgroundColor: '#f97316', color: 'white' }}
+                  className="w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center hover:opacity-90 transition-all active:scale-95"
                 >
-                  <Plus className="w-5 h-5" />
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
                 
                 <span className={clsx(
-                  'w-14 text-center font-bold text-gray-900 text-lg bg-white',
+                  'w-10 sm:w-14 text-center font-bold text-gray-900 text-base sm:text-lg bg-white',
                   isUpdating && 'opacity-50 animate-pulse'
                 )}>
                   {localQuantity}
@@ -300,25 +301,23 @@ const CartItemCard = ({
                   style={{ 
                     backgroundColor: localQuantity <= 1 ? '#d1d5db' : '#6b7280',
                     color: localQuantity <= 1 ? '#9ca3af' : 'white',
-                    width: '44px', 
-                    height: '44px',
                     cursor: localQuantity <= 1 ? 'not-allowed' : 'pointer'
                   }}
-                  className="flex items-center justify-center hover:opacity-90 transition-all active:scale-95"
+                  className="w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center hover:opacity-90 transition-all active:scale-95"
                 >
-                  <Minus className="w-5 h-5" />
+                  <Minus className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
 
               {/* Price */}
               <div className="text-end">
-                <p className="text-xl sm:text-2xl font-bold text-[var(--primary)]">
-                  {totalPrice.toFixed(2)}
-                  <span className="text-sm font-medium text-gray-500 ms-1">{currency}</span>
+                <p className="text-base sm:text-2xl font-bold text-[var(--primary)]">
+                  {totalPrice.toFixed(3)}
+                  <span className="text-xs sm:text-sm font-medium text-gray-500 ms-1">{currency}</span>
                 </p>
                 {localQuantity > 1 && (
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    {unitPrice.toFixed(2)} × {localQuantity}
+                  <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5">
+                    {unitPrice.toFixed(3)} × {localQuantity}
                   </p>
                 )}
               </div>
@@ -545,7 +544,8 @@ const CartPage = () => {
 
   // Get all cart items
   const cartItems: CartDetail[] = cart?.user_carts?.flatMap(uc => uc.cart_details || uc.cartDetails || []) || [];
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  // item.price من الـ API هو السعر الإجمالي للعنصر (سعر الوحدة × الكمية) - لا نضربه في الكمية مرة أخرى
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
   const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   // Loading State
@@ -676,16 +676,16 @@ const CartPage = () => {
       <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="grid lg:grid-cols-5 gap-6 lg:gap-8">
           {/* Cart Items - Takes 3 columns */}
-          <div className="lg:col-span-3 order-2 lg:order-1 space-y-4">
+          <div className="lg:col-span-3 order-1 space-y-4">
             {/* Shop Card */}
             {cart.shop && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-white rounded-2xl border border-gray-200/60 shadow-sm"
-                style={{ padding: '20px' }}
+                style={{ padding: '14px 16px' }}
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 sm:gap-4">
                   {/* Shop Logo */}
                   <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden bg-gray-100 shrink-0">
                     {cart.shop.logo_img ? (
@@ -749,7 +749,7 @@ const CartPage = () => {
 
             {/* Continue Shopping - Mobile */}
             <div className="lg:hidden">
-              <Link href="/shops">
+              <Link href={cart.shop?.uuid ? `/shops/${cart.shop.uuid}` : '/shops'}>
                 <Button variant="ghost" fullWidth className="text-gray-500" style={{ padding: '14px 20px' }}>
                   <Store className="w-5 h-5 me-2" />
                   {t('continueShopping')}
@@ -759,13 +759,13 @@ const CartPage = () => {
           </div>
 
           {/* Order Summary - Takes 2 columns */}
-          <div className="lg:col-span-2 order-1 lg:order-2">
+          <div className="lg:col-span-2 order-2">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
               className="bg-white rounded-2xl border border-gray-200/60 shadow-sm lg:sticky lg:top-24"
-              style={{ padding: '24px' }}
+              style={{ padding: '16px 18px' }}
             >
               {/* Header */}
               <div className="flex items-center gap-3 mb-5 pb-5 border-b border-gray-100">
@@ -853,18 +853,30 @@ const CartPage = () => {
 
               {/* Summary Details */}
               <div className="space-y-3 py-4 border-y border-gray-100">
+                {/* Subtotal - سعر المنتجات */}
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500 text-sm">{t('subtotal')}</span>
                   <span className="font-semibold text-gray-900">
-                    {subtotal.toFixed(2)} {currency}
+                    {subtotal.toFixed(3)} {currency}
                   </span>
                 </div>
+
+                {/* Delivery Fee - رسوم التوصيل */}
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 text-sm">{t('deliveryFee')}</span>
+                  <span className="text-gray-500 text-sm flex items-center gap-1.5">
+                    <Truck className="w-4 h-4" />
+                    {t('deliveryFee')}
+                  </span>
                   <span className="font-semibold text-gray-900">
-                    {(cart.shop?.price || 0).toFixed(2)} {currency}
+                    {cart.shop?.price === 0 ? (
+                      <span className="text-green-600">{t('freeDelivery')}</span>
+                    ) : (
+                      <>{(cart.shop?.price || 0).toFixed(3)} {currency}</>
+                    )}
                   </span>
                 </div>
+
+                {/* Coupon Discount - خصم الكوبون */}
                 {appliedCoupon && (
                   <div className="flex justify-between items-center text-green-600">
                     <span className="flex items-center gap-1.5 text-sm">
@@ -881,7 +893,7 @@ const CartPage = () => {
                 <span className="text-base font-bold text-gray-900">{t('total')}</span>
                 <div className="text-end">
                   <span className="text-2xl sm:text-3xl font-bold text-[var(--primary)]">
-                    {(subtotal + (cart.shop?.price || 0)).toFixed(2)}
+                    {(subtotal + (cart.shop?.price || 0)).toFixed(3)}
                   </span>
                   <span className="text-sm font-medium text-gray-500 ms-1">{currency}</span>
                 </div>
@@ -901,7 +913,7 @@ const CartPage = () => {
               </Button>
 
               {/* Continue Shopping - Desktop */}
-              <Link href="/shops" className="hidden lg:block mt-4">
+              <Link href={cart.shop?.uuid ? `/shops/${cart.shop.uuid}` : '/shops'} className="hidden lg:block mt-4">
                 <Button variant="ghost" fullWidth className="text-gray-500 hover:text-[var(--primary)] text-sm" style={{ padding: '12px 20px' }}>
                   <Store className="w-4 h-4 me-2" />
                   {t('continueShopping')}

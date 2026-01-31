@@ -437,11 +437,11 @@ const ProductPage = ({ params }: ProductPageProps) => {
               {/* Price */}
               <div className="flex items-center gap-3 mb-6">
                 <span className="text-3xl font-bold text-[var(--primary)]">
-                  {tCommon('sar')} {price.toFixed(2)}
+                  {tCommon('sar')} {price.toFixed(3)}
                 </span>
                 {hasDiscount && (
                   <span className="text-lg text-[var(--text-grey)] line-through">
-                    {tCommon('sar')} {originalPrice.toFixed(2)}
+                    {tCommon('sar')} {originalPrice.toFixed(3)}
                   </span>
                 )}
               </div>

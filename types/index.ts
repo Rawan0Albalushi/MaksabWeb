@@ -403,25 +403,29 @@ export interface ParcelOrder {
   delivery_man?: DeliveryMan;
 }
 
-// Calculate
+// Calculate - Based on GetCalculateModel from API
 export interface CalculateResult {
   // Snake case (from API)
-  price?: number; // Subtotal
-  total_price: number;
-  delivery_fee: number;
-  tax: number;
-  total_tax?: number;
-  service_fee: number;
-  discount: number;
-  total_discount?: number;
-  coupon_price: number;
+  price?: number;              // السعر الأساسي للمنتجات (Subtotal)
+  total_price: number;         // السعر الإجمالي النهائي
+  delivery_fee: number;        // سعر التوصيل
+  tax: number;                 // الضريبة
+  total_tax?: number;          // الضريبة الإجمالية
+  total_shop_tax?: number;     // ضريبة المتجر
+  service_fee: number;         // رسوم الخدمة
+  discount: number;            // الخصم
+  total_discount?: number;     // إجمالي الخصومات
+  coupon_price: number;        // قيمة خصم الكوبون
+  bonus_shop?: number | null;  // بونص المتجر
   // Camel case alternatives (some APIs return this)
   totalPrice?: number;
   deliveryFee?: number;
   totalTax?: number;
+  totalShopTax?: number;
   serviceFee?: number;
   couponPrice?: number;
   totalDiscount?: number;
+  bonusShop?: number | null;
 }
 
 // Wallet History

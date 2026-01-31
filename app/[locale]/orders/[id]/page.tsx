@@ -854,7 +854,7 @@ const OrderDetailsPage = () => {
                 </div>
               </div>
               <div className="text-end shrink-0 hidden sm:block">
-                <p className="text-2xl font-bold text-white">{order.total_price.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-white">{order.total_price.toFixed(3)}</p>
                 <p className="text-white/50 text-sm">{tCommon('sar')}</p>
               </div>
             </div>
@@ -877,15 +877,15 @@ const OrderDetailsPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6"
-            style={{ padding: '24px' }}
+            className="bg-white rounded-2xl shadow-sm border border-gray-100"
+            style={{ padding: '18px 20px', marginBottom: '20px' }}
           >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <Truck size={20} className="text-[var(--primary)]" />
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                <Truck size={18} className="text-[var(--primary)]" />
                 {t('orderStatus')}
               </h2>
-              <span className="text-2xl font-bold text-[var(--primary)]">
+              <span className="text-xl font-bold text-[var(--primary)]">
                 {getProgressPercentage(order.status)}%
               </span>
             </div>
@@ -913,7 +913,7 @@ const OrderDetailsPage = () => {
                     <div key={step.status} className="flex flex-col items-center">
                       <motion.div
                         className={clsx(
-                          'w-12 h-12 rounded-full flex items-center justify-center z-10 transition-all shadow-md',
+                          'w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center z-10 transition-all shadow-md',
                           isCompleted
                             ? 'bg-gradient-to-br from-[var(--primary)] to-orange-400 text-white'
                             : 'bg-white border-2 border-gray-200 text-gray-400'
@@ -921,20 +921,20 @@ const OrderDetailsPage = () => {
                         animate={isCurrent ? { scale: [1, 1.1, 1] } : {}}
                         transition={{ repeat: isCurrent ? Infinity : 0, duration: 2 }}
                       >
-                        {step.status === 'new' && <Clock size={20} />}
-                        {step.status === 'accepted' && <CheckCircle2 size={20} />}
-                        {step.status === 'ready' && <Package size={20} />}
-                        {step.status === 'on_a_way' && <Truck size={20} />}
-                        {step.status === 'delivered' && <CheckCircle2 size={20} />}
+                        {step.status === 'new' && <Clock size={16} />}
+                        {step.status === 'accepted' && <CheckCircle2 size={16} />}
+                        {step.status === 'ready' && <Package size={16} />}
+                        {step.status === 'on_a_way' && <Truck size={16} />}
+                        {step.status === 'delivered' && <CheckCircle2 size={16} />}
                       </motion.div>
                       <span className={clsx(
-                        'text-xs mt-2 text-center font-medium',
+                        'text-[10px] sm:text-xs mt-1.5 text-center font-medium',
                         isCompleted ? 'text-[var(--primary)]' : 'text-gray-400'
                       )}>
                         {getStatusText(step.status)}
                       </span>
                       <span className={clsx(
-                        'text-[10px] mt-0.5',
+                        'text-[9px] sm:text-[10px] mt-0.5',
                         isCompleted ? 'text-[var(--primary)]/70' : 'text-gray-300'
                       )}>
                         {step.percentage}%
@@ -952,24 +952,24 @@ const OrderDetailsPage = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-red-50 border border-red-200 rounded-2xl mb-6"
-            style={{ padding: '20px 24px' }}
+            className="bg-red-50 border border-red-200 rounded-2xl mb-4"
+            style={{ padding: '14px 18px' }}
           >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-                <XCircle size={24} className="text-red-500" />
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                <XCircle size={20} className="text-red-500" />
               </div>
               <div>
-                <p className="font-bold text-red-700">تم إلغاء هذا الطلب</p>
-                <p className="text-sm text-red-600/70">يمكنك إعادة الطلب من المتجر</p>
+                <p className="font-bold text-red-700 text-sm">تم إلغاء هذا الطلب</p>
+                <p className="text-xs text-red-600/70">يمكنك إعادة الطلب من المتجر</p>
               </div>
             </div>
           </motion.div>
         )}
 
-        <div className="grid lg:grid-cols-5 gap-6">
+        <div className="grid lg:grid-cols-5 gap-4 lg:gap-6">
           {/* Main Content */}
-          <div className="lg:col-span-3 space-y-4">
+          <div className="lg:col-span-3" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {/* Shop Info with Call Button */}
             {order.shop && (
               <motion.div
@@ -977,14 +977,14 @@ const OrderDetailsPage = () => {
                 initial="hidden"
                 animate="visible"
                 className="bg-white rounded-2xl shadow-sm border border-gray-100"
-                style={{ padding: '20px' }}
+                style={{ padding: '16px 18px' }}
               >
-                <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Store size={18} className="text-[var(--primary)]" />
+                <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+                  <Store size={16} className="text-[var(--primary)]" />
                   {isRTL ? 'المتجر' : 'Shop'}
                 </h2>
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 shrink-0 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-100 shrink-0 shadow-sm">
                     {order.shop.logo_img ? (
                       <Image
                         src={order.shop.logo_img}
@@ -1032,10 +1032,10 @@ const OrderDetailsPage = () => {
                 animate="visible"
                 transition={{ delay: 0.1 }}
                 className="bg-white rounded-2xl shadow-sm border border-gray-100"
-                style={{ padding: '20px' }}
+                style={{ padding: '16px 18px' }}
               >
-                <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Navigation size={18} className="text-[var(--primary)]" />
+                <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+                  <Navigation size={16} className="text-[var(--primary)]" />
                   {isRTL ? 'تتبع الطلب' : 'Track Order'}
                 </h2>
                 <OrderTrackingMap
@@ -1063,10 +1063,10 @@ const OrderDetailsPage = () => {
                     ? 'bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-200'
                     : 'bg-white border-gray-100 shadow-sm'
                 )}
-                style={{ padding: '20px' }}
+                style={{ padding: '16px 18px' }}
               >
-                <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Truck size={18} className={clsx(
+                <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+                  <Truck size={16} className={clsx(
                     order.status === 'on_a_way' ? 'text-cyan-600' :
                     order.status === 'delivered' ? 'text-emerald-600' : 'text-gray-600'
                   )} />
@@ -1076,9 +1076,9 @@ const OrderDetailsPage = () => {
                     ? (isRTL ? 'تم التوصيل بواسطة' : 'Delivered by')
                     : (isRTL ? 'السائق المعين' : 'Assigned Driver')}
                 </h2>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                   <div className={clsx(
-                    'w-14 h-14 rounded-full flex items-center justify-center shadow-sm overflow-hidden',
+                    'w-12 h-12 rounded-full flex items-center justify-center shadow-sm overflow-hidden',
                     order.status === 'on_a_way' ? 'bg-white' :
                     order.status === 'delivered' ? 'bg-white' : 'bg-gray-50'
                   )}>
@@ -1139,22 +1139,22 @@ const OrderDetailsPage = () => {
               animate="visible"
               transition={{ delay: 0.2 }}
               className="bg-white rounded-2xl shadow-sm border border-gray-100"
-              style={{ padding: '20px' }}
+              style={{ padding: '16px 18px' }}
             >
-              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Package size={18} className="text-[var(--primary)]" />
+              <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <Package size={16} className="text-[var(--primary)]" />
                 {isRTL ? 'المنتجات' : 'Products'}
                 <span className="text-sm font-normal text-gray-400">({order.details?.length || 0})</span>
               </h2>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {order.details?.map((item: OrderDetail) => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-4 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-xl"
-                    style={{ padding: '14px 16px' }}
+                    className="flex items-center gap-3 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-xl"
+                    style={{ padding: '12px 14px' }}
                   >
-                    <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm shrink-0">
-                      <Package size={20} className="text-gray-400" />
+                    <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm shrink-0">
+                      <Package size={18} className="text-gray-400" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-gray-900 truncate">
@@ -1165,7 +1165,7 @@ const OrderDetailsPage = () => {
                       </p>
                     </div>
                     <p className="font-bold text-[var(--primary)] shrink-0">
-                      {item.total_price.toFixed(2)}
+                      {item.total_price.toFixed(3)}
                       <span className="text-xs text-gray-400 ms-1">{tCommon('sar')}</span>
                     </p>
                   </div>
@@ -1183,15 +1183,15 @@ const OrderDetailsPage = () => {
                   animate="visible"
                   transition={{ delay: 0.3 }}
                   className="bg-white rounded-2xl shadow-sm border border-gray-100"
-                  style={{ padding: '20px' }}
+                  style={{ padding: '16px 18px' }}
                 >
-                  <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <MapPin size={18} className="text-[var(--primary)]" />
+                  <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+                    <MapPin size={16} className="text-[var(--primary)]" />
                     {isRTL ? 'عنوان التوصيل' : 'Delivery Address'}
                   </h2>
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-[var(--primary)]/10 to-orange-100 rounded-lg flex items-center justify-center shrink-0">
-                      <MapPin size={18} className="text-[var(--primary)]" />
+                    <div className="w-9 h-9 bg-gradient-to-br from-[var(--primary)]/10 to-orange-100 rounded-lg flex items-center justify-center shrink-0">
+                      <MapPin size={16} className="text-[var(--primary)]" />
                     </div>
                     <div>
                       <p className="text-gray-900">{deliveryAddress}</p>
@@ -1209,28 +1209,28 @@ const OrderDetailsPage = () => {
           </div>
 
           {/* Sidebar - Price Summary */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2" style={{ marginTop: '4px' }}>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               className="bg-white rounded-2xl shadow-sm border border-gray-100 lg:sticky lg:top-24"
-              style={{ padding: '24px' }}
+              style={{ padding: '18px 20px' }}
             >
               {/* Header */}
-              <div className="flex items-center gap-3 mb-5 pb-5 border-b border-gray-100">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/5 flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-[var(--primary)]" />
+              <div className="flex items-center gap-2.5 mb-4 pb-4 border-b border-gray-100">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/5 flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-[var(--primary)]" />
                 </div>
-                <h2 className="text-lg font-bold text-gray-900">{isRTL ? 'ملخص الطلب' : 'Order Summary'}</h2>
+                <h2 className="text-base font-bold text-gray-900">{isRTL ? 'ملخص الطلب' : 'Order Summary'}</h2>
               </div>
 
               {/* Summary Details */}
-              <div className="space-y-3 pb-4 border-b border-gray-100">
+              <div className="space-y-2.5 pb-3 border-b border-gray-100">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">{isRTL ? 'المجموع الفرعي' : 'Subtotal'}</span>
                   <span className="font-medium text-gray-900">
-                    {(order.total_price - (order.delivery_fee || 0) - (order.tax || 0) - (order.service_fee || 0) + (order.discount || 0) + (order.coupon_price || 0)).toFixed(2)} {tCommon('sar')}
+                    {(order.total_price - (order.delivery_fee || 0) - (order.tax || 0) - (order.service_fee || 0) + (order.discount || 0) + (order.coupon_price || 0)).toFixed(3)} {tCommon('sar')}
                   </span>
                 </div>
 
@@ -1238,7 +1238,7 @@ const OrderDetailsPage = () => {
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">{isRTL ? 'رسوم التوصيل' : 'Delivery Fee'}</span>
                     <span className="font-medium text-gray-900">
-                      {order.delivery_fee.toFixed(2)} {tCommon('sar')}
+                      {order.delivery_fee.toFixed(3)} {tCommon('sar')}
                     </span>
                   </div>
                 )}
@@ -1247,7 +1247,7 @@ const OrderDetailsPage = () => {
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">{isRTL ? 'رسوم الخدمة' : 'Service Fee'}</span>
                     <span className="font-medium text-gray-900">
-                      {order.service_fee.toFixed(2)} {tCommon('sar')}
+                      {order.service_fee.toFixed(3)} {tCommon('sar')}
                     </span>
                   </div>
                 )}
@@ -1256,7 +1256,7 @@ const OrderDetailsPage = () => {
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">{isRTL ? 'الضريبة' : 'Tax'}</span>
                     <span className="font-medium text-gray-900">
-                      {order.tax.toFixed(2)} {tCommon('sar')}
+                      {order.tax.toFixed(3)} {tCommon('sar')}
                     </span>
                   </div>
                 )}
@@ -1268,27 +1268,27 @@ const OrderDetailsPage = () => {
                       {isRTL ? 'الخصم' : 'Discount'}
                     </span>
                     <span className="font-medium">
-                      -{((order.discount || 0) + (order.coupon_price || 0)).toFixed(2)} {tCommon('sar')}
+                      -{((order.discount || 0) + (order.coupon_price || 0)).toFixed(3)} {tCommon('sar')}
                     </span>
                   </div>
                 )}
               </div>
 
               {/* Total */}
-              <div className="flex justify-between items-center py-4">
-                <span className="text-lg font-bold text-gray-900">{isRTL ? 'الإجمالي' : 'Total'}</span>
+              <div className="flex justify-between items-center py-3">
+                <span className="text-base font-bold text-gray-900">{isRTL ? 'الإجمالي' : 'Total'}</span>
                 <div className="text-end">
-                  <span className="text-2xl font-bold text-[var(--primary)]">
-                    {order.total_price.toFixed(2)}
+                  <span className="text-xl font-bold text-[var(--primary)]">
+                    {order.total_price.toFixed(3)}
                   </span>
-                  <span className="text-sm font-medium text-gray-400 ms-1">{tCommon('sar')}</span>
+                  <span className="text-xs font-medium text-gray-400 ms-1">{tCommon('sar')}</span>
                 </div>
               </div>
 
               {/* Payment Info */}
               {order.transaction && (
-                <div className="flex items-center gap-3 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-xl mb-5" style={{ padding: '14px 16px' }}>
-                  <CreditCard size={18} className="text-gray-500" />
+                <div className="flex items-center gap-2.5 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-xl mb-4" style={{ padding: '12px 14px' }}>
+                  <CreditCard size={16} className="text-gray-500" />
                   <span className="text-sm text-gray-600 flex-1">
                     {order.transaction.payment_system?.tag === 'cash' 
                       ? (isRTL ? 'الدفع عند الاستلام' : 'Cash on Delivery')
@@ -1304,15 +1304,15 @@ const OrderDetailsPage = () => {
               )}
 
               {/* Actions */}
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {canRate && (
                   <Button
                     fullWidth
                     onClick={() => setShowRatingModal(true)}
                     className="rounded-xl !bg-gradient-to-r !from-yellow-400 !to-orange-400 shadow-lg shadow-orange-200"
-                    style={{ padding: '14px 20px' }}
+                    style={{ padding: '12px 18px' }}
                   >
-                    <Star size={18} className="me-2" />
+                    <Star size={16} className="me-2" />
                     {t('rateOrder')}
                   </Button>
                 )}
@@ -1326,9 +1326,9 @@ const OrderDetailsPage = () => {
                       'rounded-xl',
                       !canRate && '!bg-gradient-to-r !from-[var(--primary)] !to-orange-500 shadow-lg shadow-orange-200'
                     )}
-                    style={{ padding: '14px 20px' }}
+                    style={{ padding: '12px 18px' }}
                   >
-                    <RefreshCw size={18} className="me-2" />
+                    <RefreshCw size={16} className="me-2" />
                     {t('reorder')}
                   </Button>
                 )}
@@ -1339,9 +1339,9 @@ const OrderDetailsPage = () => {
                     variant="outline"
                     className="rounded-xl text-red-500 border-red-300 hover:!bg-red-50"
                     onClick={() => setShowCancelModal(true)}
-                    style={{ padding: '14px 20px' }}
+                    style={{ padding: '12px 18px' }}
                   >
-                    <XCircle size={18} className="me-2" />
+                    <XCircle size={16} className="me-2" />
                     {t('cancelOrder')}
                   </Button>
                 )}
@@ -1349,9 +1349,9 @@ const OrderDetailsPage = () => {
 
               {/* Order Note */}
               {order.note && (
-                <div className="mt-5 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-xl" style={{ padding: '14px 16px' }}>
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-                    <MessageSquare size={14} />
+                <div className="mt-4 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-xl" style={{ padding: '12px 14px' }}>
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1.5">
+                    <MessageSquare size={12} />
                     <span className="font-medium">{isRTL ? 'ملاحظات' : 'Notes'}</span>
                   </div>
                   <p className="text-sm text-gray-700">{order.note}</p>
@@ -1388,24 +1388,24 @@ const OrderDetailsPage = () => {
         <div
           className="text-center"
           style={{
-            padding: '24px',
+            padding: '20px',
             background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(248, 113, 113, 0.05) 100%)'
           }}
         >
-          <div className="w-16 h-16 mx-auto mb-5 bg-red-100 rounded-full flex items-center justify-center">
-            <XCircle size={32} className="text-red-500" />
+          <div className="w-14 h-14 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+            <XCircle size={28} className="text-red-500" />
           </div>
-          <h3 className="text-lg font-bold text-gray-900 mb-2">{isRTL ? 'إلغاء الطلب' : 'Cancel Order'}</h3>
-          <p className="text-gray-600 mb-6">
+          <h3 className="text-base font-bold text-gray-900 mb-2">{isRTL ? 'إلغاء الطلب' : 'Cancel Order'}</h3>
+          <p className="text-sm text-gray-600 mb-5">
             {isRTL ? 'هل أنت متأكد من إلغاء هذا الطلب؟' : 'Are you sure you want to cancel this order?'}
           </p>
-          <div className="flex gap-3">
+          <div className="flex gap-2.5">
             <Button
               variant="outline"
               fullWidth
               onClick={() => setShowCancelModal(false)}
               className="rounded-xl"
-              style={{ padding: '14px 20px' }}
+              style={{ padding: '12px 18px' }}
             >
               {tCommon('back')}
             </Button>
@@ -1414,7 +1414,7 @@ const OrderDetailsPage = () => {
               className="rounded-xl !bg-red-500 hover:!bg-red-600"
               onClick={handleCancelOrder}
               isLoading={cancelLoading}
-              style={{ padding: '14px 20px' }}
+              style={{ padding: '12px 18px' }}
             >
               {tCommon('confirm')}
             </Button>
@@ -1430,25 +1430,25 @@ const OrderDetailsPage = () => {
         size="sm"
       >
         <div
-          className="space-y-6"
+          className="space-y-4"
           style={{
-            padding: '24px',
+            padding: '20px',
             background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.05) 0%, rgba(251, 191, 36, 0.05) 100%)'
           }}
         >
           <div className="text-center">
-            <p className="text-gray-600 mb-5">{isRTL ? 'كيف كانت تجربتك مع هذا الطلب؟' : 'How was your experience with this order?'}</p>
-            <div className="flex justify-center gap-2">
+            <p className="text-sm text-gray-600 mb-4">{isRTL ? 'كيف كانت تجربتك مع هذا الطلب؟' : 'How was your experience with this order?'}</p>
+            <div className="flex justify-center gap-1.5">
               {[1, 2, 3, 4, 5].map((star) => (
                 <motion.button
                   key={star}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setRating(star)}
-                  style={{ padding: '8px' }}
+                  style={{ padding: '6px' }}
                 >
                   <Star
-                    size={40}
+                    size={32}
                     className={clsx(
                       'transition-colors',
                       star <= rating
@@ -1468,13 +1468,13 @@ const OrderDetailsPage = () => {
             onChange={(e) => setComment(e.target.value)}
           />
 
-          <div className="flex gap-3">
+          <div className="flex gap-2.5">
             <Button
               variant="outline"
               fullWidth
               onClick={() => setShowRatingModal(false)}
               className="rounded-xl"
-              style={{ padding: '14px 20px' }}
+              style={{ padding: '12px 18px' }}
             >
               {tCommon('cancel')}
             </Button>
@@ -1484,9 +1484,9 @@ const OrderDetailsPage = () => {
               isLoading={ratingLoading}
               disabled={rating === 0}
               className="rounded-xl !bg-gradient-to-r !from-yellow-400 !to-orange-400"
-              style={{ padding: '14px 20px' }}
+              style={{ padding: '12px 18px' }}
             >
-              <Star size={18} className="me-2" />
+              <Star size={16} className="me-2" />
               {isRTL ? 'إرسال التقييم' : 'Submit Rating'}
             </Button>
           </div>

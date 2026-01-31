@@ -88,11 +88,11 @@ const ProductCard = ({
           <div className="flex items-center justify-between mt-2">
             <div className="flex items-center gap-2">
               <span className="font-bold text-[var(--primary)]">
-                {t('sar')} {price.toFixed(2)}
+                {t('sar')} {price.toFixed(3)}
               </span>
               {hasDiscount && (
                 <span className="text-sm text-[var(--text-grey)] line-through">
-                  {t('sar')} {originalPrice.toFixed(2)}
+                  {t('sar')} {originalPrice.toFixed(3)}
                 </span>
               )}
             </div>
@@ -129,7 +129,7 @@ const ProductCard = ({
           {product.translation?.title}
         </h3>
         <span className="text-sm font-bold text-[var(--primary)]">
-          {t('sar')} {price.toFixed(2)}
+          {t('sar')} {price.toFixed(3)}
         </span>
       </Link>
     );
@@ -206,11 +206,11 @@ const ProductCard = ({
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
             <span className="font-bold text-lg text-[var(--primary)]">
-              {t('sar')} {price.toFixed(2)}
+              {t('sar')} {price.toFixed(3)}
             </span>
             {hasDiscount && (
               <span className="text-xs text-[var(--text-grey)] line-through">
-                {t('sar')} {originalPrice.toFixed(2)}
+                {t('sar')} {originalPrice.toFixed(3)}
               </span>
             )}
           </div>

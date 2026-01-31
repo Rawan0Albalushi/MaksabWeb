@@ -30,6 +30,8 @@ interface AddressSelectorProps {
   className?: string;
   /** If true, clicking will open the address modal instead of dropdown */
   useModal?: boolean;
+  /** If true, the selector will take full width (hero variant only) */
+  fullWidth?: boolean;
 }
 
 export const AddressSelector = ({
@@ -38,6 +40,7 @@ export const AddressSelector = ({
   onAddressChange,
   className,
   useModal = false,
+  fullWidth = false,
 }: AddressSelectorProps) => {
   const t = useTranslations('common');
   const [isOpen, setIsOpen] = useState(false);
@@ -290,46 +293,50 @@ export const AddressSelector = ({
   // Hero variant (default - for homepage)
   return (
     <>
-      <div className={clsx("relative", className)} ref={dropdownRef}>
+      <div className={clsx("relative", fullWidth && "w-full", className)} ref={dropdownRef}>
         <button
           type="button"
           onClick={handleTriggerClick}
           className={clsx(
-          "flex items-center gap-2 sm:gap-3 px-3.5 sm:px-5 py-3.5 sm:py-5 border-e border-white/10 transition-all duration-200 rounded-s-xl group",
+          "flex items-center gap-2 sm:gap-3 px-3.5 sm:px-5 py-3.5 sm:py-5 transition-all duration-200 group",
+          fullWidth ? "w-full rounded-xl justify-between" : "border-e border-white/10 rounded-s-xl",
           isOpen ? "bg-white/10" : "hover:bg-white/[0.06]"
         )}
       >
-        <div className="relative flex-shrink-0">
-          <div className={clsx(
-            "w-10 h-10 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center transition-all duration-300",
-            selectedAddress
-              ? "bg-gradient-to-br from-green-500/20 to-emerald-500/10"
-              : "bg-gradient-to-br from-[var(--primary)]/20 to-[var(--primary-light)]/10 group-hover:from-[var(--primary)]/30 group-hover:to-[var(--primary-light)]/20"
-          )}>
-            <MapPin size={20} className={clsx("sm:hidden", selectedAddress ? "text-green-400" : "text-[var(--primary-light)]")} />
-            <MapPin size={20} className={clsx("hidden sm:block", selectedAddress ? "text-green-400" : "text-[var(--primary-light)]")} />
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="relative flex-shrink-0">
+            <div className={clsx(
+              "w-10 h-10 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center transition-all duration-300",
+              selectedAddress
+                ? "bg-gradient-to-br from-green-500/20 to-emerald-500/10"
+                : "bg-gradient-to-br from-[var(--primary)]/20 to-[var(--primary-light)]/10 group-hover:from-[var(--primary)]/30 group-hover:to-[var(--primary-light)]/20"
+            )}>
+              <MapPin size={20} className={clsx("sm:hidden", selectedAddress ? "text-green-400" : "text-[var(--primary-light)]")} />
+              <MapPin size={20} className={clsx("hidden sm:block", selectedAddress ? "text-green-400" : "text-[var(--primary-light)]")} />
+            </div>
+            {selectedAddress && (
+              <span className="absolute -top-0.5 -end-0.5 w-2.5 sm:w-3 h-2.5 sm:h-3 bg-green-500 rounded-full border border-[#1a3a4a] sm:border-2 animate-pulse" />
+            )}
           </div>
-          {selectedAddress && (
-            <span className="absolute -top-0.5 -end-0.5 w-2.5 sm:w-3 h-2.5 sm:h-3 bg-green-500 rounded-full border border-[#1a3a4a] sm:border-2 animate-pulse" />
-          )}
-        </div>
-        <div className="hidden sm:block text-start min-w-[100px] max-w-[140px]">
-          {selectedAddress ? (
-            <>
-              <span className="text-[10px] text-green-400/80 font-semibold uppercase tracking-wider block">{t('yourLocation')}</span>
-              <span className="text-sm text-white font-bold truncate block leading-tight mt-0.5">
-                {selectedAddress.title || (typeof selectedAddress.address === 'string' ? selectedAddress.address?.split(',')[0] : '') || t('currentLocation')}
-              </span>
-            </>
-          ) : (
-            <>
-              <span className="text-[10px] text-white/50 font-semibold uppercase tracking-wider block">{t('location')}</span>
-              <span className="text-sm text-white/80 font-semibold block leading-tight mt-0.5">{t('selectLocation')}</span>
-            </>
-          )}
+          <div className={clsx("text-start", fullWidth ? "block" : "hidden sm:block", fullWidth ? "min-w-0 flex-1" : "min-w-[100px] max-w-[140px]")}>
+            {selectedAddress ? (
+              <>
+                <span className="text-[10px] text-green-400/80 font-semibold uppercase tracking-wider block">{t('yourLocation')}</span>
+                <span className={clsx("text-sm text-white font-bold block leading-tight mt-0.5", fullWidth ? "truncate" : "truncate")}>
+                  {selectedAddress.title || (typeof selectedAddress.address === 'string' ? selectedAddress.address?.split(',')[0] : '') || t('currentLocation')}
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="text-[10px] text-white/50 font-semibold uppercase tracking-wider block">{t('location')}</span>
+                <span className="text-sm text-white/80 font-semibold block leading-tight mt-0.5">{t('selectLocation')}</span>
+              </>
+            )}
+          </div>
         </div>
         <ChevronDown size={16} className={clsx(
-          "text-white/40 transition-transform duration-300 hidden sm:block ms-1",
+          "text-white/40 transition-transform duration-300 ms-1",
+          fullWidth ? "block" : "hidden sm:block",
           isOpen && "rotate-180 text-white/60"
         )} />
       </button>

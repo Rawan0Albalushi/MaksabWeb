@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation, EffectFade } from 'swiper/modules';
@@ -23,7 +22,6 @@ import {
 import { clsx } from 'clsx';
 
 import {
-  Button,
   ShopCardSkeleton,
   CategorySkeleton,
   BannerSkeleton,
@@ -42,7 +40,6 @@ import 'swiper/css/effect-fade';
 const HomePage = () => {
   const t = useTranslations('home');
   const tCommon = useTranslations('common');
-  const router = useRouter();
   const { locale } = useSettingsStore();
   const { selectedAddress, refreshTrigger, currentLocation, _hasHydrated } = useLocationStore();
   const { user } = useAuthStore();
@@ -56,8 +53,6 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [shopsLoading, setShopsLoading] = useState(false);
   const [activeStory, setActiveStory] = useState<Story | null>(null);
-  const [searchFocused, setSearchFocused] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch home data (banners, categories, stories - not location dependent)
   const fetchStaticData = useCallback(async () => {
@@ -174,13 +169,6 @@ const HomePage = () => {
     }
   }, [refreshTrigger, fetchShops, _hasHydrated]);
 
-  // Handle search form submission
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    const params = new URLSearchParams();
-    if (searchQuery) params.set('search', searchQuery);
-    router.push(`/shops${params.toString() ? `?${params.toString()}` : ''}`);
-  };
 
   // Animation variants
   const fadeInUp = {
@@ -204,7 +192,7 @@ const HomePage = () => {
   return (
     <div className="min-h-screen overflow-x-hidden bg-[var(--black)]">
       {/* Hero Section */}
-      <section className="relative min-h-[auto] sm:min-h-[520px] lg:min-h-[580px] flex items-start sm:items-center z-[100]">
+      <section className="relative min-h-[auto] sm:min-h-[420px] lg:min-h-[480px] flex items-start sm:items-center z-[100]">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] overflow-hidden">
           <div className="absolute top-10 sm:top-20 start-5 sm:start-10 w-32 sm:w-72 h-32 sm:h-72 bg-[var(--primary)]/20 rounded-full blur-3xl animate-pulse pointer-events-none" />
@@ -219,8 +207,8 @@ const HomePage = () => {
           />
         </div>
 
-        <div className="container relative z-10 sm:pt-10 sm:pb-10 lg:py-14" style={{ paddingTop: '80px', paddingBottom: '60px' }}>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
+        <div className="container relative z-10 sm:pt-6 sm:pb-6 lg:py-10" style={{ paddingTop: '70px', paddingBottom: '40px' }}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-10 items-center">
             {/* Hero Content */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -237,95 +225,37 @@ const HomePage = () => {
               </h1>
 
               {/* Spacer after Title */}
-              <div className="h-2 sm:h-5" aria-hidden="true" />
+              <div className="h-1.5 sm:h-3" aria-hidden="true" />
               
               <p className="text-xs sm:text-base md:text-lg text-white/70 max-w-lg mx-auto lg:mx-0 leading-relaxed px-2 sm:px-0">
                 {t('heroSubtitle')}
               </p>
 
               {/* Spacer after Description */}
-              <div className="h-3 sm:h-6" aria-hidden="true" />
+              <div className="h-2 sm:h-4" aria-hidden="true" />
 
-              {/* Search Bar with Location Picker */}
+              {/* Location Selector */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="relative max-w-xl mx-auto lg:mx-0 z-[60] w-full px-1 sm:px-0"
+                className="relative max-w-md mx-auto lg:mx-0 z-[60] w-full px-1 sm:px-0"
               >
-                <form onSubmit={handleSearch}>
-                  {/* Outer glow effect */}
-                  <div className={clsx(
-                    "absolute -inset-1 rounded-xl sm:rounded-3xl transition-all duration-500 blur-lg opacity-0",
-                    searchFocused && "opacity-100 bg-gradient-to-r from-[var(--primary)]/40 via-[#ff6b3d]/30 to-[var(--primary-light)]/40"
-                  )} />
-                  
-                  <div className={clsx(
-                    "relative flex items-center rounded-xl sm:rounded-2xl border transition-all duration-300",
-                    "bg-gradient-to-r from-white/[0.08] to-white/[0.04] backdrop-blur-xl",
-                    searchFocused 
-                      ? "border-[var(--primary)]/60 shadow-[0_8px_32px_rgba(255,61,0,0.25),inset_0_1px_0_rgba(255,255,255,0.1)]" 
-                      : "border-white/[0.12] hover:border-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
-                  )}>
-                    {/* Address Selector Component */}
-                    <AddressSelector variant="hero" />
-
-                    {/* Divider */}
-                    <div className="w-px h-6 sm:h-10 bg-gradient-to-b from-transparent via-white/20 to-transparent mx-0.5 sm:mx-1" />
-
-                    {/* Search Input */}
-                    <div className="flex-1 relative min-w-0 px-1 sm:px-3">
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder={tCommon('searchPlaceholder')}
-                        className={clsx(
-                          "w-full px-1.5 sm:px-4 py-2.5 sm:py-5 bg-transparent text-white placeholder:text-white/40 focus:outline-none",
-                          "text-xs sm:text-[15px] font-medium"
-                        )}
-                        onFocus={() => setSearchFocused(true)}
-                        onBlur={() => setSearchFocused(false)}
-                      />
-                    </div>
-
-                    {/* Search Button */}
-                    <div style={{ padding: '4px 4px 4px 2px' }} className="sm:p-2.5 sm:ps-1">
-                      <Button 
-                        type="submit" 
-                        className={clsx(
-                          "rounded-lg sm:rounded-xl font-semibold transition-all duration-300",
-                          "bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)] hover:from-[var(--primary-hover)] hover:to-[var(--primary)]",
-                          "shadow-[0_4px_20px_rgba(255,61,0,0.35)] hover:shadow-[0_6px_25px_rgba(255,61,0,0.45)]",
-                          "hover:scale-[1.02] active:scale-[0.98]"
-                        )}
-                        style={{ padding: '10px 12px' }}
-                      >
-                        <span className="hidden sm:inline">{tCommon('search')}</span>
-                        <Search size={16} className="sm:hidden" />
-                      </Button>
-                    </div>
-                  </div>
-                </form>
-
-                {/* Location Status Indicator (Mobile) */}
-                {selectedAddress && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="sm:hidden mt-2 flex items-center justify-center gap-2 text-white/70"
-                    style={{ padding: '8px 12px' }}
-                  >
-                    <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-                    <span className="text-[10px] truncate max-w-[180px]">
-                      {selectedAddress.title || selectedAddress.address?.split(',')[0] || tCommon('locationSet')}
-                    </span>
-                  </motion.div>
-                )}
+                {/* Outer glow effect */}
+                <div className="absolute -inset-1 rounded-xl sm:rounded-2xl transition-all duration-500 blur-lg opacity-50 bg-gradient-to-r from-[var(--primary)]/30 via-[#ff6b3d]/20 to-[var(--primary-light)]/30" />
+                
+                <div className={clsx(
+                  "relative flex items-center rounded-xl sm:rounded-2xl border transition-all duration-300",
+                  "bg-gradient-to-r from-white/[0.08] to-white/[0.04] backdrop-blur-xl",
+                  "border-white/[0.12] hover:border-[var(--primary)]/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] hover:shadow-[0_8px_32px_rgba(255,61,0,0.15)]"
+                )}>
+                  {/* Address Selector Component - Full Width */}
+                  <AddressSelector variant="hero" fullWidth />
+                </div>
               </motion.div>
 
               {/* Spacer before Stats */}
-              <div className="h-4 sm:h-8" aria-hidden="true" />
+              <div className="h-3 sm:h-5" aria-hidden="true" />
 
               {/* Stats */}
               <motion.div
@@ -728,22 +658,6 @@ const HomePage = () => {
             </motion.div>
           </div>
 
-          {/* Bottom CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.8 }}
-            className="text-center mt-6 sm:mt-10 lg:mt-12"
-          >
-            <Link href="/shops">
-              <Button className="text-sm sm:text-lg font-semibold bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)] hover:from-[var(--primary-hover)] hover:to-[var(--primary)] shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300" style={{ padding: '14px 24px' }}>
-                {tCommon('startShopping')}
-                {isRTL ? <ChevronLeft size={18} className="ms-1.5 sm:ms-2 sm:hidden" /> : <ChevronRight size={18} className="ms-1.5 sm:ms-2 sm:hidden" />}
-                {isRTL ? <ChevronLeft size={20} className="ms-2 hidden sm:inline" /> : <ChevronRight size={20} className="ms-2 hidden sm:inline" />}
-              </Button>
-            </Link>
-          </motion.div>
         </div>
       </section>
 
