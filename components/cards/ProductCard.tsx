@@ -172,8 +172,8 @@ const ProductCard = ({
           )}
         </div>
 
-        {/* Favorite button */}
-        <button
+        {/* Favorite button - Hidden temporarily */}
+        {/* <button
           onClick={handleFavoriteClick}
           className={clsx(
             'absolute top-2 end-2 w-8 h-8 flex items-center justify-center rounded-full',
@@ -182,7 +182,7 @@ const ProductCard = ({
           )}
         >
           <Heart size={16} className={isFavorite ? 'fill-current' : ''} />
-        </button>
+        </button> */}
       </div>
 
       {/* Content */}

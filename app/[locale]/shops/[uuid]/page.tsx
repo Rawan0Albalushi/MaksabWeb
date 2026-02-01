@@ -846,7 +846,8 @@ export default function ShopPage({ params }: ShopPageProps) {
             
             {/* Action Buttons */}
             <div className="flex items-center gap-3">
-              <motion.button
+              {/* Favorite button - Hidden temporarily */}
+              {/* <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => toggleFavoriteShop(shop.id)}
@@ -857,7 +858,7 @@ export default function ShopPage({ params }: ShopPageProps) {
                 style={{ background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.9) 0%, rgba(0, 188, 212, 0.9) 100%)', padding: '10px' }}
               >
                 <Heart size={20} className={clsx('text-white', isFav && 'fill-current')} />
-              </motion.button>
+              </motion.button> */}
               
               {shop.phone && (
                 <motion.a

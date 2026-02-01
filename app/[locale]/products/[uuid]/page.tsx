@@ -262,7 +262,8 @@ const ProductPage = ({ params }: ProductPageProps) => {
 
               {/* Actions */}
               <div className="absolute top-4 end-4 flex flex-col gap-2 z-10">
-                <button
+                {/* Favorite button - Hidden temporarily */}
+                {/* <button
                   onClick={handleToggleFavorite}
                   className={clsx(
                     'w-10 h-10 flex items-center justify-center rounded-full shadow-lg transition-all',
@@ -272,7 +273,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
                   )}
                 >
                   <Heart size={20} className={isFavorite ? 'fill-current' : ''} />
-                </button>
+                </button> */}
                 <button className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-[var(--main-bg)] transition-colors">
                   <Share2 size={20} className="text-[var(--text-grey)]" />
                 </button>

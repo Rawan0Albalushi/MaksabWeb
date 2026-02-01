@@ -97,8 +97,8 @@ const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
           </div>
         </div>
 
-        {/* Favorite */}
-        <button
+        {/* Favorite - Hidden temporarily */}
+        {/* <button
           onClick={handleFavoriteClick}
           className={clsx(
             'shrink-0 w-10 h-10 flex items-center justify-center rounded-full transition-all hover:scale-110',
@@ -106,7 +106,7 @@ const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
           )}
         >
           <Heart size={20} className={isFavorite ? 'fill-current' : ''} />
-        </button>
+        </button> */}
       </Link>
     );
   }
@@ -184,8 +184,8 @@ const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
           {/* Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
           
-          {/* Favorite button */}
-          <button
+          {/* Favorite button - Hidden temporarily */}
+          {/* <button
             onClick={handleFavoriteClick}
             className={clsx(
               'absolute top-2 end-2 sm:top-3 sm:end-3 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full transition-all hover:scale-110',
@@ -195,7 +195,7 @@ const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
           >
             <Heart size={16} className={clsx("sm:hidden", isFavorite && 'fill-current')} />
             <Heart size={18} className={clsx("hidden sm:block", isFavorite && 'fill-current')} />
-          </button>
+          </button> */}
 
           {/* Status badge */}
           {!shop.open && (

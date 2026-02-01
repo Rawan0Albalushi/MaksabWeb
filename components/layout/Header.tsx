@@ -115,7 +115,7 @@ const Header = () => {
   const navLinks = [
     { href: '/', label: t('home'), icon: Home },
     { href: '/shops', label: t('shops'), icon: Store },
-    { href: '/categories', label: t('categories'), icon: Grid3X3 },
+    // { href: '/categories', label: t('categories'), icon: Grid3X3 }, // Hidden temporarily
     // Show orders link only when authenticated
     ...(isAuthenticated ? [{ href: '/orders', label: t('orders'), icon: Package }] : []),
   ];
@@ -257,8 +257,8 @@ const Header = () => {
               {/* Divider - Desktop */}
               <div className="hidden md:block w-px h-5 bg-[var(--border)]/60 mx-1" />
 
-              {/* Favorites - Desktop */}
-              <Link
+              {/* Favorites - Desktop - Hidden temporarily */}
+              {/* <Link
                 href="/favorites"
                 className="hidden sm:flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-[var(--main-bg)]/70 active:scale-95 transition-all duration-200 group"
               >
@@ -266,7 +266,7 @@ const Header = () => {
                   size={19} 
                   className="text-[var(--text-grey)] group-hover:text-[var(--primary)] transition-colors duration-200" 
                 />
-              </Link>
+              </Link> */}
 
               {/* Cart */}
               <Link
@@ -345,7 +345,8 @@ const Header = () => {
                     
                     {/* Menu Items */}
                     <div style={{ padding: '8px 12px' }}>
-                      <Link
+                      {/* Profile Link - Hidden temporarily */}
+                      {/* <Link
                         href="/profile"
                         onClick={() => setIsProfileDropdownOpen(false)}
                         className="flex items-center gap-3 rounded-xl text-sm hover:bg-[var(--main-bg)] transition-colors group"
@@ -353,7 +354,7 @@ const Header = () => {
                       >
                         <User size={17} className="text-[var(--text-grey)] group-hover:text-[var(--primary)] transition-colors" />
                         <span className="text-[var(--black)]">{t('profile')}</span>
-                      </Link>
+                      </Link> */}
                       <Link
                         href="/orders"
                         onClick={() => setIsProfileDropdownOpen(false)}
@@ -363,7 +364,8 @@ const Header = () => {
                         <Package size={17} className="text-[var(--text-grey)] group-hover:text-[var(--primary)] transition-colors" />
                         <span className="text-[var(--black)]">{t('orders')}</span>
                       </Link>
-                      <Link
+                      {/* Settings Link - Hidden temporarily */}
+                      {/* <Link
                         href="/settings"
                         onClick={() => setIsProfileDropdownOpen(false)}
                         className="flex items-center gap-3 rounded-xl text-sm hover:bg-[var(--main-bg)] transition-colors group"
@@ -371,7 +373,7 @@ const Header = () => {
                       >
                         <Settings size={17} className="text-[var(--text-grey)] group-hover:text-[var(--primary)] transition-colors" />
                         <span className="text-[var(--black)]">{t('settings')}</span>
-                      </Link>
+                      </Link> */}
                     </div>
                     
                     {/* Logout */}
@@ -495,24 +497,20 @@ const Header = () => {
 
               {/* User Section in Header */}
               {_hasHydrated && isAuthenticated ? (
-                <Link
-                  href="/profile"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 group"
-                >
+                <div className="flex items-center gap-3">
                   <div className="relative">
                     <Avatar src={user?.img} fallback={user?.firstname} size="md" className="ring-2 ring-white/30" />
                     <div className="absolute -bottom-0.5 -end-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-white text-[15px] truncate group-hover:underline">
+                    <p className="font-bold text-white text-[15px] truncate">
                       {user?.firstname} {user?.lastname}
                     </p>
                     <p className="text-white/70 text-xs truncate">
                       {user?.email || user?.phone}
                     </p>
                   </div>
-                </Link>
+                </div>
               ) : (
                 <div>
                   <Image
@@ -572,8 +570,8 @@ const Header = () => {
                 );
               })}
               
-              {/* Favorites Link */}
-              <Link
+              {/* Favorites Link - Hidden temporarily */}
+              {/* <Link
                 href="/favorites"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="flex items-center gap-3.5 rounded-2xl text-[var(--black)] hover:bg-[var(--main-bg)] font-semibold text-[15px] transition-all duration-200 active:scale-[0.98]"
@@ -588,14 +586,14 @@ const Header = () => {
                   <Heart size={20} className="text-[var(--text-grey)]" />
                 </span>
                 <span className="flex-1">{locale === 'ar' ? 'المفضلة' : 'Favorites'}</span>
-              </Link>
+              </Link> */}
             </nav>
 
             {/* Divider */}
             <div className="mx-5 h-px bg-[var(--border)]/60" />
 
-            {/* Settings Link for Authenticated Users */}
-            {_hasHydrated && isAuthenticated && (
+            {/* Settings Link for Authenticated Users - Hidden temporarily */}
+            {/* {_hasHydrated && isAuthenticated && (
               <>
                 <div style={{ padding: '16px 18px' }} className="space-y-1.5">
                   <Link
@@ -612,7 +610,7 @@ const Header = () => {
                 </div>
                 <div className="mx-5 h-px bg-[var(--border)]/60" />
               </>
-            )}
+            )} */}
 
             {/* Auth Section for Non-Authenticated Users */}
             {_hasHydrated && !isAuthenticated && (

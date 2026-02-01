@@ -30,9 +30,9 @@ const Footer = () => {
 
   const quickLinks = [
     { href: '/shops', label: tCommon('shops') },
-    { href: '/categories', label: tCommon('categories') },
+    // { href: '/categories', label: tCommon('categories') }, // Hidden temporarily
     { href: '/orders', label: tCommon('orders') },
-    { href: '/favorites', label: 'المفضلة' },
+    // { href: '/favorites', label: 'المفضلة' }, // Hidden temporarily
   ];
 
   const supportLinks = [
