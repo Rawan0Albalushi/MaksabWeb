@@ -144,7 +144,7 @@ export const AddressModal = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm"
             onClick={onClose}
           />
 
@@ -154,7 +154,7 @@ export const AddressModal = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed inset-x-0 bottom-0 z-50 max-h-[90vh] bg-white rounded-t-3xl shadow-2xl overflow-hidden sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-lg sm:w-full sm:rounded-3xl sm:max-h-[85vh]"
+            className="fixed inset-x-0 bottom-0 z-[200] max-h-[90vh] bg-white rounded-t-3xl shadow-2xl overflow-hidden sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-lg sm:w-full sm:rounded-3xl sm:max-h-[85vh]"
           >
             {/* Header */}
             <div className="sticky top-0 z-10 bg-white border-b border-gray-100">

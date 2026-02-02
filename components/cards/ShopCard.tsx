@@ -3,9 +3,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { clsx } from 'clsx';
-import { Clock, Star, Heart, MapPin, BadgeCheck, Calendar, ArrowUpRight } from 'lucide-react';
+import { Timer, Star, Heart, MapPin, BadgeCheck, CalendarDays } from 'lucide-react';
 import { Shop } from '@/types';
-import { Badge, Button } from '@/components/ui';
+import { Badge } from '@/components/ui';
 import { useFavoritesStore } from '@/store';
 import { useTranslations } from 'next-intl';
 
@@ -17,7 +17,6 @@ interface ShopCardProps {
 
 const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
   const t = useTranslations('common');
-  const tShop = useTranslations('shop');
   const { toggleFavoriteShop, isFavoriteShop } = useFavoritesStore();
   const isFavorite = isFavoriteShop(shop.id);
 
@@ -43,9 +42,10 @@ const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
       <Link
         href={`/shops/${shop.uuid}`}
         className={clsx(
-          'group flex gap-4 p-5 bg-white rounded-2xl border border-[var(--border)] hover:border-[var(--primary)]/30 hover:shadow-lg transition-all duration-300',
+          'group flex gap-4 bg-white rounded-2xl border border-[var(--border)] hover:border-[var(--primary)]/30 hover:shadow-lg transition-all duration-300',
           className
         )}
+        style={{ padding: '16px 18px' }}
       >
         {/* Logo */}
         <div className="relative w-20 h-20 shrink-0 rounded-2xl overflow-hidden bg-[var(--main-bg)] ring-2 ring-[var(--primary)]/20 group-hover:ring-[var(--primary)]/40 transition-all">
@@ -90,7 +90,7 @@ const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
             )}
             {deliveryTime && (
               <div className="flex items-center gap-1 text-[var(--text-grey)]">
-                <Clock size={14} />
+                <Timer size={14} strokeWidth={2.5} />
                 <span>{deliveryTime}</span>
               </div>
             )}
@@ -116,9 +116,10 @@ const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
       <Link
         href={`/shops/${shop.uuid}`}
         className={clsx(
-          'group flex flex-col items-center text-center p-5 bg-white rounded-2xl border border-[var(--border)] hover:border-[var(--primary)]/30 hover:shadow-md transition-all duration-300',
+          'group flex flex-col items-center text-center bg-white rounded-2xl border border-[var(--border)] hover:border-[var(--primary)]/30 hover:shadow-md transition-all duration-300',
           className
         )}
+        style={{ padding: '16px 18px' }}
       >
         {/* Logo with ring */}
         <div className="relative w-16 h-16 mb-3 rounded-full overflow-hidden ring-2 ring-[var(--primary)]/20 group-hover:ring-[var(--primary)]/50 transition-all">
@@ -228,7 +229,7 @@ const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
       </div>
 
       {/* Content */}
-      <div className="px-3 sm:px-5 pt-2 sm:pt-3 pb-4 sm:pb-5 text-center">
+      <div className="text-center" style={{ padding: '10px 14px 16px 14px' }}>
         {/* Title with verify badge */}
         <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
           <h3 className="font-bold text-base sm:text-lg text-[var(--black)] group-hover:text-[var(--primary)] transition-colors line-clamp-1">
@@ -284,28 +285,22 @@ const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
         )}
 
         {/* Shop Info - Horizontal layout */}
-        <div className="flex items-center justify-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-[var(--text-grey)] mb-4 sm:mb-5 flex-wrap">
+        <div className="flex items-center justify-center gap-2 sm:gap-3 text-[11px] sm:text-sm text-[var(--text-grey)] mb-3 sm:mb-4 flex-wrap">
           {deliveryTime && (
-            <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 bg-gray-50 rounded-lg">
-              <Clock size={11} className="text-[var(--primary)] sm:hidden" />
-              <Clock size={13} className="text-[var(--primary)] hidden sm:block" />
+            <div className="flex items-center gap-1 sm:gap-1.5 bg-gray-50 rounded-lg" style={{ padding: '6px 10px' }}>
+              <Timer size={12} className="text-[var(--primary)] sm:hidden" strokeWidth={2.5} />
+              <Timer size={14} className="text-[var(--primary)] hidden sm:block" strokeWidth={2.5} />
               <span>{deliveryTime}</span>
             </div>
           )}
           {shop.created_at && (
-            <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 bg-gray-50 rounded-lg hidden sm:flex">
-              <Calendar size={13} className="text-[var(--primary)]" />
+            <div className="flex items-center gap-1 sm:gap-1.5 bg-gray-50 rounded-lg hidden sm:flex" style={{ padding: '6px 10px' }}>
+              <CalendarDays size={14} className="text-[var(--primary)]" strokeWidth={2.5} />
               <span>{formatDate(shop.created_at)}</span>
             </div>
           )}
         </div>
 
-        {/* Visit Store Button */}
-        <Button className="w-full py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base bg-[var(--primary)] hover:bg-[var(--primary-hover)] group-hover:shadow-lg transition-all flex items-center justify-center gap-1.5 sm:gap-2">
-          {tShop('visitStore')}
-          <ArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform sm:hidden" />
-          <ArrowUpRight size={18} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform hidden sm:block" />
-        </Button>
       </div>
     </Link>
   );

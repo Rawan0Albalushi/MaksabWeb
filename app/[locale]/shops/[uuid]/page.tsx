@@ -26,7 +26,6 @@ import {
   Bike,
   Users,
   Utensils,
-  Share2,
   Store,
   CheckCircle2,
   BadgePercent,
@@ -829,60 +828,7 @@ export default function ShopPage({ params }: ShopPageProps) {
           </div>
         )}
 
-        <div className="container relative z-10 px-4 sm:px-6 lg:px-8" style={{ paddingTop: '16px', paddingBottom: '16px' }}>
-          {/* Top Navigation */}
-          <div className="flex items-center justify-between mb-4 sm:mb-5">
-            <Link
-              href="/shops"
-              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all shadow-lg hover:shadow-xl group border border-white/30"
-              style={{ background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.9) 0%, rgba(0, 188, 212, 0.9) 100%)', padding: '10px' }}
-            >
-              {isRTL ? (
-                <ChevronRight size={22} className="text-white group-hover:scale-110 transition-transform" />
-              ) : (
-                <ChevronLeft size={22} className="text-white group-hover:scale-110 transition-transform" />
-              )}
-            </Link>
-            
-            {/* Action Buttons */}
-            <div className="flex items-center gap-3">
-              {/* Favorite button - Hidden temporarily */}
-              {/* <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => toggleFavoriteShop(shop.id)}
-                className={clsx(
-                  'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all shadow-lg hover:shadow-xl border border-white/30',
-                  isFav && 'ring-2 ring-white'
-                )}
-                style={{ background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.9) 0%, rgba(0, 188, 212, 0.9) 100%)', padding: '10px' }}
-              >
-                <Heart size={20} className={clsx('text-white', isFav && 'fill-current')} />
-              </motion.button> */}
-              
-              {shop.phone && (
-                <motion.a
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  href={`tel:${shop.phone}`}
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white transition-all shadow-lg hover:shadow-xl border border-white/30"
-                  style={{ background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.9) 0%, rgba(0, 188, 212, 0.9) 100%)', padding: '10px' }}
-                >
-                  <Phone size={20} />
-                </motion.a>
-              )}
-              
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white transition-all shadow-lg hover:shadow-xl border border-white/30"
-                style={{ background: 'linear-gradient(135deg, rgba(255, 61, 0, 0.9) 0%, rgba(0, 188, 212, 0.9) 100%)', padding: '10px' }}
-              >
-                <Share2 size={20} />
-              </motion.button>
-            </div>
-          </div>
-
+        <div className="container relative z-10 px-4 sm:px-6 lg:px-8" style={{ paddingTop: '24px', paddingBottom: '16px' }}>
           {/* Shop Info */}
           <div className="flex items-start gap-4 sm:gap-6 lg:gap-8">
             {/* Logo */}
@@ -977,6 +923,19 @@ export default function ShopPage({ params }: ShopPageProps) {
                 )}
               </div>
             </motion.div>
+
+            {/* Phone Button - End */}
+            {shop.phone && (
+              <motion.a
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                href={`tel:${shop.phone}`}
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-[var(--primary)] transition-all shadow-lg hover:shadow-xl border border-[var(--border)] shrink-0 self-center"
+                style={{ backgroundColor: 'white', padding: '10px' }}
+              >
+                <Phone size={20} />
+              </motion.a>
+            )}
           </div>
 
         </div>

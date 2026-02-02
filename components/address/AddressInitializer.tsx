@@ -184,7 +184,7 @@ export const AddressInitializer = ({ children }: AddressInitializerProps) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+              className="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm"
               onClick={() => setShowPrompt(false)}
             />
 
@@ -194,7 +194,7 @@ export const AddressInitializer = ({ children }: AddressInitializerProps) => {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed inset-x-4 top-1/2 -translate-y-1/2 z-50 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-md sm:w-full"
+              className="fixed inset-x-4 top-1/2 -translate-y-1/2 z-[99999] sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-md sm:w-full"
             >
               <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
                 {/* Close button */}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
@@ -46,7 +47,27 @@ export const AddressSelector = ({
   const [isOpen, setIsOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [startWithForm, setStartWithForm] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+
+  // For portal - ensure we're on client side
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Calculate dropdown position when opening
+  useEffect(() => {
+    if (isOpen && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY + 12,
+        left: rect.left + window.scrollX,
+        width: Math.max(rect.width, 340),
+      });
+    }
+  }, [isOpen]);
 
   const {
     selectedAddress,
@@ -88,7 +109,10 @@ export const AddressSelector = ({
 
   // Handle opening form or dropdown
   const handleTriggerClick = () => {
-    if (useModal) {
+    // On mobile (screen width < 640px), always open the form modal for better UX
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+    
+    if (useModal || isMobile) {
       setIsFormOpen(true);
     } else {
       setIsOpen(!isOpen);
@@ -134,6 +158,7 @@ export const AddressSelector = ({
       <>
         <div className={clsx("relative", className)} ref={dropdownRef}>
           <button
+            ref={triggerRef}
             onClick={handleTriggerClick}
             className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
           >
@@ -147,20 +172,38 @@ export const AddressSelector = ({
           )} />
         </button>
 
-        <AnimatePresence>
-          {isOpen && !useModal && (
+        {/* Dropdown via Portal */}
+        {mounted && isOpen && !useModal && createPortal(
+          <AnimatePresence>
             <motion.div
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className="absolute top-full end-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[9999]"
+              style={{
+                position: 'fixed',
+                top: dropdownPosition.top,
+                left: dropdownPosition.left,
+                width: 320,
+                zIndex: 99999,
+              }}
+              className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
             >
               {renderDropdownContent()}
             </motion.div>
-          )}
-        </AnimatePresence>
+          </AnimatePresence>,
+          document.body
+        )}
         </div>
+
+        {/* Backdrop for dropdown */}
+        {mounted && isOpen && !useModal && createPortal(
+          <div 
+            className="fixed inset-0 z-[99998]" 
+            onClick={() => setIsOpen(false)}
+          />,
+          document.body
+        )}
 
         {/* Address Form (includes saved addresses list) */}
         <AddressForm
@@ -295,6 +338,7 @@ export const AddressSelector = ({
     <>
       <div className={clsx("relative", fullWidth && "w-full", className)} ref={dropdownRef}>
         <button
+          ref={triggerRef}
           type="button"
           onClick={handleTriggerClick}
           className={clsx(
@@ -341,21 +385,38 @@ export const AddressSelector = ({
         )} />
       </button>
 
-      {/* Dropdown */}
-      <AnimatePresence>
-        {isOpen && !useModal && (
+      {/* Dropdown via Portal */}
+      {mounted && isOpen && !useModal && createPortal(
+        <AnimatePresence>
           <motion.div
             initial={{ opacity: 0, y: 8, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute top-full start-0 mt-3 w-[340px] sm:w-[380px] bg-white rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] border border-gray-200/60 overflow-hidden z-[9999]"
+            style={{
+              position: 'fixed',
+              top: dropdownPosition.top,
+              left: dropdownPosition.left,
+              width: Math.min(dropdownPosition.width, 380),
+              zIndex: 99999,
+            }}
+            className="bg-white rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] border border-gray-200/60 overflow-hidden"
           >
             {renderDropdownContent()}
           </motion.div>
-        )}
-      </AnimatePresence>
+        </AnimatePresence>,
+        document.body
+      )}
       </div>
+
+      {/* Backdrop for dropdown */}
+      {mounted && isOpen && !useModal && createPortal(
+        <div 
+          className="fixed inset-0 z-[99998]" 
+          onClick={() => setIsOpen(false)}
+        />,
+        document.body
+      )}
 
       {/* Address Form (includes saved addresses list) */}
       <AddressForm

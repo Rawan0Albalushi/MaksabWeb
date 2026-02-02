@@ -193,7 +193,7 @@ const HomePage = () => {
   return (
     <div className="min-h-screen overflow-x-hidden bg-[var(--black)]">
       {/* Hero Section */}
-      <section className="relative min-h-[auto] sm:min-h-[420px] lg:min-h-[480px] flex items-start sm:items-center z-[100]">
+      <section className="relative min-h-[auto] sm:min-h-[420px] lg:min-h-[480px] flex items-start sm:items-center">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] overflow-hidden">
           <div className="absolute top-10 sm:top-20 start-5 sm:start-10 w-32 sm:w-72 h-32 sm:h-72 bg-[var(--primary)]/20 rounded-full blur-3xl animate-pulse pointer-events-none" />
@@ -240,7 +240,7 @@ const HomePage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="relative max-w-md mx-auto lg:mx-0 z-[60] w-full px-1 sm:px-0"
+                className="relative max-w-md mx-auto lg:mx-0 w-full px-1 sm:px-0"
               >
                 {/* Outer glow effect */}
                 <div className="absolute -inset-1 rounded-xl sm:rounded-2xl transition-all duration-500 blur-lg opacity-50 bg-gradient-to-r from-[var(--primary)]/30 via-[#ff6b3d]/20 to-[var(--primary-light)]/30" />
@@ -756,23 +756,25 @@ const HomePage = () => {
               transition={{ duration: 0.6 }}
               className="text-white text-center lg:text-start"
             >
-              <span className="inline-block bg-white/10 text-[var(--primary-light)] text-xs sm:text-sm font-semibold rounded-full mb-5 sm:mb-8" style={{ padding: '8px 18px' }}>
+              <span className="inline-block bg-white/10 text-[var(--primary-light)] text-xs sm:text-sm font-semibold rounded-full" style={{ padding: '8px 18px', marginBottom: '16px' }}>
                 {t('app.badge')}
               </span>
               
-              <h2 className="text-2xl sm:text-3xl lg:text-5xl font-bold mb-4 sm:mb-6 leading-tight">
+              <h2 className="text-2xl sm:text-3xl lg:text-5xl font-bold leading-tight" style={{ marginBottom: '12px' }}>
                 {t('downloadApp')}
-                <span className="block text-[var(--primary)] mt-1 sm:mt-2">{t('now')}</span>
+                <span className="block text-[var(--primary)]" style={{ marginTop: '4px' }}>{t('now')}</span>
               </h2>
               
-              <p className="text-sm sm:text-lg text-gray-400 mb-6 sm:mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+              <p className="text-sm sm:text-lg text-gray-400 max-w-lg mx-auto lg:mx-0 leading-relaxed" style={{ marginBottom: '24px' }}>
                 {t('downloadAppSubtitle')}. {t('downloadAppDescription')}
               </p>
 
               {/* App store buttons */}
-              <div className="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-5 mb-8 sm:mb-12">
+              <div className="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4" style={{ marginBottom: '24px' }}>
                 <a
-                  href="#"
+                  href="https://apps.apple.com/om/app/maksab-مكسب/id1668516381"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="group flex items-center gap-2.5 sm:gap-4 min-w-[140px] sm:min-w-[180px] bg-gradient-to-b from-gray-800 to-black text-white rounded-xl hover:from-gray-700 hover:to-gray-900 hover:scale-[1.03] transition-all duration-300 shadow-xl border border-gray-600/50"
                   style={{ padding: '14px 20px' }}
                 >
@@ -787,16 +789,18 @@ const HomePage = () => {
                   </div>
                 </a>
                 <a
-                  href="#"
+                  href="https://play.google.com/store/apps/details?id=om.thawani.user"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="group flex items-center gap-2.5 sm:gap-4 min-w-[140px] sm:min-w-[180px] bg-gradient-to-b from-gray-800 to-black text-white rounded-xl hover:from-gray-700 hover:to-gray-900 hover:scale-[1.03] transition-all duration-300 shadow-xl border border-gray-600/50"
                   style={{ padding: '14px 20px' }}
                 >
                   <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" className="w-7 h-7 sm:w-9 sm:h-9 group-hover:scale-110 transition-transform">
-                      <path fill="#EA4335" d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92z"/>
-                      <path fill="#FBBC04" d="M17.556 8.307l-3.765 3.693 3.765 3.693 4.231-2.385c.474-.268.474-.948 0-1.216l-4.231-2.385z"/>
-                      <path fill="#4285F4" d="M3.609 22.186L14.778 11.01l-3.765-3.693-7.404 14.87z"/>
-                      <path fill="#34A853" d="M3.609 1.814l10.17 10.17 3.777-3.677L3.609 1.814z"/>
+                    <svg viewBox="0 0 512 512" className="w-7 h-7 sm:w-9 sm:h-9 group-hover:scale-110 transition-transform">
+                      <path fill="#4DB6AC" d="M51.6 22.5c-5.1 5.4-8.2 13.8-8.2 24.6v417.8c0 10.8 3.1 19.2 8.2 24.6l1.3 1.2 234-234v-5.4L53 17.3l-1.4 5.2z"/>
+                      <path fill="#DCE775" d="M363.6 334l-78-78v-5.4l78-78 1.8 1 92.3 52.5c26.4 15 26.4 39.5 0 54.5L365.4 333l-1.8 1z"/>
+                      <path fill="#D32F2F" d="M365.4 333L285.6 253 51.6 487c8.7 9.2 23 10.4 39 1.2l274.8-155.2"/>
+                      <path fill="#4285F4" d="M365.4 178.5L90.6 23.3c-16-9.2-30.3-8-39 1.2l234 234 79.8-80z"/>
                     </svg>
                   </div>
                   <div className="text-start">
@@ -806,25 +810,6 @@ const HomePage = () => {
                 </a>
               </div>
 
-              {/* Stats */}
-              <div className="flex items-center justify-center lg:justify-start gap-6 sm:gap-10 pt-6 sm:pt-8 border-t border-white/10">
-                <div className="text-center lg:text-start">
-                  <p className="text-2xl sm:text-3xl font-bold text-white mb-1">4.9</p>
-                  <div className="flex items-center justify-center lg:justify-start gap-0.5 sm:gap-1 text-[var(--star)]">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={12} className="fill-current sm:hidden" />
-                    ))}
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={`lg-${i}`} size={14} className="fill-current hidden sm:block" />
-                    ))}
-                  </div>
-                </div>
-                <div className="w-px h-10 sm:h-14 bg-white/10" />
-                <div className="text-center lg:text-start">
-                  <p className="text-2xl sm:text-3xl font-bold text-white mb-1">50K+</p>
-                  <p className="text-xs sm:text-sm text-gray-400">{tCommon('downloads')}</p>
-                </div>
-              </div>
             </motion.div>
 
             <motion.div

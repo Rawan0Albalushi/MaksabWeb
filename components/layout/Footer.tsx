@@ -5,10 +5,8 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import {
-  Facebook,
   Twitter,
   Instagram,
-  Youtube,
   Mail,
   Phone,
   Apple,
@@ -22,10 +20,8 @@ const Footer = () => {
   const [openSection, setOpenSection] = useState<string | null>(null);
 
   const socialLinks = [
-    { icon: Facebook, href: '#', label: 'Facebook' },
-    { icon: Twitter, href: '#', label: 'Twitter' },
-    { icon: Instagram, href: '#', label: 'Instagram' },
-    { icon: Youtube, href: '#', label: 'Youtube' },
+    { icon: Instagram, href: 'https://www.instagram.com/maksab_oman', label: 'Instagram' },
+    { icon: Twitter, href: 'https://x.com/maksab_oman', label: 'Twitter' },
   ];
 
   const quickLinks = [
@@ -33,13 +29,6 @@ const Footer = () => {
     // { href: '/categories', label: tCommon('categories') }, // Hidden temporarily
     { href: '/orders', label: tCommon('orders') },
     // { href: '/favorites', label: 'المفضلة' }, // Hidden temporarily
-  ];
-
-  const supportLinks = [
-    { href: '/help', label: t('faq') },
-    { href: '/contact', label: t('contactUs') },
-    { href: '/terms', label: 'الشروط والأحكام' },
-    { href: '/privacy', label: 'سياسة الخصوصية' },
   ];
 
   const toggleSection = (section: string) => {
@@ -59,10 +48,11 @@ const Footer = () => {
     <div className="border-b border-white/10 last:border-b-0 md:border-0">
       {/* Mobile: Collapsible header */}
       <button
-        className="flex items-center justify-between w-full py-3.5 md:hidden active:bg-white/5 -mx-1 px-1 rounded-lg"
+        className="flex items-center justify-between w-full md:hidden active:bg-white/5 rounded-md"
         onClick={() => toggleSection(sectionKey)}
+        style={{ padding: '8px 4px' }}
       >
-        <h3 className="text-[15px] font-semibold">{title}</h3>
+        <h3 className="text-[13px] font-semibold">{title}</h3>
         <ChevronDown
           size={18}
           className={`text-gray-500 transition-transform duration-300 ease-out ${
@@ -71,7 +61,7 @@ const Footer = () => {
         />
       </button>
       {/* Desktop: Always visible header */}
-      <h3 className="hidden md:block text-base lg:text-lg font-bold mb-4 lg:mb-5">
+      <h3 className="hidden md:block text-[13px] lg:text-sm font-bold" style={{ marginBottom: '8px' }}>
         {title}
       </h3>
       {/* Content */}
@@ -89,74 +79,82 @@ const Footer = () => {
     <footer className="bg-[var(--black)] text-white">
       {/* Mobile: Quick Actions Bar */}
       <div className="md:hidden bg-gradient-to-b from-white/[0.08] to-transparent">
-        <div className="px-4 py-4">
+        <div style={{ padding: '10px 14px' }}>
           {/* App Download Buttons */}
-          <div className="flex gap-2.5 mb-3">
+          <div className="flex gap-2" style={{ marginBottom: '8px' }}>
             <a
-              href="#"
-              className="flex-1 flex items-center justify-center gap-2 h-11 bg-white/10 rounded-xl active:bg-white/20 transition-colors"
+              href="https://apps.apple.com/om/app/maksab-مكسب/id1668516381"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 flex items-center justify-center gap-1.5 bg-white/10 rounded-md active:bg-white/20 transition-colors"
+              style={{ padding: '8px 10px' }}
             >
-              <Apple size={20} />
-              <span className="text-[13px] font-semibold">App Store</span>
+              <Apple size={14} />
+              <span className="text-[11px] font-semibold">App Store</span>
             </a>
             <a
-              href="#"
-              className="flex-1 flex items-center justify-center gap-2 h-11 bg-white/10 rounded-xl active:bg-white/20 transition-colors"
+              href="https://play.google.com/store/apps/details?id=om.thawani.user"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 flex items-center justify-center gap-1.5 bg-white/10 rounded-md active:bg-white/20 transition-colors"
+              style={{ padding: '8px 10px' }}
             >
-              <PlayIcon size={20} />
-              <span className="text-[13px] font-semibold">Google Play</span>
+              <PlayIcon size={14} />
+              <span className="text-[11px] font-semibold">Google Play</span>
             </a>
           </div>
 
           {/* Contact Buttons */}
-          <div className="flex gap-2.5">
+          <div className="flex gap-2">
             <a
               href="tel:+96893456789"
-              className="flex-1 flex items-center justify-center gap-2 h-11 bg-[var(--primary)] text-white rounded-xl active:opacity-90 transition-opacity"
+              className="flex-1 flex items-center justify-center gap-1.5 bg-[var(--primary)] text-white rounded-md active:opacity-90 transition-opacity"
+              style={{ padding: '8px 10px' }}
             >
-              <Phone size={16} />
-              <span className="text-[13px] font-semibold">اتصل بنا</span>
+              <Phone size={12} />
+              <span className="text-[11px] font-semibold">اتصل بنا</span>
             </a>
             <a
               href="mailto:support@maksab.om"
-              className="flex-1 flex items-center justify-center gap-2 h-11 border border-white/20 rounded-xl active:bg-white/10 transition-colors"
+              className="flex-1 flex items-center justify-center gap-1.5 border border-white/20 rounded-md active:bg-white/10 transition-colors"
+              style={{ padding: '8px 10px' }}
             >
-              <Mail size={16} />
-              <span className="text-[13px] font-medium">راسلنا</span>
+              <Mail size={12} />
+              <span className="text-[11px] font-medium">راسلنا</span>
             </a>
           </div>
         </div>
       </div>
 
       {/* Main Footer Content */}
-      <div className="px-4 md:container py-5 md:py-10 lg:py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 md:gap-8 lg:gap-10">
+      <div className="md:container" style={{ padding: '10px 16px' }}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-8 lg:gap-12">
           {/* About Section */}
-          <div className="lg:col-span-1 pb-4 md:pb-0 mb-1 md:mb-0 border-b border-white/10 md:border-0">
-            <Link href="/" className="inline-block mb-3 md:mb-5">
+          <div className="border-b border-white/10 md:border-0" style={{ paddingBottom: '8px', marginBottom: '2px' }}>
+            <Link href="/" className="inline-block" style={{ marginBottom: '6px' }}>
               <Image
                 src="/images/maksab.png"
                 alt="Maksab"
-                width={120}
-                height={40}
-                className="h-7 md:h-9 w-auto brightness-0 invert"
+                width={100}
+                height={32}
+                className="h-5 md:h-7 w-auto brightness-0 invert"
               />
             </Link>
-            <p className="text-gray-400 text-[13px] md:text-sm leading-relaxed mb-4 md:mb-5">
+            <p className="text-gray-400 text-[11px] md:text-[12px] leading-relaxed" style={{ marginBottom: '8px' }}>
               {t('aboutUsText')}
             </p>
             {/* Social Links */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-[var(--primary)] active:scale-95 transition-all"
+                  className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-[var(--primary)] active:scale-95 transition-all"
                   aria-label={social.label}
                 >
-                  <social.icon size={16} />
+                  <social.icon size={12} />
                 </a>
               ))}
             </div>
@@ -164,28 +162,12 @@ const Footer = () => {
 
           {/* Quick Links */}
           <CollapsibleSection title={t('quickLinks')} sectionKey="quick">
-            <ul className="space-y-2.5 md:space-y-3">
+            <ul className="space-y-1 md:space-y-1.5">
               {quickLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-gray-400 hover:text-white active:text-white/80 transition-colors text-[13px] md:text-sm inline-block py-0.5"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </CollapsibleSection>
-
-          {/* Support Links */}
-          <CollapsibleSection title={t('support')} sectionKey="support">
-            <ul className="space-y-2.5 md:space-y-3">
-              {supportLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-gray-400 hover:text-white active:text-white/80 transition-colors text-[13px] md:text-sm inline-block py-0.5"
+                    className="text-gray-400 hover:text-white active:text-white/80 transition-colors text-[12px] md:text-[13px] inline-block"
                   >
                     {link.label}
                   </Link>
@@ -196,53 +178,59 @@ const Footer = () => {
 
           {/* Download App & Contact - Desktop Only */}
           <div className="hidden md:block">
-            <h3 className="text-base lg:text-lg font-bold mb-4 lg:mb-5">
+            <h3 className="text-[13px] lg:text-sm font-bold" style={{ marginBottom: '8px' }}>
               {t('downloadApp')}
             </h3>
-            <div className="space-y-2.5">
+            <div className="flex flex-col gap-2">
               <a
-                href="#"
-                className="flex items-center gap-3 px-3.5 py-2.5 bg-white/10 rounded-xl hover:bg-white/15 transition-colors"
+                href="https://apps.apple.com/om/app/maksab-مكسب/id1668516381"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-white/10 rounded-md hover:bg-white/15 transition-colors"
+                style={{ padding: '8px 10px' }}
               >
-                <Apple size={24} />
+                <Apple size={18} />
                 <div>
-                  <p className="text-[10px] text-gray-400 leading-tight">
+                  <p className="text-[8px] text-gray-400 leading-tight">
                     Download on the
                   </p>
-                  <p className="text-sm font-semibold">App Store</p>
+                  <p className="text-[12px] font-semibold">App Store</p>
                 </div>
               </a>
               <a
-                href="#"
-                className="flex items-center gap-3 px-3.5 py-2.5 bg-white/10 rounded-xl hover:bg-white/15 transition-colors"
+                href="https://play.google.com/store/apps/details?id=om.thawani.user"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-white/10 rounded-md hover:bg-white/15 transition-colors"
+                style={{ padding: '8px 10px' }}
               >
-                <PlayIcon size={24} />
+                <PlayIcon size={18} />
                 <div>
-                  <p className="text-[10px] text-gray-400 leading-tight">
+                  <p className="text-[8px] text-gray-400 leading-tight">
                     Get it on
                   </p>
-                  <p className="text-sm font-semibold">Google Play</p>
+                  <p className="text-[12px] font-semibold">Google Play</p>
                 </div>
               </a>
             </div>
 
             {/* Contact Info */}
-            <div className="mt-5 space-y-2.5">
+            <div className="space-y-1.5" style={{ marginTop: '10px' }}>
               <a
                 href="tel:+96893456789"
-                className="flex items-center gap-2.5 text-sm text-gray-400 hover:text-white transition-colors group"
+                className="flex items-center gap-2 text-[12px] text-gray-400 hover:text-white transition-colors group"
               >
-                <div className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 group-hover:bg-[var(--primary)] transition-colors">
-                  <Phone size={14} />
+                <div className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10 group-hover:bg-[var(--primary)] transition-colors">
+                  <Phone size={11} />
                 </div>
                 <span dir="ltr">+968 9345 6789</span>
               </a>
               <a
                 href="mailto:support@maksab.om"
-                className="flex items-center gap-2.5 text-sm text-gray-400 hover:text-white transition-colors group"
+                className="flex items-center gap-2 text-[12px] text-gray-400 hover:text-white transition-colors group"
               >
-                <div className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 group-hover:bg-[var(--primary)] transition-colors">
-                  <Mail size={14} />
+                <div className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10 group-hover:bg-[var(--primary)] transition-colors">
+                  <Mail size={11} />
                 </div>
                 support@maksab.om
               </a>
@@ -253,22 +241,22 @@ const Footer = () => {
 
       {/* Bottom Bar */}
       <div className="border-t border-white/10">
-        <div className="px-4 md:container py-3.5 md:py-5">
-          <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-2.5 md:gap-4">
-            <p className="text-[11px] md:text-sm text-gray-500">
+        <div className="md:container" style={{ padding: '8px 16px' }}>
+          <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-1.5 md:gap-2">
+            <p className="text-[9px] md:text-[11px] text-gray-500">
               © {new Date().getFullYear()} {t('copyright')}
             </p>
-            <div className="flex items-center gap-5 md:gap-6">
+            <div className="flex items-center gap-3 md:gap-4">
               <Link
                 href="/terms"
-                className="text-[11px] md:text-sm text-gray-400 hover:text-white active:text-white/80 transition-colors"
+                className="text-[9px] md:text-[11px] text-gray-400 hover:text-white active:text-white/80 transition-colors"
               >
                 الشروط والأحكام
               </Link>
               <span className="w-1 h-1 rounded-full bg-gray-600 md:hidden" />
               <Link
                 href="/privacy"
-                className="text-[11px] md:text-sm text-gray-400 hover:text-white active:text-white/80 transition-colors"
+                className="text-[9px] md:text-[11px] text-gray-400 hover:text-white active:text-white/80 transition-colors"
               >
                 سياسة الخصوصية
               </Link>
