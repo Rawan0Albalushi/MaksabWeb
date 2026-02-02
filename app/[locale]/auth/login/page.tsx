@@ -65,7 +65,7 @@ const LoginPage = () => {
     <div className="auth-page min-h-[calc(100vh-80px)] grid grid-cols-1 lg:grid-cols-2 bg-gradient-to-br from-[var(--primary-dark)] to-[var(--primary-dark-hover)]">
       
       {/* Left - Login Form on Background */}
-      <div className="flex items-center justify-center bg-gradient-to-br from-[#FFF5F3] via-[#F5FAFA] to-[#E8F7F7]" style={{ padding: '24px 28px' }}>
+      <div className="flex items-center justify-center bg-gradient-to-br from-[#FFF2EE] via-[#F4F8F7] to-[#80d1cd]/30" style={{ padding: '24px 28px' }}>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}

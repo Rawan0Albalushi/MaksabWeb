@@ -125,10 +125,10 @@ const fadeInUp = {
 
 // Skeleton Loader
 const OrderDetailsSkeleton = () => (
-  <div className="min-h-screen bg-gray-50">
+  <div className="min-h-screen bg-[var(--main-bg)]">
     {/* Header Skeleton */}
-    <div className="bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233]">
-      <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <div className="bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C]">
+      <div className="container max-w-4xl mx-auto" style={{ padding: '24px 18px 32px 18px' }}>
         <div className="animate-pulse">
           <div className="flex items-center justify-between mb-6">
             <div className="w-12 h-12 bg-white/10 rounded-full" />
@@ -142,15 +142,15 @@ const OrderDetailsSkeleton = () => (
     </div>
 
     {/* Content Skeleton */}
-    <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="container max-w-4xl mx-auto" style={{ padding: '24px 18px' }}>
       <div className="animate-pulse grid lg:grid-cols-5 gap-6">
         <div className="lg:col-span-3 space-y-4">
-          <div className="bg-white rounded-2xl p-5 h-40" />
-          <div className="bg-white rounded-2xl p-5 h-[300px]" />
-          <div className="bg-white rounded-2xl p-5 h-60" />
+          <div className="bg-white rounded-2xl h-40" style={{ padding: '16px 18px' }} />
+          <div className="bg-white rounded-2xl h-[300px]" style={{ padding: '16px 18px' }} />
+          <div className="bg-white rounded-2xl h-60" style={{ padding: '16px 18px' }} />
         </div>
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl p-5 h-80" />
+          <div className="bg-white rounded-2xl h-80" style={{ padding: '18px 20px' }} />
         </div>
       </div>
     </div>
@@ -283,7 +283,7 @@ const OrderTrackingMap = ({ shopLocation, deliveryLocation, driverLocation, stat
         icon: {
           url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-              <circle cx="20" cy="20" r="18" fill="#10B981" stroke="white" stroke-width="3"/>
+              <circle cx="20" cy="20" r="18" fill="#4CAF50" stroke="white" stroke-width="3"/>
               <path d="M14 18h12M14 22h12M12 14h16l-2 12H14L12 14z" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           `),
@@ -731,12 +731,12 @@ const OrderDetailsPage = () => {
 
   if (error || !order) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-8 px-4">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center" style={{ padding: '32px 18px' }}>
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           className="bg-white rounded-2xl shadow-xl text-center max-w-md w-full"
-          style={{ padding: '40px 32px' }}
+          style={{ padding: '32px 24px' }}
         >
           <div className="w-20 h-20 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center">
             <AlertCircle size={40} className="text-red-500" />
@@ -775,7 +775,7 @@ const OrderDetailsPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Header */}
-      <div className="bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C] relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 start-1/4 w-48 h-48 bg-[var(--primary)]/10 rounded-full blur-3xl" />
@@ -790,9 +790,9 @@ const OrderDetailsPage = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               className="bg-green-500/20 backdrop-blur-sm border-b border-green-400/30"
-              style={{ padding: '16px 0' }}
+              style={{ padding: '16px 18px' }}
             >
-              <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
+              <div className="container max-w-4xl mx-auto flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-green-400/20 flex items-center justify-center">
                   <CheckCircle2 size={20} className="text-green-400" />
                 </div>
@@ -805,7 +805,7 @@ const OrderDetailsPage = () => {
           )}
         </AnimatePresence>
 
-        <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10" style={{ paddingTop: '24px', paddingBottom: '40px' }}>
+        <div className="container max-w-4xl mx-auto relative z-10" style={{ padding: '24px 18px 40px 18px' }}>
           {/* Navigation */}
           <div className="flex items-center justify-between mb-6">
             <button
@@ -864,13 +864,13 @@ const OrderDetailsPage = () => {
         {/* Wave */}
         <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
           <svg viewBox="0 0 1440 40" fill="none" className="w-full h-10 sm:h-12" preserveAspectRatio="none">
-            <path d="M0 40L60 36C120 32 240 24 360 20C480 16 600 16 720 18C840 20 960 26 1080 30C1200 34 1320 36 1380 37L1440 38V40H0Z" fill="#f9fafb" />
+            <path d="M0 40L60 36C120 32 240 24 360 20C480 16 600 16 720 18C840 20 960 26 1080 30C1200 34 1320 36 1380 37L1440 38V40H0Z" fill="#F4F4F4" />
           </svg>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="container max-w-4xl mx-auto" style={{ padding: '24px 18px' }}>
         {/* Order Progress with Percentage */}
         {order.status !== 'canceled' && (
           <motion.div

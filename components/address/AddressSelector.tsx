@@ -359,7 +359,7 @@ export const AddressSelector = ({
               <MapPin size={20} className={clsx("hidden sm:block", selectedAddress ? "text-green-400" : "text-[var(--primary-light)]")} />
             </div>
             {selectedAddress && (
-              <span className="absolute -top-0.5 -end-0.5 w-2.5 sm:w-3 h-2.5 sm:h-3 bg-green-500 rounded-full border border-[#1a3a4a] sm:border-2 animate-pulse" />
+              <span className="absolute -top-0.5 -end-0.5 w-2.5 sm:w-3 h-2.5 sm:h-3 bg-[#4CAF50] rounded-full border border-[#1E272E] sm:border-2 animate-pulse" />
             )}
           </div>
           <div className={clsx("text-start", fullWidth ? "block" : "hidden sm:block", fullWidth ? "min-w-0 flex-1" : "min-w-[100px] max-w-[140px]")}>

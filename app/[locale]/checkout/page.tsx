@@ -684,7 +684,7 @@ const CheckoutPage = () => {
     return (
       <div className="min-h-screen bg-gray-50">
         {/* Loading Header */}
-        <div className="bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] relative overflow-hidden min-h-[160px] sm:min-h-[180px] lg:min-h-[200px] flex flex-col">
+        <div className="bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C] relative overflow-hidden min-h-[160px] sm:min-h-[180px] lg:min-h-[200px] flex flex-col">
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-0 start-1/4 w-48 h-48 bg-[var(--primary)]/10 rounded-full blur-3xl" />
             <div className="absolute bottom-0 end-1/4 w-40 h-40 bg-[var(--primary-dark)]/15 rounded-full blur-3xl" />
@@ -703,7 +703,7 @@ const CheckoutPage = () => {
           {/* Wave */}
           <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
             <svg viewBox="0 0 1440 40" fill="none" className="w-full h-10 sm:h-12" preserveAspectRatio="none">
-              <path d="M0 40L60 36C120 32 240 24 360 20C480 16 600 16 720 18C840 20 960 26 1080 30C1200 34 1320 36 1380 37L1440 38V40H0Z" fill="#f9fafb" />
+              <path d="M0 40L60 36C120 32 240 24 360 20C480 16 600 16 720 18C840 20 960 26 1080 30C1200 34 1320 36 1380 37L1440 38V40H0Z" fill="#F4F4F4" />
             </svg>
           </div>
         </div>
@@ -759,7 +759,7 @@ const CheckoutPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header - Similar to Cart Page */}
-      <div className="bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] relative overflow-hidden min-h-[160px] sm:min-h-[180px] lg:min-h-[200px] flex flex-col">
+      <div className="bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C] relative overflow-hidden min-h-[160px] sm:min-h-[180px] lg:min-h-[200px] flex flex-col">
         {/* Decorative Background Elements */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 start-1/4 w-48 h-48 bg-[var(--primary)]/10 rounded-full blur-3xl" />
@@ -808,7 +808,7 @@ const CheckoutPage = () => {
         {/* Wave */}
         <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
           <svg viewBox="0 0 1440 40" fill="none" className="w-full h-10 sm:h-12" preserveAspectRatio="none">
-            <path d="M0 40L60 36C120 32 240 24 360 20C480 16 600 16 720 18C840 20 960 26 1080 30C1200 34 1320 36 1380 37L1440 38V40H0Z" fill="#f9fafb" />
+            <path d="M0 40L60 36C120 32 240 24 360 20C480 16 600 16 720 18C840 20 960 26 1080 30C1200 34 1320 36 1380 37L1440 38V40H0Z" fill="#F4F4F4" />
           </svg>
         </div>
       </div>
@@ -1520,23 +1520,23 @@ const CheckoutPage = () => {
                       disabled={isDisabled}
                       className="w-full rounded-2xl font-bold text-base flex items-center justify-center gap-3 transition-all duration-300 py-4"
                       style={{
-                        backgroundColor: isDisabled ? '#e5e7eb' : '#ef4444',
-                        color: isDisabled ? '#9ca3af' : '#ffffff',
-                        border: isDisabled ? '1px solid #d1d5db' : '1px solid #ef4444',
+                        backgroundColor: isDisabled ? '#E6E6E6' : '#FF3D00',
+                        color: isDisabled ? '#898989' : '#ffffff',
+                        border: isDisabled ? '1px solid #DCDCDC' : '1px solid #FF3D00',
                         cursor: isDisabled ? 'not-allowed' : 'pointer',
-                        boxShadow: isDisabled ? 'none' : '0 10px 25px -5px rgba(239, 68, 68, 0.3)',
+                        boxShadow: isDisabled ? 'none' : '0 10px 25px -5px rgba(255, 61, 0, 0.3)',
                       }}
                     >
                       {submitting ? (
-                        <Loader2 size={22} className="animate-spin" style={{ color: isDisabled ? '#9ca3af' : '#ffffff' }} />
+                        <Loader2 size={22} className="animate-spin" style={{ color: isDisabled ? '#898989' : '#ffffff' }} />
                       ) : (
                         <>
-                          <ShoppingBag size={20} style={{ color: isDisabled ? '#9ca3af' : '#ffffff' }} />
-                          <span style={{ color: isDisabled ? '#9ca3af' : '#ffffff' }}>{t('placeOrder')}</span>
+                          <ShoppingBag size={20} style={{ color: isDisabled ? '#898989' : '#ffffff' }} />
+                          <span style={{ color: isDisabled ? '#898989' : '#ffffff' }}>{t('placeOrder')}</span>
                           {isRTL ? (
-                            <ArrowLeft size={18} style={{ color: isDisabled ? '#9ca3af' : '#ffffff' }} />
+                            <ArrowLeft size={18} style={{ color: isDisabled ? '#898989' : '#ffffff' }} />
                           ) : (
-                            <ArrowRight size={18} style={{ color: isDisabled ? '#9ca3af' : '#ffffff' }} />
+                            <ArrowRight size={18} style={{ color: isDisabled ? '#898989' : '#ffffff' }} />
                           )}
                         </>
                       )}
@@ -1545,8 +1545,8 @@ const CheckoutPage = () => {
                 })()}
                 
                 {/* Security Note */}
-                <div className="mt-4 flex items-center justify-center gap-2 text-xs" style={{ color: '#6b7280' }}>
-                  <Shield size={14} style={{ color: '#10b981' }} />
+                <div className="mt-4 flex items-center justify-center gap-2 text-xs" style={{ color: '#898989' }}>
+                  <Shield size={14} style={{ color: '#4CAF50' }} />
                   <span>{t('securePayment') || 'دفع آمن ومشفر 100%'}</span>
                 </div>
               </div>
@@ -1599,19 +1599,19 @@ const CheckoutPage = () => {
                 disabled={isMobileDisabled}
                 className="w-full rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all duration-300 py-5"
                 style={{
-                  backgroundColor: isMobileDisabled ? '#e5e7eb' : '#ef4444',
-                  color: isMobileDisabled ? '#9ca3af' : '#ffffff',
-                  border: isMobileDisabled ? '1px solid #d1d5db' : '1px solid #ef4444',
+                  backgroundColor: isMobileDisabled ? '#E6E6E6' : '#FF3D00',
+                  color: isMobileDisabled ? '#898989' : '#ffffff',
+                  border: isMobileDisabled ? '1px solid #DCDCDC' : '1px solid #FF3D00',
                   cursor: isMobileDisabled ? 'not-allowed' : 'pointer',
-                  boxShadow: isMobileDisabled ? 'none' : '0 10px 25px -5px rgba(239, 68, 68, 0.3)',
+                  boxShadow: isMobileDisabled ? 'none' : '0 10px 25px -5px rgba(255, 61, 0, 0.3)',
                 }}
               >
                 {submitting ? (
-                  <Loader2 size={24} className="animate-spin" style={{ color: isMobileDisabled ? '#9ca3af' : '#ffffff' }} />
+                  <Loader2 size={24} className="animate-spin" style={{ color: isMobileDisabled ? '#898989' : '#ffffff' }} />
                 ) : (
                   <>
-                    <ShoppingBag size={22} style={{ color: isMobileDisabled ? '#9ca3af' : '#ffffff' }} />
-                    <span style={{ color: isMobileDisabled ? '#9ca3af' : '#ffffff' }}>{t('placeOrder')}</span>
+                    <ShoppingBag size={22} style={{ color: isMobileDisabled ? '#898989' : '#ffffff' }} />
+                    <span style={{ color: isMobileDisabled ? '#898989' : '#ffffff' }}>{t('placeOrder')}</span>
                   </>
                 )}
               </motion.button>

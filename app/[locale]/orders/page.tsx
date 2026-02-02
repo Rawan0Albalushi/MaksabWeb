@@ -385,14 +385,14 @@ const OrdersPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Header */}
-      <div className="bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C] relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 start-1/4 w-48 h-48 bg-[var(--primary)]/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 end-1/4 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl" />
         </div>
 
-        <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10" style={{ paddingTop: '24px', paddingBottom: '40px' }}>
+        <div className="container max-w-4xl mx-auto relative z-10" style={{ padding: '24px 18px 40px 18px' }}>
           {/* Navigation */}
           <div className="flex items-center justify-between mb-6">
             <button
@@ -444,13 +444,13 @@ const OrdersPage = () => {
         {/* Wave */}
         <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
           <svg viewBox="0 0 1440 40" fill="none" className="w-full h-10 sm:h-12" preserveAspectRatio="none">
-            <path d="M0 40L60 36C120 32 240 24 360 20C480 16 600 16 720 18C840 20 960 26 1080 30C1200 34 1320 36 1380 37L1440 38V40H0Z" fill="#f9fafb" />
+            <path d="M0 40L60 36C120 32 240 24 360 20C480 16 600 16 720 18C840 20 960 26 1080 30C1200 34 1320 36 1380 37L1440 38V40H0Z" fill="#F4F4F4" />
           </svg>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="container max-w-4xl mx-auto" style={{ padding: '24px 18px' }}>
         {/* Tabs */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -471,8 +471,8 @@ const OrdersPage = () => {
               )}
               style={activeTab === tab.key ? {
                 padding: '12px 14px',
-                background: 'linear-gradient(135deg, #FF5722 0%, #FF9800 100%)',
-                boxShadow: '0 4px 15px rgba(255, 87, 34, 0.4)'
+                background: 'linear-gradient(135deg, #FF3D00 0%, #FFA000 100%)',
+                boxShadow: '0 4px 15px rgba(255, 61, 0, 0.4)'
               } : {
                 padding: '12px 14px'
               }}

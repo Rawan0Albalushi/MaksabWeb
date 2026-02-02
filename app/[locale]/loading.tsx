@@ -21,7 +21,7 @@ export default function Loading() {
       <div className="h-4 sm:h-8 lg:h-12 bg-[var(--main-bg)]" />
 
       {/* How It Works Section Skeleton */}
-      <section className="py-8 sm:py-12 lg:py-16 bg-gradient-to-b from-white via-[#fefefe] to-[#f8fafc] relative overflow-hidden">
+      <section className="py-8 sm:py-12 lg:py-16 bg-gradient-to-b from-white via-[#F5F5F5] to-[#F4F5F8] relative overflow-hidden">
         {/* Background Decorations */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-10 sm:top-20 start-5 sm:start-10 w-40 sm:w-64 h-40 sm:h-64 bg-[var(--primary)]/5 rounded-full blur-3xl" />
@@ -46,7 +46,7 @@ export default function Loading() {
             {[
               { color: '#FF3D00' },
               { color: '#4CAF50' },
-              { color: '#9C27B0' },
+              { color: '#03758E' },
               { color: '#267881' },
             ].map((item, i) => (
               <div key={i} className="flex flex-col items-center text-center">
@@ -109,7 +109,7 @@ export default function Loading() {
       <div className="h-4 sm:h-8 lg:h-12 bg-[var(--main-bg)]" />
 
       {/* Download App Section Skeleton */}
-      <section className="py-10 sm:py-16 lg:py-20 bg-[#0a1628] relative overflow-hidden">
+      <section className="py-10 sm:py-16 lg:py-20 bg-[#1E272E] relative overflow-hidden">
         {/* Background decorations */}
         <div className="absolute inset-0">
           <div className="absolute top-0 start-1/4 w-48 sm:w-96 h-48 sm:h-96 bg-[var(--primary)]/20 rounded-full blur-[60px] sm:blur-[100px] animate-pulse" />

@@ -106,7 +106,7 @@ export const StorySkeleton = () => (
 export const HeroSkeleton = () => (
   <section className="relative min-h-[auto] sm:min-h-[420px] lg:min-h-[480px] flex items-start sm:items-center z-[100]">
     {/* Background matching the actual hero */}
-    <div className="absolute inset-0 bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] overflow-hidden">
+    <div className="absolute inset-0 bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C] overflow-hidden">
       <div className="absolute top-10 sm:top-20 start-5 sm:start-10 w-32 sm:w-72 h-32 sm:h-72 bg-[var(--primary)]/20 rounded-full blur-3xl animate-pulse" />
       <div className="absolute bottom-20 sm:bottom-24 end-5 sm:end-10 w-32 sm:w-72 h-32 sm:h-72 bg-[var(--primary-dark)]/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
       {/* Grid pattern like actual hero */}

@@ -69,23 +69,23 @@ const ConfirmModal = ({
             width: '64px', 
             height: '64px', 
             margin: '0 auto 20px auto',
-            backgroundColor: '#FEE2E2',
+            backgroundColor: '#FFF2EE',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
           }}
         >
-          <Trash2 className="w-8 h-8 text-red-500" />
+          <Trash2 className="w-8 h-8 text-[var(--error)]" />
         </div>
         
         {/* Title */}
-        <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827', marginBottom: '12px' }}>
+        <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#232B2F', marginBottom: '12px' }}>
           {title}
         </h3>
         
         {/* Message */}
-        <p style={{ color: '#6B7280', marginBottom: '28px', lineHeight: '1.6' }}>
+        <p style={{ color: '#898989', marginBottom: '28px', lineHeight: '1.6' }}>
           {message}
         </p>
         
@@ -282,14 +282,14 @@ const CartItemCard = ({
                 <button
                   onClick={() => handleQuantityChange(localQuantity + 1)}
                   disabled={isUpdating}
-                  style={{ backgroundColor: '#f97316', color: 'white' }}
+                  style={{ backgroundColor: '#FF3D00', color: 'white' }}
                   className="w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center hover:opacity-90 transition-all active:scale-95"
                 >
                   <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
                 
                 <span className={clsx(
-                  'w-10 sm:w-14 text-center font-bold text-gray-900 text-base sm:text-lg bg-white',
+                  'w-10 sm:w-14 text-center font-bold text-[var(--black)] text-base sm:text-lg bg-white',
                   isUpdating && 'opacity-50 animate-pulse'
                 )}>
                   {localQuantity}
@@ -299,8 +299,8 @@ const CartItemCard = ({
                   onClick={() => handleQuantityChange(localQuantity - 1)}
                   disabled={localQuantity <= 1 || isUpdating}
                   style={{ 
-                    backgroundColor: localQuantity <= 1 ? '#d1d5db' : '#6b7280',
-                    color: localQuantity <= 1 ? '#9ca3af' : 'white',
+                    backgroundColor: localQuantity <= 1 ? '#DCDCDC' : '#898989',
+                    color: localQuantity <= 1 ? '#A7A7A7' : 'white',
                     cursor: localQuantity <= 1 ? 'not-allowed' : 'pointer'
                   }}
                   className="w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center hover:opacity-90 transition-all active:scale-95"
@@ -333,10 +333,10 @@ const CartItemCard = ({
 // SKELETON LOADER
 // ============================================
 const CartSkeleton = () => (
-  <div className="min-h-screen bg-gray-50">
+  <div className="min-h-screen bg-[var(--main-bg)]">
     {/* Header Skeleton */}
-    <div className="bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233]">
-      <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <div className="bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C]">
+      <div className="container max-w-6xl mx-auto" style={{ padding: '24px 18px 32px 18px' }}>
         <div className="animate-pulse flex items-center justify-between">
           <div>
             <div className="h-8 w-40 bg-white/10 rounded-lg mb-2" />
@@ -348,11 +348,11 @@ const CartSkeleton = () => (
     </div>
 
     {/* Content Skeleton */}
-    <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <div className="container max-w-6xl mx-auto" style={{ padding: '24px 18px' }}>
       <div className="animate-pulse grid lg:grid-cols-5 gap-6 lg:gap-8">
         {/* Cart Items */}
         <div className="lg:col-span-3 space-y-4">
-          <div className="bg-white rounded-2xl p-5 flex gap-4">
+          <div className="bg-white rounded-2xl flex gap-4" style={{ padding: '14px 16px' }}>
             <div className="w-14 h-14 bg-gray-200 rounded-xl" />
             <div className="flex-1">
               <div className="h-5 w-32 bg-gray-200 rounded mb-2" />
@@ -360,7 +360,7 @@ const CartSkeleton = () => (
             </div>
           </div>
           {[1, 2].map((i) => (
-            <div key={i} className="bg-white rounded-2xl p-5 flex gap-4">
+            <div key={i} className="bg-white rounded-2xl flex gap-4" style={{ padding: '14px 16px' }}>
               <div className="w-28 h-28 bg-gray-200 rounded-xl" />
               <div className="flex-1 flex flex-col justify-between py-1">
                 <div>
@@ -378,7 +378,7 @@ const CartSkeleton = () => (
 
         {/* Summary */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl p-6 space-y-5">
+          <div className="bg-white rounded-2xl space-y-5" style={{ padding: '16px 18px' }}>
             <div className="h-7 w-32 bg-gray-200 rounded" />
             <div className="h-12 w-full bg-gray-200 rounded-xl" />
             <div className="space-y-3 py-4 border-y border-gray-100">
@@ -629,13 +629,13 @@ const CartPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] relative overflow-hidden min-h-[160px] sm:min-h-[180px] lg:min-h-[200px] flex flex-col">
+      <div className="bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C] relative overflow-hidden min-h-[160px] sm:min-h-[180px] lg:min-h-[200px] flex flex-col">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 start-1/4 w-48 h-48 bg-[var(--primary)]/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 end-1/4 w-40 h-40 bg-[var(--primary-dark)]/15 rounded-full blur-3xl" />
         </div>
 
-        <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-10 flex-1 flex items-center">
+        <div className="container max-w-6xl mx-auto relative z-10 flex-1 flex items-center" style={{ padding: '24px 18px' }}>
           <div className="flex items-center justify-between w-full">
             <div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
@@ -667,13 +667,13 @@ const CartPage = () => {
         {/* Wave */}
         <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
           <svg viewBox="0 0 1440 40" fill="none" className="w-full h-10 sm:h-12" preserveAspectRatio="none">
-            <path d="M0 40L60 36C120 32 240 24 360 20C480 16 600 16 720 18C840 20 960 26 1080 30C1200 34 1320 36 1380 37L1440 38V40H0Z" fill="#f9fafb" />
+            <path d="M0 40L60 36C120 32 240 24 360 20C480 16 600 16 720 18C840 20 960 26 1080 30C1200 34 1320 36 1380 37L1440 38V40H0Z" fill="#F4F4F4" />
           </svg>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="container max-w-6xl mx-auto" style={{ padding: '24px 18px' }}>
         <div className="grid lg:grid-cols-5 gap-6 lg:gap-8">
           {/* Cart Items - Takes 3 columns */}
           <div className="lg:col-span-3 order-1 space-y-4">

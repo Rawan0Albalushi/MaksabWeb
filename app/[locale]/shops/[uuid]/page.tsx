@@ -206,9 +206,9 @@ const ProductModal = ({
                     onClick={() => qty > 1 && setQty(qty - 1)}
                     disabled={qty <= 1}
                     style={{
-                      backgroundColor: qty <= 1 ? '#e5e7eb' : '#ffffff',
-                      borderColor: qty <= 1 ? '#d1d5db' : '#FF3D00',
-                      color: qty <= 1 ? '#9ca3af' : '#FF3D00',
+                      backgroundColor: qty <= 1 ? '#E6E6E6' : '#ffffff',
+                      borderColor: qty <= 1 ? '#DCDCDC' : '#FF3D00',
+                      color: qty <= 1 ? '#898989' : '#FF3D00',
                       padding: '12px',
                     }}
                     className="w-12 h-12 rounded-xl flex items-center justify-center transition-all border-2 font-bold text-2xl shadow-sm hover:shadow-md"
@@ -217,7 +217,7 @@ const ProductModal = ({
                   </button>
                   
                   {/* Quantity Display */}
-                  <span className="w-12 text-center font-bold text-2xl text-gray-900" style={{ padding: '0 8px' }}>{qty}</span>
+                  <span className="w-12 text-center font-bold text-2xl text-[var(--black)]" style={{ padding: '0 8px' }}>{qty}</span>
                   
                   {/* Plus Button */}
                   <button
@@ -241,10 +241,10 @@ const ProductModal = ({
                 onClick={handleAdd}
                 disabled={loading || success}
                 style={{
-                  backgroundColor: success ? '#22c55e' : '#FF3D00',
+                  backgroundColor: success ? '#4CAF50' : '#FF3D00',
                   color: '#ffffff',
                   boxShadow: success 
-                    ? '0 8px 24px rgba(34, 197, 94, 0.4)' 
+                    ? '0 8px 24px rgba(76, 175, 80, 0.4)' 
                     : '0 8px 24px rgba(255, 61, 0, 0.4)',
                   padding: '18px 24px',
                 }}
@@ -358,9 +358,9 @@ const ProductModal = ({
                         onClick={() => qty > 1 && setQty(qty - 1)}
                         disabled={qty <= 1}
                         style={{
-                          backgroundColor: qty <= 1 ? '#e5e7eb' : '#ffffff',
-                          borderColor: qty <= 1 ? '#d1d5db' : '#FF3D00',
-                          color: qty <= 1 ? '#9ca3af' : '#FF3D00',
+                          backgroundColor: qty <= 1 ? '#E6E6E6' : '#ffffff',
+                          borderColor: qty <= 1 ? '#DCDCDC' : '#FF3D00',
+                          color: qty <= 1 ? '#898989' : '#FF3D00',
                           padding: '10px',
                         }}
                         className="w-11 h-11 rounded-xl flex items-center justify-center transition-all border-2 font-bold shadow-sm hover:shadow-md"
@@ -369,7 +369,7 @@ const ProductModal = ({
                       </button>
                       
                       {/* Quantity Display */}
-                      <span className="w-12 text-center font-bold text-2xl text-gray-900" style={{ padding: '0 8px' }}>{qty}</span>
+                      <span className="w-12 text-center font-bold text-2xl text-[var(--black)]" style={{ padding: '0 8px' }}>{qty}</span>
                       
                       {/* Plus Button */}
                       <button
@@ -395,10 +395,10 @@ const ProductModal = ({
                     onClick={handleAdd}
                     disabled={loading || success}
                     style={{
-                      backgroundColor: success ? '#22c55e' : '#FF3D00',
+                      backgroundColor: success ? '#4CAF50' : '#FF3D00',
                       color: '#ffffff',
                       boxShadow: success 
-                        ? '0 8px 24px rgba(34, 197, 94, 0.4)' 
+                        ? '0 8px 24px rgba(76, 175, 80, 0.4)' 
                         : '0 8px 24px rgba(255, 61, 0, 0.4)',
                       padding: '16px 24px',
                       marginTop: '8px',

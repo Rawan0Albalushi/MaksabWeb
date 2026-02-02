@@ -195,7 +195,7 @@ const HomePage = () => {
       {/* Hero Section */}
       <section className="relative min-h-[auto] sm:min-h-[420px] lg:min-h-[480px] flex items-start sm:items-center">
         {/* Animated Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0a1628] via-[#1a3a4a] to-[#0d2233] overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C] overflow-hidden">
           <div className="absolute top-10 sm:top-20 start-5 sm:start-10 w-32 sm:w-72 h-32 sm:h-72 bg-[var(--primary)]/20 rounded-full blur-3xl animate-pulse pointer-events-none" />
           <div className="absolute bottom-20 sm:bottom-24 end-5 sm:end-10 w-32 sm:w-72 h-32 sm:h-72 bg-[var(--primary-dark)]/30 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDelay: '1s' }} />
           
@@ -481,7 +481,7 @@ const HomePage = () => {
       <div className="h-4 sm:h-8 lg:h-12 bg-[var(--main-bg)]" />
 
       {/* How It Works Section */}
-      <section className="py-8 sm:py-12 lg:py-16 bg-gradient-to-b from-white via-[#fefefe] to-[#f8fafc] relative overflow-hidden">
+      <section className="py-8 sm:py-12 lg:py-16 bg-gradient-to-b from-white via-[#F5F5F5] to-[#F4F5F8] relative overflow-hidden">
         {/* Background Decorations */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-10 sm:top-20 start-5 sm:start-10 w-40 sm:w-64 h-40 sm:h-64 bg-[var(--primary)]/5 rounded-full blur-3xl" />
@@ -522,13 +522,13 @@ const HomePage = () => {
           <div className="relative">
             {/* Connecting Line - Desktop */}
             <div className="hidden lg:block absolute top-[140px] start-[12.5%] end-[12.5%] h-1">
-              <div className="absolute inset-0 bg-gradient-to-r from-[var(--primary)]/20 via-[#4CAF50]/20 via-[#9C27B0]/20 to-[#267881]/20 rounded-full" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[var(--primary)]/20 via-[#4CAF50]/20 via-[#03758E]/20 to-[#267881]/20 rounded-full" />
               <motion.div
                 initial={{ scaleX: 0 }}
                 whileInView={{ scaleX: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 1.8, ease: "easeOut", delay: 0.5 }}
-                className="absolute inset-0 bg-gradient-to-r from-[var(--primary)] via-[#4CAF50] via-[#9C27B0] to-[#267881] rounded-full origin-start"
+                className="absolute inset-0 bg-gradient-to-r from-[var(--primary)] via-[#4CAF50] via-[#03758E] to-[#267881] rounded-full origin-start"
                 style={{ transformOrigin: isRTL ? 'right' : 'left' }}
               />
             </div>
@@ -557,8 +557,8 @@ const HomePage = () => {
                   title: t('howItWorks.step2Title'),
                   description: t('howItWorks.step2Desc'),
                   color: '#4CAF50',
-                  gradient: 'from-[#4CAF50] to-[#66BB6A]',
-                  bgGradient: 'from-[#4CAF50]/10 to-[#66BB6A]/5',
+                  gradient: 'from-[#4CAF50] to-[#6BC14A]',
+                  bgGradient: 'from-[#4CAF50]/10 to-[#6BC14A]/5',
                   delay: 0.15,
                 },
                 {
@@ -566,9 +566,9 @@ const HomePage = () => {
                   icon: CreditCard,
                   title: t('howItWorks.step3Title'),
                   description: t('howItWorks.step3Desc'),
-                  color: '#9C27B0',
-                  gradient: 'from-[#9C27B0] to-[#BA68C8]',
-                  bgGradient: 'from-[#9C27B0]/10 to-[#BA68C8]/5',
+                  color: '#03758E',
+                  gradient: 'from-[#03758E] to-[#00979b]',
+                  bgGradient: 'from-[#03758E]/10 to-[#00979b]/5',
                   delay: 0.3,
                 },
                 {
@@ -577,8 +577,8 @@ const HomePage = () => {
                   title: t('howItWorks.step4Title'),
                   description: t('howItWorks.step4Desc'),
                   color: '#267881',
-                  gradient: 'from-[#267881] to-[#3a9aa3]',
-                  bgGradient: 'from-[#267881]/10 to-[#3a9aa3]/5',
+                  gradient: 'from-[#267881] to-[#00979b]',
+                  bgGradient: 'from-[#267881]/10 to-[#00979b]/5',
                   delay: 0.45,
                 },
               ].map((item) => (
@@ -741,7 +741,7 @@ const HomePage = () => {
       <div className="h-4 sm:h-8 lg:h-12 bg-[var(--main-bg)]" />
 
       {/* Download App Section */}
-      <section className="py-10 sm:py-16 lg:py-20 bg-[#0a1628] relative overflow-hidden">
+      <section className="py-10 sm:py-16 lg:py-20 bg-[#1E272E] relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-0 start-1/4 w-48 sm:w-96 h-48 sm:h-96 bg-[var(--primary)]/20 rounded-full blur-[60px] sm:blur-[100px]" />
           <div className="absolute bottom-0 end-1/4 w-48 sm:w-96 h-48 sm:h-96 bg-[var(--primary-dark)]/20 rounded-full blur-[60px] sm:blur-[100px]" />
@@ -797,10 +797,10 @@ const HomePage = () => {
                 >
                   <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
                     <svg viewBox="0 0 512 512" className="w-7 h-7 sm:w-9 sm:h-9 group-hover:scale-110 transition-transform">
-                      <path fill="#4DB6AC" d="M51.6 22.5c-5.1 5.4-8.2 13.8-8.2 24.6v417.8c0 10.8 3.1 19.2 8.2 24.6l1.3 1.2 234-234v-5.4L53 17.3l-1.4 5.2z"/>
-                      <path fill="#DCE775" d="M363.6 334l-78-78v-5.4l78-78 1.8 1 92.3 52.5c26.4 15 26.4 39.5 0 54.5L365.4 333l-1.8 1z"/>
-                      <path fill="#D32F2F" d="M365.4 333L285.6 253 51.6 487c8.7 9.2 23 10.4 39 1.2l274.8-155.2"/>
-                      <path fill="#4285F4" d="M365.4 178.5L90.6 23.3c-16-9.2-30.3-8-39 1.2l234 234 79.8-80z"/>
+                      <path fill="#00979b" d="M51.6 22.5c-5.1 5.4-8.2 13.8-8.2 24.6v417.8c0 10.8 3.1 19.2 8.2 24.6l1.3 1.2 234-234v-5.4L53 17.3l-1.4 5.2z"/>
+                      <path fill="#FFA826" d="M363.6 334l-78-78v-5.4l78-78 1.8 1 92.3 52.5c26.4 15 26.4 39.5 0 54.5L365.4 333l-1.8 1z"/>
+                      <path fill="#E53935" d="M365.4 333L285.6 253 51.6 487c8.7 9.2 23 10.4 39 1.2l274.8-155.2"/>
+                      <path fill="#03758E" d="M365.4 178.5L90.6 23.3c-16-9.2-30.3-8-39 1.2l234 234 79.8-80z"/>
                     </svg>
                   </div>
                   <div className="text-start">
