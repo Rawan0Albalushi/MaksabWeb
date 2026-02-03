@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { clsx } from 'clsx';
 import { Timer, Star, Heart, MapPin, BadgeCheck, CalendarDays } from 'lucide-react';
 import { Shop } from '@/types';
-import { Badge } from '@/components/ui';
 import { useFavoritesStore } from '@/store';
 import { useTranslations } from 'next-intl';
 
@@ -59,6 +58,14 @@ const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] text-white font-bold text-2xl">
               {shop.translation?.title?.charAt(0)}
+            </div>
+          )}
+          {/* Closed overlay */}
+          {!shop.open && (
+            <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-10">
+              <span className="text-white text-xs font-medium">
+                {t('closed')}
+              </span>
             </div>
           )}
         </div>
@@ -135,6 +142,14 @@ const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
               {shop.translation?.title?.charAt(0)}
             </div>
           )}
+          {/* Closed overlay */}
+          {!shop.open && (
+            <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-10">
+              <span className="text-white text-[10px] font-medium">
+                {t('closed')}
+              </span>
+            </div>
+          )}
         </div>
         
         {/* Title with verify */}
@@ -198,11 +213,13 @@ const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
             <Heart size={18} className={clsx("hidden sm:block", isFavorite && 'fill-current')} />
           </button> */}
 
-          {/* Status badge */}
+          {/* Closed overlay */}
           {!shop.open && (
-            <Badge variant="error" className="absolute top-2 start-2 sm:top-3 sm:start-3 shadow-md text-[10px] sm:text-xs">
-              {t('closed')}
-            </Badge>
+            <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-10">
+              <span className="text-white text-lg sm:text-xl font-medium">
+                {t('closed')}
+              </span>
+            </div>
           )}
         </div>
 

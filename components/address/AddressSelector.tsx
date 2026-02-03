@@ -50,6 +50,7 @@ export const AddressSelector = ({
   const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const portalDropdownRef = useRef<HTMLDivElement>(null);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
 
   // For portal - ensure we're on client side
@@ -62,11 +63,37 @@ export const AddressSelector = ({
     if (isOpen && triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
       setDropdownPosition({
-        top: rect.bottom + window.scrollY + 12,
-        left: rect.left + window.scrollX,
+        top: rect.bottom + 12,
+        left: rect.left,
         width: Math.max(rect.width, 340),
       });
     }
+  }, [isOpen]);
+
+  // Close dropdown on window scroll (not scroll inside dropdown)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = (e: Event) => {
+      // Only close on window/document scroll, not on element scroll
+      const target = e.target;
+      if (target === document || target === window || target === document.documentElement) {
+        // Check if scroll position actually changed significantly
+        const currentScrollY = window.scrollY;
+        if (Math.abs(currentScrollY - lastScrollY) > 5) {
+          setIsOpen(false);
+        }
+        lastScrollY = currentScrollY;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, [isOpen]);
 
   const {
@@ -176,10 +203,13 @@ export const AddressSelector = ({
         {mounted && isOpen && !useModal && createPortal(
           <AnimatePresence>
             <motion.div
+              ref={portalDropdownRef}
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               transition={{ duration: 0.2 }}
+              onClick={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
               style={{
                 position: 'fixed',
                 top: dropdownPosition.top,
@@ -389,10 +419,13 @@ export const AddressSelector = ({
       {mounted && isOpen && !useModal && createPortal(
         <AnimatePresence>
           <motion.div
+            ref={portalDropdownRef}
             initial={{ opacity: 0, y: 8, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
             style={{
               position: 'fixed',
               top: dropdownPosition.top,
