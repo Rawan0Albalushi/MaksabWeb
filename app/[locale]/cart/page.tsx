@@ -26,13 +26,14 @@ import {
   Truck,
   CreditCard,
   Heart,
+  Loader2,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
 import { Button, Modal } from '@/components/ui';
 import { cartService } from '@/services';
-import { Cart, CartDetail } from '@/types';
-import { useCartStore, useAuthStore, useSettingsStore } from '@/store';
+import { Cart, CartDetail, CalculateResult } from '@/types';
+import { useCartStore, useAuthStore, useSettingsStore, useLocationStore } from '@/store';
 
 // ============================================
 // CONFIRMATION MODAL COMPONENT
@@ -164,9 +165,18 @@ const CartItemCard = ({
   const product = item.stock?.product;
   const productImage = product?.img || item.stock?.extras?.find(e => e.group?.type === 'image')?.value;
   const productTitle = product?.translation?.title || `#${item.stock?.id}`;
-  // item.price من الـ API هو السعر الإجمالي (سعر الوحدة × الكمية)
-  // لذا سعر الوحدة = item.price / item.quantity
-  const unitPrice = item.stock?.total_price || (item.quantity > 0 ? item.price / item.quantity : item.price);
+  
+  // حساب سعر الوحدة للمنتج الأساسي
+  const baseUnitPrice = item.stock?.total_price || (item.quantity > 0 ? item.price / item.quantity : item.price);
+  
+  // حساب سعر الإضافات (Addons)
+  const addonsPrice = item.addons?.reduce((sum, addon) => {
+    const addonPrice = addon.stock?.total_price ?? addon.stock?.price ?? addon.price ?? 0;
+    return sum + (addonPrice * (addon.quantity || 1));
+  }, 0) || 0;
+  
+  // السعر الإجمالي للوحدة (المنتج + الإضافات)
+  const unitPrice = baseUnitPrice + addonsPrice;
   const totalPrice = unitPrice * localQuantity;
 
   const handleQuantityChange = async (newQty: number) => {
@@ -249,17 +259,41 @@ const CartItemCard = ({
                 
                 {/* Extras/Variants */}
                 {item.stock?.extras && item.stock.extras.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mb-1.5">
+                    {item.stock.extras.map((extra) => (
+                      <span
+                        key={extra.id}
+                        className="inline-flex items-center bg-gray-100 text-gray-600 text-xs rounded-md"
+                        style={{ padding: '6px 10px' }}
+                      >
+                        <span className="text-gray-400">{extra.group?.translation?.title}:</span>
+                        <span className="ms-1 font-medium">{extra.value}</span>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Addons */}
+                {item.addons && item.addons.length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
-                                {item.stock.extras.map((extra) => (
-                                      <span
-                                        key={extra.id}
-                                        className="inline-flex items-center bg-gray-100 text-gray-600 text-xs rounded-md"
-                                        style={{ padding: '6px 10px' }}
-                                      >
-                                        <span className="text-gray-400">{extra.group?.translation?.title}:</span>
-                                        <span className="ms-1 font-medium">{extra.value}</span>
-                                      </span>
-                                    ))}
+                    {item.addons.map((addon) => {
+                      const addonTitle = addon.stock?.product?.translation?.title || `إضافة #${addon.id}`;
+                      const addonPrice = addon.stock?.total_price ?? addon.stock?.price ?? addon.price ?? 0;
+                      return (
+                        <span
+                          key={addon.id}
+                          className="inline-flex items-center bg-[var(--primary)]/10 text-[var(--primary)] text-xs rounded-md"
+                          style={{ padding: '6px 10px' }}
+                        >
+                          <span className="font-medium">+ {addonTitle}</span>
+                          {addonPrice > 0 && (
+                            <span className="ms-1 text-[var(--primary)]/70">
+                              ({addonPrice.toFixed(3)} {currency})
+                            </span>
+                          )}
+                        </span>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -405,6 +439,7 @@ const CartPage = () => {
   
   const { isAuthenticated } = useAuthStore();
   const { cart, setCart, clearCart } = useCartStore();
+  const { selectedAddress } = useLocationStore();
 
   const [loading, setLoading] = useState(true);
   const [couponCode, setCouponCode] = useState('');
@@ -414,6 +449,8 @@ const CartPage = () => {
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [clearingCart, setClearingCart] = useState(false);
+  const [calculatedPrices, setCalculatedPrices] = useState<CalculateResult | null>(null);
+  const [calculateLoading, setCalculateLoading] = useState(false);
 
   const currency = tCommon('sar');
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
@@ -426,6 +463,13 @@ const CartPage = () => {
       setLoading(false);
     }
   }, [isAuthenticated]);
+
+  // Calculate prices when cart or address changes
+  useEffect(() => {
+    if (cart?.id) {
+      calculatePrices();
+    }
+  }, [cart?.id, selectedAddress?.id, appliedCoupon]);
 
   const fetchCart = async () => {
     setLoading(true);
@@ -441,6 +485,40 @@ const CartPage = () => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const calculatePrices = async () => {
+    if (!cart?.id) return;
+
+    setCalculateLoading(true);
+    try {
+      // Build location from selected address
+      let formattedLocation: { latitude: number; longitude: number } | undefined;
+      if (selectedAddress?.location) {
+        if (Array.isArray(selectedAddress.location)) {
+          formattedLocation = {
+            latitude: selectedAddress.location[0],
+            longitude: selectedAddress.location[1],
+          };
+        } else if (typeof selectedAddress.location === 'object') {
+          formattedLocation = selectedAddress.location as { latitude: number; longitude: number };
+        }
+      }
+
+      const calculateData = {
+        type: 'delivery' as const,
+        coupon: appliedCoupon || undefined,
+        address: formattedLocation,
+      };
+
+      const response = await cartService.calculateCart(cart.id, calculateData);
+      setCalculatedPrices(response.data);
+    } catch (error) {
+      console.error('Error calculating prices:', error);
+      setCalculatedPrices(null);
+    } finally {
+      setCalculateLoading(false);
     }
   };
 
@@ -544,8 +622,19 @@ const CartPage = () => {
 
   // Get all cart items
   const cartItems: CartDetail[] = cart?.user_carts?.flatMap(uc => uc.cart_details || uc.cartDetails || []) || [];
-  // item.price من الـ API هو السعر الإجمالي للعنصر (سعر الوحدة × الكمية) - لا نضربه في الكمية مرة أخرى
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
+  
+  // Helper function to calculate item total with addons
+  const calculateItemTotal = (item: CartDetail) => {
+    const basePrice = item.stock?.total_price || (item.quantity > 0 ? item.price / item.quantity : item.price);
+    const addonsPrice = item.addons?.reduce((sum, addon) => {
+      const addonPrice = addon.stock?.total_price ?? addon.stock?.price ?? addon.price ?? 0;
+      return sum + (addonPrice * (addon.quantity || 1));
+    }, 0) || 0;
+    return (basePrice + addonsPrice) * item.quantity;
+  };
+  
+  // حساب المجموع الفرعي شامل الإضافات
+  const subtotal = cartItems.reduce((sum, item) => sum + calculateItemTotal(item), 0);
   const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   // Loading State
@@ -857,7 +946,7 @@ const CartPage = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500 text-sm">{t('subtotal')}</span>
                   <span className="font-semibold text-gray-900">
-                    {subtotal.toFixed(3)} {currency}
+                    {(calculatedPrices?.price ?? subtotal).toFixed(3)} {currency}
                   </span>
                 </div>
 
@@ -868,11 +957,16 @@ const CartPage = () => {
                     {t('deliveryFee')}
                   </span>
                   <span className="font-semibold text-gray-900">
-                    {cart.shop?.price === 0 ? (
-                      <span className="text-green-600">{t('freeDelivery')}</span>
-                    ) : (
-                      <>{(cart.shop?.price || 0).toFixed(3)} {currency}</>
-                    )}
+                    {calculateLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                    ) : (() => {
+                      const fee = calculatedPrices?.delivery_fee ?? calculatedPrices?.deliveryFee ?? cart.shop?.price ?? 0;
+                      return fee === 0 ? (
+                        <span className="text-green-600">{t('freeDelivery')}</span>
+                      ) : (
+                        <>{fee.toFixed(3)} {currency}</>
+                      );
+                    })()}
                   </span>
                 </div>
 
@@ -892,10 +986,16 @@ const CartPage = () => {
               <div className="flex justify-between items-center py-4">
                 <span className="text-base font-bold text-gray-900">{t('total')}</span>
                 <div className="text-end">
-                  <span className="text-2xl sm:text-3xl font-bold text-[var(--primary)]">
-                    {(subtotal + (cart.shop?.price || 0)).toFixed(3)}
-                  </span>
-                  <span className="text-sm font-medium text-gray-500 ms-1">{currency}</span>
+                  {calculateLoading ? (
+                    <Loader2 className="w-6 h-6 animate-spin text-[var(--primary)]" />
+                  ) : (
+                    <>
+                      <span className="text-2xl sm:text-3xl font-bold text-[var(--primary)]">
+                        {(calculatedPrices?.total_price ?? calculatedPrices?.totalPrice ?? (subtotal + (calculatedPrices?.delivery_fee ?? calculatedPrices?.deliveryFee ?? cart.shop?.price ?? 0))).toFixed(3)}
+                      </span>
+                      <span className="text-sm font-medium text-gray-500 ms-1">{currency}</span>
+                    </>
+                  )}
                 </div>
               </div>
 

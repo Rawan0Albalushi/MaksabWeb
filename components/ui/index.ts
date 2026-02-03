@@ -9,4 +9,6 @@ export { default as QuantitySelector } from './QuantitySelector';
 export { default as Avatar } from './Avatar';
 export { default as EmptyState } from './EmptyState';
 export { default as LinkWithLoading } from './LinkWithLoading';
+export { default as ExtrasSelector } from './ExtrasSelector';
+export { default as AddonsSelector } from './AddonsSelector';
 

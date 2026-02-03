@@ -202,6 +202,7 @@
     "ingredients": "المكونات",
     "options": "الخيارات",
     "extras": "إضافات",
+    "addons": "إضافات اختيارية",
     "required": "مطلوب",
     "optional": "اختياري",
     "addedToCart": "تمت الإضافة للسلة",
@@ -211,7 +212,12 @@
     "minutes": "دقيقة",
     "hours": "ساعة",
     "shopOpen": "مفتوح",
-    "shopClosed": "مغلق"
+    "shopClosed": "مغلق",
+    "totalWithAddons": "الإجمالي مع الإضافات",
+    "selectRequired": "يرجى اختيار الخيارات المطلوبة",
+    "size": "الحجم",
+    "color": "اللون",
+    "flavor": "النكهة"
   },
   "cart": {
     "title": "سلة المشتريات",

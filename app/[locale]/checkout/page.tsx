@@ -637,8 +637,19 @@ const CheckoutPage = () => {
   // Get cart items
   const cartItems: CartDetail[] = cart?.user_carts?.flatMap(uc => uc.cart_details || uc.cartDetails || []) || [];
   const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  // item.price من الـ API هو السعر الإجمالي للعنصر (سعر الوحدة × الكمية) - لا نضربه في الكمية مرة أخرى
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
+  
+  // Helper function to calculate item total with addons
+  const calculateItemTotal = (item: CartDetail) => {
+    const basePrice = item.stock?.total_price || (item.quantity > 0 ? item.price / item.quantity : item.price);
+    const addonsPrice = item.addons?.reduce((sum, addon) => {
+      const addonPrice = addon.stock?.total_price ?? addon.stock?.price ?? addon.price ?? 0;
+      return sum + (addonPrice * (addon.quantity || 1));
+    }, 0) || 0;
+    return (basePrice + addonsPrice) * item.quantity;
+  };
+  
+  // حساب المجموع الفرعي شامل الإضافات
+  const subtotal = cartItems.reduce((sum, item) => sum + calculateItemTotal(item), 0);
 
   // Generate available delivery dates (next 7 days)
   const getAvailableDates = () => {
@@ -1262,20 +1273,41 @@ const CheckoutPage = () => {
 
               <div style={{ padding: '20px' }}>
                 {/* Cart Items Preview */}
-                <div className="space-y-2.5 mb-5 max-h-32 overflow-y-auto custom-scrollbar">
+                <div className="space-y-2.5 mb-5 max-h-40 overflow-y-auto custom-scrollbar">
                   {cartItems.slice(0, 3).map((item) => {
                     const productTitle = item.stock?.product?.translation?.title || `${t('item')} #${item.stock?.id}`;
+                    const itemTotal = calculateItemTotal(item);
+                    const hasAddons = item.addons && item.addons.length > 0;
+                    
                     return (
-                      <div key={item.id} className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                          <span className="w-6 h-6 bg-[var(--primary)]/10 rounded-lg text-xs font-bold flex items-center justify-center text-[var(--primary)] shrink-0">
-                            {item.quantity}×
+                      <div key={item.id} className="text-sm">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                            <span className="w-6 h-6 bg-[var(--primary)]/10 rounded-lg text-xs font-bold flex items-center justify-center text-[var(--primary)] shrink-0">
+                              {item.quantity}×
+                            </span>
+                            <span className="text-gray-700 truncate">{productTitle}</span>
+                          </div>
+                          <span className="text-gray-800 font-semibold shrink-0 ms-2">
+                            {itemTotal.toFixed(3)} {tCommon('sar')}
                           </span>
-                          <span className="text-gray-700 truncate">{productTitle}</span>
                         </div>
-                        <span className="text-gray-800 font-semibold shrink-0 ms-2">
-                          {item.price.toFixed(3)} {tCommon('sar')}
-                        </span>
+                        {/* Addons */}
+                        {hasAddons && (
+                          <div className="ms-8 mt-1 flex flex-wrap gap-1">
+                            {item.addons!.map((addon) => {
+                              const addonTitle = addon.stock?.product?.translation?.title || `إضافة #${addon.id}`;
+                              return (
+                                <span
+                                  key={addon.id}
+                                  className="inline-flex items-center bg-[var(--primary)]/10 text-[var(--primary)] text-[10px] rounded px-1.5 py-0.5"
+                                >
+                                  + {addonTitle}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                     );
                   })}

@@ -33,10 +33,11 @@ import {
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
-import { EmptyState, Button } from '@/components/ui';
-import { shopService, cartService } from '@/services';
-import { Shop, Category, Product } from '@/types';
+import { EmptyState, Button, ExtrasSelector, AddonsSelector } from '@/components/ui';
+import { shopService, cartService, productService } from '@/services';
+import { Shop, Category, Product, Stock, Addon } from '@/types';
 import { useFavoritesStore, useSettingsStore, useCartStore, useAuthStore } from '@/store';
+import { useProductExtras } from '@/hooks';
 
 interface ShopPageProps {
   params: Promise<{ uuid: string }>;
@@ -62,10 +63,10 @@ const scaleIn = {
 };
 
 // ============================================
-// PRODUCT MODAL COMPONENT
+// PRODUCT MODAL COMPONENT WITH EXTRAS & ADDONS
 // ============================================
 const ProductModal = ({
-  product,
+  product: initialProduct,
   isOpen,
   onClose,
   onAdd,
@@ -73,24 +74,66 @@ const ProductModal = ({
   product: Product | null;
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (p: Product, qty: number, stockId: number) => Promise<void>;
+  onAdd: (p: Product, qty: number, stockId: number, addons?: Array<{ stock_id: number; quantity: number }>) => Promise<void>;
 }) => {
   const tCommon = useTranslations('common');
+  const tProduct = useTranslations('product');
   const [qty, setQty] = useState(1);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [fetchingDetails, setFetchingDetails] = useState(false);
+  const [fullProduct, setFullProduct] = useState<Product | null>(null);
 
-  const stock = product?.stocks?.[0];
-  const price = stock?.total_price ?? stock?.price ?? 0;
-  const oldPrice = stock?.price ?? 0;
-  const hasDiscount = stock?.discount && stock.discount > 0;
-  const discountPercent = hasDiscount ? Math.round((stock!.discount! / oldPrice) * 100) : 0;
+  // Use the full product with extras/addons if available, otherwise use initial
+  const product = fullProduct || initialProduct;
+
+  // Extras & Addons management
+  const {
+    selectedStock,
+    typedExtras,
+    selectExtra,
+    toggleAddon,
+    incrementAddon,
+    decrementAddon,
+    calculateTotalPrice,
+    getActiveAddons,
+    hasExtras,
+    hasAddons,
+    addonsState,
+  } = useProductExtras({
+    stocks: product?.stocks || [],
+  });
+
+  // Fetch full product details when modal opens
+  useEffect(() => {
+    if (isOpen && initialProduct?.uuid) {
+      setFetchingDetails(true);
+      productService.getProductDetails(initialProduct.uuid)
+        .then((res) => {
+          setFullProduct(res.data);
+        })
+        .catch((err) => {
+          console.error('Error fetching product details:', err);
+        })
+        .finally(() => {
+          setFetchingDetails(false);
+        });
+    }
+  }, [isOpen, initialProduct?.uuid]);
+
+  // Calculate prices
+  const basePrice = selectedStock?.total_price ?? selectedStock?.price ?? 0;
+  const oldPrice = selectedStock?.price ?? 0;
+  const totalPrice = calculateTotalPrice(qty);
+  const hasDiscount = selectedStock?.discount && selectedStock.discount > 0;
+  const discountPercent = hasDiscount ? Math.round((selectedStock!.discount! / oldPrice) * 100) : 0;
 
   useEffect(() => {
     if (!isOpen) {
       const timer = setTimeout(() => {
         setSuccess(false);
         setQty(1);
+        setFullProduct(null);
       }, 300);
       return () => clearTimeout(timer);
     }
@@ -107,12 +150,20 @@ const ProductModal = ({
     };
   }, [isOpen]);
 
-  if (!product || !stock) return null;
+  if (!product || !selectedStock) return null;
 
   const handleAdd = async () => {
+    if (!selectedStock) return;
     setLoading(true);
     try {
-      await onAdd(product, qty, stock.id);
+      // Get active addons
+      const activeAddons = getActiveAddons();
+      const addonsForCart = activeAddons.map(addon => ({
+        stock_id: addon.stocks?.id ?? addon.product?.stock?.id ?? addon.product?.stocks?.[0]?.id ?? 0,
+        quantity: addon.quantity,
+      })).filter(addon => addon.stock_id > 0);
+
+      await onAdd(product, qty, selectedStock.id, addonsForCart.length > 0 ? addonsForCart : undefined);
       setSuccess(true);
       setTimeout(onClose, 600);
     } catch (e) {
@@ -121,6 +172,45 @@ const ProductModal = ({
       setLoading(false);
     }
   };
+
+  // Render extras and addons section
+  const renderExtrasAndAddons = () => (
+    <>
+      {/* Extras Selection */}
+      {hasExtras && (
+        <div style={{ marginTop: '16px' }}>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-6 h-6 rounded-lg bg-[var(--primary)] flex items-center justify-center">
+              <span className="text-white text-xs font-bold">✓</span>
+            </span>
+            <h4 className="font-bold text-gray-900 text-sm">{tProduct('options')}</h4>
+          </div>
+          <ExtrasSelector
+            typedExtras={typedExtras}
+            onSelect={selectExtra}
+          />
+        </div>
+      )}
+
+      {/* Addons Selection */}
+      {hasAddons && selectedStock?.addons && selectedStock.addons.length > 0 && (
+        <div style={{ marginTop: '16px' }}>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-6 h-6 rounded-lg bg-teal-500 flex items-center justify-center">
+              <span className="text-white text-xs font-bold">+</span>
+            </span>
+            <h4 className="font-bold text-gray-900 text-sm">{tProduct('addons')}</h4>
+          </div>
+          <AddonsSelector
+            addons={selectedStock.addons}
+            addonsState={addonsState}
+            onToggle={toggleAddon}
+            currency={tCommon('sar')}
+          />
+        </div>
+      )}
+    </>
+  );
 
   return (
     <AnimatePresence>
@@ -142,7 +232,7 @@ const ProductModal = ({
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '100%', opacity: 0 }}
             transition={{ type: 'spring', damping: 30, stiffness: 400 }}
-            className="fixed bottom-0 inset-x-0 z-50 bg-white rounded-t-[28px] max-h-[85vh] overflow-hidden safe-area-bottom lg:hidden"
+            className="fixed bottom-0 inset-x-0 z-50 bg-white rounded-t-[28px] max-h-[90vh] overflow-hidden safe-area-bottom lg:hidden"
           >
             <div className="flex justify-center" style={{ padding: '12px 0 8px 0' }}>
               <div className="w-12 h-1.5 bg-[var(--border)] rounded-full" />
@@ -150,122 +240,128 @@ const ProductModal = ({
 
             <button
               onClick={onClose}
-              className="absolute top-4 end-4 w-10 h-10 bg-[var(--main-bg)] hover:bg-[var(--border)] rounded-full flex items-center justify-center transition-colors"
+              className="absolute top-4 end-4 w-10 h-10 bg-[var(--main-bg)] hover:bg-[var(--border)] rounded-full flex items-center justify-center transition-colors z-10"
               style={{ padding: '10px' }}
             >
               <X size={20} className="text-[var(--text-grey)]" />
             </button>
 
-            <div className="overflow-y-auto max-h-[calc(85vh-60px)]" style={{ padding: '8px 20px 32px 20px' }}>
-              <div className="flex gap-4">
-                <div className="w-28 h-28 rounded-2xl overflow-hidden bg-[var(--main-bg)] shrink-0 shadow-lg">
-                  {product.img ? (
-                    <Image
-                      src={product.img}
-                      alt={product.translation?.title || ''}
-                      width={112}
-                      height={112}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <ChefHat size={36} className="text-[var(--border)]" />
+            <div className="overflow-y-auto max-h-[calc(90vh-60px)]" style={{ padding: '8px 20px 32px 20px' }}>
+              {fetchingDetails ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="w-8 h-8 border-3 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : (
+                <>
+                  <div className="flex gap-4">
+                    <div className="w-28 h-28 rounded-2xl overflow-hidden bg-[var(--main-bg)] shrink-0 shadow-lg">
+                      {product.img ? (
+                        <Image
+                          src={product.img}
+                          alt={product.translation?.title || ''}
+                          width={112}
+                          height={112}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <ChefHat size={36} className="text-[var(--border)]" />
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
 
-                <div className="flex-1 min-w-0 py-1">
-                  <h3 className="font-bold text-[var(--black)] text-lg leading-tight line-clamp-2">
-                    {product.translation?.title}
-                  </h3>
-                  {product.translation?.description && (
-                    <p className="text-[var(--text-grey)] text-sm mt-1.5 line-clamp-2">
-                      {product.translation.description}
-                    </p>
-                  )}
-                  <div className="mt-3 flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-[var(--primary)]">
-                      {price.toFixed(3)}
-                    </span>
-                    <span className="text-[var(--text-grey)] text-sm">{tCommon('sar')}</span>
-                    {hasDiscount && (
-                      <span className="text-sm text-[var(--text-grey)] line-through ms-1">
-                        {oldPrice.toFixed(3)}
-                      </span>
-                    )}
+                    <div className="flex-1 min-w-0 py-1">
+                      <h3 className="font-bold text-[var(--black)] text-lg leading-tight line-clamp-2">
+                        {product.translation?.title}
+                      </h3>
+                      {product.translation?.description && (
+                        <p className="text-[var(--text-grey)] text-sm mt-1.5 line-clamp-2">
+                          {product.translation.description}
+                        </p>
+                      )}
+                      <div className="mt-3 flex items-baseline gap-2">
+                        <span className="text-2xl font-bold text-[var(--primary)]">
+                          {basePrice.toFixed(3)}
+                        </span>
+                        <span className="text-[var(--text-grey)] text-sm">{tCommon('sar')}</span>
+                        {hasDiscount && (
+                          <span className="text-sm text-[var(--text-grey)] line-through ms-1">
+                            {oldPrice.toFixed(3)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Quantity Section - Enhanced */}
-              <div className="flex items-center justify-between border-t-2 border-gray-100" style={{ marginTop: '32px', padding: '20px 0' }}>
-                <span className="font-bold text-gray-900 text-lg" style={{ padding: '0 4px' }}>الكمية</span>
-                <div className="flex items-center gap-3 bg-gray-100 rounded-2xl" style={{ padding: '8px' }}>
-                  {/* Minus Button */}
+                  {/* Extras & Addons */}
+                  {renderExtrasAndAddons()}
+
+                  {/* Quantity Section - Enhanced */}
+                  <div className="flex items-center justify-between border-t-2 border-gray-100" style={{ marginTop: '16px', padding: '20px 0' }}>
+                    <span className="font-bold text-gray-900 text-lg" style={{ padding: '0 4px' }}>{tProduct('quantity')}</span>
+                    <div className="flex items-center gap-3 bg-gray-100 rounded-2xl" style={{ padding: '8px' }}>
+                      <button
+                        onClick={() => qty > 1 && setQty(qty - 1)}
+                        disabled={qty <= 1}
+                        style={{
+                          backgroundColor: qty <= 1 ? '#E6E6E6' : '#ffffff',
+                          borderColor: qty <= 1 ? '#DCDCDC' : '#FF3D00',
+                          color: qty <= 1 ? '#898989' : '#FF3D00',
+                          padding: '12px',
+                        }}
+                        className="w-12 h-12 rounded-xl flex items-center justify-center transition-all border-2 font-bold text-2xl shadow-sm hover:shadow-md"
+                      >
+                        <Minus size={22} strokeWidth={3} />
+                      </button>
+                      <span className="w-12 text-center font-bold text-2xl text-[var(--black)]" style={{ padding: '0 8px' }}>{qty}</span>
+                      <button
+                        onClick={() => setQty(qty + 1)}
+                        style={{
+                          backgroundColor: '#FF3D00',
+                          borderColor: '#FF3D00',
+                          color: '#ffffff',
+                          boxShadow: '0 4px 14px rgba(255, 61, 0, 0.4)',
+                          padding: '12px',
+                        }}
+                        className="w-12 h-12 rounded-xl flex items-center justify-center transition-all border-2 font-bold text-2xl hover:opacity-90 active:scale-95"
+                      >
+                        <Plus size={22} strokeWidth={3} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Add to Cart Button */}
                   <button
-                    onClick={() => qty > 1 && setQty(qty - 1)}
-                    disabled={qty <= 1}
+                    onClick={handleAdd}
+                    disabled={loading || success}
                     style={{
-                      backgroundColor: qty <= 1 ? '#E6E6E6' : '#ffffff',
-                      borderColor: qty <= 1 ? '#DCDCDC' : '#FF3D00',
-                      color: qty <= 1 ? '#898989' : '#FF3D00',
-                      padding: '12px',
-                    }}
-                    className="w-12 h-12 rounded-xl flex items-center justify-center transition-all border-2 font-bold text-2xl shadow-sm hover:shadow-md"
-                  >
-                    <Minus size={22} strokeWidth={3} />
-                  </button>
-                  
-                  {/* Quantity Display */}
-                  <span className="w-12 text-center font-bold text-2xl text-[var(--black)]" style={{ padding: '0 8px' }}>{qty}</span>
-                  
-                  {/* Plus Button */}
-                  <button
-                    onClick={() => setQty(qty + 1)}
-                    style={{
-                      backgroundColor: '#FF3D00',
-                      borderColor: '#FF3D00',
+                      backgroundColor: success ? '#4CAF50' : '#FF3D00',
                       color: '#ffffff',
-                      boxShadow: '0 4px 14px rgba(255, 61, 0, 0.4)',
-                      padding: '12px',
+                      boxShadow: success 
+                        ? '0 8px 24px rgba(76, 175, 80, 0.4)' 
+                        : '0 8px 24px rgba(255, 61, 0, 0.4)',
+                      padding: '18px 24px',
                     }}
-                    className="w-12 h-12 rounded-xl flex items-center justify-center transition-all border-2 font-bold text-2xl hover:opacity-90 active:scale-95"
+                    className="w-full h-16 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all hover:opacity-95 active:scale-[0.98]"
                   >
-                    <Plus size={22} strokeWidth={3} />
+                    {success ? (
+                      <>
+                        <Check size={26} strokeWidth={3} />
+                        <span>{tProduct('addedToCart')}</span>
+                      </>
+                    ) : loading ? (
+                      <div className="w-7 h-7 border-[3px] border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <ShoppingBag size={24} />
+                        <span>{tProduct('addToCart')}</span>
+                        <span className="w-[2px] h-7 bg-white/50 rounded-full mx-1" />
+                        <span className="font-bold text-xl">{totalPrice.toFixed(3)} {tCommon('sar')}</span>
+                      </>
+                    )}
                   </button>
-                </div>
-              </div>
-
-              {/* Add to Cart Button */}
-              <button
-                onClick={handleAdd}
-                disabled={loading || success}
-                style={{
-                  backgroundColor: success ? '#4CAF50' : '#FF3D00',
-                  color: '#ffffff',
-                  boxShadow: success 
-                    ? '0 8px 24px rgba(76, 175, 80, 0.4)' 
-                    : '0 8px 24px rgba(255, 61, 0, 0.4)',
-                  padding: '18px 24px',
-                }}
-                className="w-full h-16 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all hover:opacity-95 active:scale-[0.98]"
-              >
-                {success ? (
-                  <>
-                    <Check size={26} strokeWidth={3} />
-                    <span>تمت الإضافة!</span>
-                  </>
-                ) : loading ? (
-                  <div className="w-7 h-7 border-[3px] border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <ShoppingBag size={24} />
-                    <span>أضف للسلة</span>
-                    <span className="w-[2px] h-7 bg-white/50 rounded-full mx-1" />
-                    <span className="font-bold text-xl">{(price * qty).toFixed(3)} {tCommon('sar')}</span>
-                  </>
-                )}
-              </button>
+                </>
+              )}
             </div>
           </motion.div>
 
@@ -282,10 +378,10 @@ const ProductModal = ({
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
               transition={{ type: 'spring', damping: 25, stiffness: 400 }}
-              className="relative bg-white rounded-3xl shadow-2xl overflow-hidden max-w-2xl w-full"
+              className="relative bg-white rounded-3xl shadow-2xl overflow-hidden max-w-3xl w-full max-h-[90vh]"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex">
+              <div className="flex h-full">
                 {/* Product Image */}
                 <div className="relative w-[280px] shrink-0 group">
                   <div className="aspect-[4/5] bg-[var(--main-bg)] overflow-hidden">
@@ -322,109 +418,121 @@ const ProductModal = ({
                 </div>
 
                 {/* Product Info */}
-                <div className="flex-1 flex flex-col" style={{ padding: '24px' }}>
-                  <h3 className="font-bold text-[var(--black)] text-xl leading-tight">
-                    {product.translation?.title}
-                  </h3>
-                  
-                  {product.translation?.description && (
-                    <p className="text-[var(--text-grey)] text-sm mt-2 line-clamp-3 leading-relaxed">
-                      {product.translation.description}
-                    </p>
-                  )}
-
-                  <div className="mt-5 flex items-end gap-3">
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-3xl font-bold text-[var(--primary)]">
-                        {price.toFixed(3)}
-                      </span>
-                      <span className="text-base font-medium text-[var(--text-grey)]">{tCommon('sar')}</span>
+                <div className="flex-1 flex flex-col overflow-hidden" style={{ padding: '24px' }}>
+                  {fetchingDetails ? (
+                    <div className="flex-1 flex items-center justify-center">
+                      <div className="w-10 h-10 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
                     </div>
-                    {hasDiscount && (
-                      <span className="text-base text-[var(--text-grey)] line-through pb-1">
-                        {oldPrice.toFixed(3)}
-                      </span>
-                    )}
-                  </div>
+                  ) : (
+                    <>
+                      <div className="overflow-y-auto flex-1">
+                        <h3 className="font-bold text-[var(--black)] text-xl leading-tight">
+                          {product.translation?.title}
+                        </h3>
+                        
+                        {product.translation?.description && (
+                          <p className="text-[var(--text-grey)] text-sm mt-2 line-clamp-3 leading-relaxed">
+                            {product.translation.description}
+                          </p>
+                        )}
 
-                  <div className="flex-1" />
+                        <div className="mt-5 flex items-end gap-3">
+                          <div className="flex items-baseline gap-1.5">
+                            <span className="text-3xl font-bold text-[var(--primary)]">
+                              {basePrice.toFixed(3)}
+                            </span>
+                            <span className="text-base font-medium text-[var(--text-grey)]">{tCommon('sar')}</span>
+                          </div>
+                          {hasDiscount && (
+                            <span className="text-base text-[var(--text-grey)] line-through pb-1">
+                              {oldPrice.toFixed(3)}
+                            </span>
+                          )}
+                        </div>
 
-                  {/* Quantity Section - Desktop */}
-                  <div className="flex items-center justify-between border-t-2 border-gray-100" style={{ padding: '20px 0', marginTop: '16px' }}>
-                    <span className="font-bold text-gray-900 text-lg" style={{ padding: '0 4px' }}>الكمية</span>
-                    <div className="flex items-center gap-3 bg-gray-100 rounded-2xl" style={{ padding: '8px' }}>
-                      {/* Minus Button */}
-                      <button
-                        onClick={() => qty > 1 && setQty(qty - 1)}
-                        disabled={qty <= 1}
+                        {/* Extras & Addons */}
+                        {renderExtrasAndAddons()}
+                      </div>
+
+                      {/* Quantity Section - Desktop */}
+                      <div className="flex items-center justify-between border-t-2 border-gray-100 shrink-0" style={{ padding: '20px 0', marginTop: '16px' }}>
+                        <span className="font-bold text-gray-900 text-lg" style={{ padding: '0 4px' }}>{tProduct('quantity')}</span>
+                        <div className="flex items-center gap-3 bg-gray-100 rounded-2xl" style={{ padding: '8px' }}>
+                          <button
+                            onClick={() => qty > 1 && setQty(qty - 1)}
+                            disabled={qty <= 1}
+                            style={{
+                              backgroundColor: qty <= 1 ? '#E6E6E6' : '#ffffff',
+                              borderColor: qty <= 1 ? '#DCDCDC' : '#FF3D00',
+                              color: qty <= 1 ? '#898989' : '#FF3D00',
+                              padding: '10px',
+                            }}
+                            className="w-11 h-11 rounded-xl flex items-center justify-center transition-all border-2 font-bold shadow-sm hover:shadow-md"
+                          >
+                            <Minus size={20} strokeWidth={3} />
+                          </button>
+                          <span className="w-12 text-center font-bold text-2xl text-[var(--black)]" style={{ padding: '0 8px' }}>{qty}</span>
+                          <button
+                            onClick={() => setQty(qty + 1)}
+                            style={{
+                              backgroundColor: '#FF3D00',
+                              borderColor: '#FF3D00',
+                              color: '#ffffff',
+                              boxShadow: '0 4px 14px rgba(255, 61, 0, 0.4)',
+                              padding: '10px',
+                            }}
+                            className="w-11 h-11 rounded-xl flex items-center justify-center transition-all border-2 font-bold hover:opacity-90 active:scale-95"
+                          >
+                            <Plus size={20} strokeWidth={3} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Total with addons info */}
+                      {totalPrice !== basePrice * qty && (
+                        <p className="text-sm text-[var(--text-grey)] text-center mb-2">
+                          {tProduct('totalWithAddons')}: <span className="font-semibold text-[var(--primary)]">{totalPrice.toFixed(3)} {tCommon('sar')}</span>
+                        </p>
+                      )}
+
+                      {/* Add to Cart Button - Desktop */}
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={handleAdd}
+                        disabled={loading || success}
                         style={{
-                          backgroundColor: qty <= 1 ? '#E6E6E6' : '#ffffff',
-                          borderColor: qty <= 1 ? '#DCDCDC' : '#FF3D00',
-                          color: qty <= 1 ? '#898989' : '#FF3D00',
-                          padding: '10px',
-                        }}
-                        className="w-11 h-11 rounded-xl flex items-center justify-center transition-all border-2 font-bold shadow-sm hover:shadow-md"
-                      >
-                        <Minus size={20} strokeWidth={3} />
-                      </button>
-                      
-                      {/* Quantity Display */}
-                      <span className="w-12 text-center font-bold text-2xl text-[var(--black)]" style={{ padding: '0 8px' }}>{qty}</span>
-                      
-                      {/* Plus Button */}
-                      <button
-                        onClick={() => setQty(qty + 1)}
-                        style={{
-                          backgroundColor: '#FF3D00',
-                          borderColor: '#FF3D00',
+                          backgroundColor: success ? '#4CAF50' : '#FF3D00',
                           color: '#ffffff',
-                          boxShadow: '0 4px 14px rgba(255, 61, 0, 0.4)',
-                          padding: '10px',
+                          boxShadow: success 
+                            ? '0 8px 24px rgba(76, 175, 80, 0.4)' 
+                            : '0 8px 24px rgba(255, 61, 0, 0.4)',
+                          padding: '16px 24px',
                         }}
-                        className="w-11 h-11 rounded-xl flex items-center justify-center transition-all border-2 font-bold hover:opacity-90 active:scale-95"
+                        className="w-full h-14 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all shrink-0"
                       >
-                        <Plus size={20} strokeWidth={3} />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Add to Cart Button - Desktop */}
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleAdd}
-                    disabled={loading || success}
-                    style={{
-                      backgroundColor: success ? '#4CAF50' : '#FF3D00',
-                      color: '#ffffff',
-                      boxShadow: success 
-                        ? '0 8px 24px rgba(76, 175, 80, 0.4)' 
-                        : '0 8px 24px rgba(255, 61, 0, 0.4)',
-                      padding: '16px 24px',
-                      marginTop: '8px',
-                    }}
-                    className="w-full h-14 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all"
-                  >
-                    {success ? (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="flex items-center gap-2"
-                      >
-                        <Check size={24} strokeWidth={3} />
-                        <span>تمت الإضافة بنجاح!</span>
-                      </motion.div>
-                    ) : loading ? (
-                      <div className="w-7 h-7 border-[3px] border-white border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <>
-                        <ShoppingBag size={22} />
-                        <span>أضف للسلة</span>
-                        <span className="w-[2px] h-6 bg-white/50 rounded-full mx-1" />
-                        <span className="font-bold text-xl">{(price * qty).toFixed(3)} {tCommon('sar')}</span>
-                      </>
-                    )}
-                  </motion.button>
+                        {success ? (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="flex items-center gap-2"
+                          >
+                            <Check size={24} strokeWidth={3} />
+                            <span>{tProduct('addedToCart')}</span>
+                          </motion.div>
+                        ) : loading ? (
+                          <div className="w-7 h-7 border-[3px] border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <>
+                            <ShoppingBag size={22} />
+                            <span>{tProduct('addToCart')}</span>
+                            <span className="w-[2px] h-6 bg-white/50 rounded-full mx-1" />
+                            <span className="font-bold text-xl">{totalPrice.toFixed(3)} {tCommon('sar')}</span>
+                          </>
+                        )}
+                      </motion.button>
+                    </>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -700,7 +808,7 @@ export default function ShopPage({ params }: ShopPageProps) {
     }
   };
 
-  const handleAdd = async (p: Product, qty: number, stockId: number) => {
+  const handleAdd = async (p: Product, qty: number, stockId: number, addons?: Array<{ stock_id: number; quantity: number }>) => {
     if (!shop) return;
     
     if (!isAuthenticated) {
@@ -712,6 +820,7 @@ export default function ShopPage({ params }: ShopPageProps) {
       shop_id: shop.id,
       stock_id: stockId,
       quantity: qty,
+      addons: addons,
     });
     if (res.data) setCart(res.data);
   };

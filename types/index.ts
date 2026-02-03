@@ -96,6 +96,7 @@ export interface Product {
   max_qty?: number;
   translation?: Translation;
   stocks?: Stock[];
+  stock?: Stock; // Single stock for addon products
   galleries?: Gallery[];
   category?: Category;
   shop?: Shop;
@@ -105,10 +106,13 @@ export interface Product {
 
 export interface Stock {
   id: number;
+  countable_id?: number;
   quantity: number;
   price: number;
   total_price: number;
+  totalPrice?: number; // API sometimes returns camelCase
   discount?: number;
+  tax?: number;
   extras?: Extra[];
   addons?: Addon[];
   product?: Product;
@@ -116,6 +120,7 @@ export interface Stock {
 
 export interface Extra {
   id: number;
+  extra_group_id?: number;
   value: string;
   group?: ExtraGroup;
 }
@@ -128,9 +133,30 @@ export interface ExtraGroup {
 
 export interface Addon {
   id: number;
+  stock_id?: number;
+  addon_id?: number;
   quantity: number;
-  price: number;
+  price?: number;
+  active?: boolean;
   product?: Product;
+  stocks?: Stock;
+}
+
+// UI types for extras selection state management
+export type ExtrasType = 'color' | 'text' | 'image';
+
+export interface UiExtra {
+  index: number;
+  value: string;
+  isSelected: boolean;
+}
+
+export interface TypedExtra {
+  groupId: number;
+  groupIndex: number;
+  type: ExtrasType;
+  title: string;
+  uiExtras: UiExtra[];
 }
 
 export interface Gallery {
@@ -190,6 +216,8 @@ export interface CartAddon {
   id: number;
   quantity: number;
   stock_id: number;
+  stock?: Stock;
+  price?: number;
 }
 
 // Order

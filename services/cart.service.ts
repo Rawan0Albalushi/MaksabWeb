@@ -11,6 +11,12 @@ interface CartProductData {
   }>;
 }
 
+interface CartProductPayload {
+  stock_id: number;
+  quantity: number;
+  parent_id?: number;
+}
+
 interface CalculateData {
   type?: string;
   coupon?: string;
@@ -46,20 +52,37 @@ export const cartService = {
       }
     }
     
+    // Build products array with main product and addons
+    const products: CartProductPayload[] = [];
+    
+    // Add main product (NO parent_id)
+    products.push({
+      stock_id: data.stock_id,
+      quantity: data.quantity,
+    });
+    
+    // Add addons with parent_id pointing to main product's stock_id
+    if (data.addons && data.addons.length > 0) {
+      data.addons.forEach(addon => {
+        if (addon.quantity > 0) {
+          products.push({
+            stock_id: addon.stock_id,
+            quantity: addon.quantity,
+            parent_id: data.stock_id, // Link addon to main product
+          });
+        }
+      });
+    }
+    
     // Data for INSERT-PRODUCT (existing cart) - requires products[] array + currency_id
     const insertProductData = {
       shop_id: data.shop_id,
       currency_id: currencyId,
-      products: [
-        {
-          stock_id: data.stock_id,
-          quantity: data.quantity,
-          ...(data.addons && { parent_id: data.addons[0]?.stock_id }),
-        },
-      ],
+      products,
     };
     
     // Data for CREATE CART (new cart) - flat structure, single product
+    // Note: For new cart with addons, we'll need to use insert-product after creation
     const createCartData = {
       shop_id: data.shop_id,
       currency_id: currencyId,
@@ -67,8 +90,11 @@ export const cartService = {
       quantity: data.quantity,
     };
     
+    const hasAddons = data.addons && data.addons.length > 0;
+    
     console.log('📤 Insert data:', insertProductData);
     console.log('📤 Create data:', createCartData);
+    console.log('📤 Has addons:', hasAddons);
     
     // Try to add to existing cart first using insert-product
     try {
@@ -88,7 +114,29 @@ export const cartService = {
       // If cart doesn't exist, create new cart
       if (httpStatus === 404 || statusCode === 'ERROR_404' || errorMessage?.toLowerCase().includes('not found') || errorMessage?.toLowerCase().includes('cart')) {
         console.log('📦 No cart exists, creating new cart...');
-        return post<ApiResponse<Cart>>('/api/v1/dashboard/user/cart', createCartData);
+        
+        // Create cart with main product first
+        const cartResult = await post<ApiResponse<Cart>>('/api/v1/dashboard/user/cart', createCartData);
+        
+        // If we have addons, add them using insert-product
+        if (hasAddons && cartResult?.data) {
+          console.log('📦 Adding addons to new cart...');
+          const addonsProducts = data.addons!.filter(a => a.quantity > 0).map(addon => ({
+            stock_id: addon.stock_id,
+            quantity: addon.quantity,
+            parent_id: data.stock_id,
+          }));
+          
+          if (addonsProducts.length > 0) {
+            return post<ApiResponse<Cart>>('/api/v1/dashboard/user/cart/insert-product', {
+              shop_id: data.shop_id,
+              currency_id: currencyId,
+              products: addonsProducts,
+            });
+          }
+        }
+        
+        return cartResult;
       }
       
       // If cart exists for different shop, delete and create new
@@ -135,6 +183,25 @@ export const cartService = {
           const createResult = await post<ApiResponse<Cart>>('/api/v1/dashboard/user/cart', createCartData);
           console.log('✅ CREATE CART RESPONSE:', createResult);
           console.log('✅ Cart data:', JSON.stringify(createResult, null, 2));
+          
+          // If we have addons, add them using insert-product
+          if (hasAddons && createResult?.data) {
+            console.log('📦 Adding addons to new cart...');
+            const addonsProducts = data.addons!.filter(a => a.quantity > 0).map(addon => ({
+              stock_id: addon.stock_id,
+              quantity: addon.quantity,
+              parent_id: data.stock_id,
+            }));
+            
+            if (addonsProducts.length > 0) {
+              return post<ApiResponse<Cart>>('/api/v1/dashboard/user/cart/insert-product', {
+                shop_id: data.shop_id,
+                currency_id: currencyId,
+                products: addonsProducts,
+              });
+            }
+          }
+          
           return createResult;
         } catch (createErr: unknown) {
           const createAxiosErr = createErr as { response?: { data?: unknown; status?: number } };

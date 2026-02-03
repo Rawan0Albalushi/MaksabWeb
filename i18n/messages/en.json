@@ -202,6 +202,7 @@
     "ingredients": "Ingredients",
     "options": "Options",
     "extras": "Extras",
+    "addons": "Add-ons",
     "required": "Required",
     "optional": "Optional",
     "addedToCart": "Added to cart",
@@ -211,7 +212,12 @@
     "minutes": "min",
     "hours": "hr",
     "shopOpen": "Open",
-    "shopClosed": "Closed"
+    "shopClosed": "Closed",
+    "totalWithAddons": "Total with add-ons",
+    "selectRequired": "Please select required options",
+    "size": "Size",
+    "color": "Color",
+    "flavor": "Flavor"
   },
   "cart": {
     "title": "Shopping Cart",

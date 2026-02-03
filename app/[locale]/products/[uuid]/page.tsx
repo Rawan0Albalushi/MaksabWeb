@@ -26,11 +26,12 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Thumbs, FreeMode } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
 
-import { Button, Badge, Rating, QuantitySelector, ProductCardSkeleton } from '@/components/ui';
+import { Button, Badge, Rating, QuantitySelector, ProductCardSkeleton, ExtrasSelector, AddonsSelector } from '@/components/ui';
 import { ProductCard } from '@/components/cards';
 import { productService, cartService } from '@/services';
 import { Product, Stock } from '@/types';
 import { useFavoritesStore, useCartStore, useAuthStore, useSettingsStore } from '@/store';
+import { useProductExtras } from '@/hooks';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -58,9 +59,25 @@ const ProductPage = ({ params }: ProductPageProps) => {
   const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [addingToCart, setAddingToCart] = useState(false);
-  const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
+
+  // Extras & Addons management
+  const {
+    selectedStock,
+    typedExtras,
+    selectExtra,
+    toggleAddon,
+    incrementAddon,
+    decrementAddon,
+    calculateTotalPrice,
+    getActiveAddons,
+    hasExtras,
+    hasAddons,
+    addonsState,
+  } = useProductExtras({
+    stocks: product?.stocks || [],
+  });
 
   useEffect(() => {
     fetchProductData();
@@ -74,11 +91,6 @@ const ProductPage = ({ params }: ProductPageProps) => {
       ]);
 
       setProduct(productRes.data);
-      
-      // Set default stock
-      if (productRes.data?.stocks && productRes.data.stocks.length > 0) {
-        setSelectedStock(productRes.data.stocks[0]);
-      }
 
       // Fetch similar products
       if (productRes.data?.category?.id) {
@@ -113,10 +125,20 @@ const ProductPage = ({ params }: ProductPageProps) => {
 
     setAddingToCart(true);
     try {
+      // Get active addons with their quantities
+      const activeAddons = getActiveAddons();
+      
+      // Build addons array for cart service
+      const addonsForCart = activeAddons.map(addon => ({
+        stock_id: addon.stocks?.id ?? addon.product?.stock?.id ?? addon.product?.stocks?.[0]?.id ?? 0,
+        quantity: addon.quantity,
+      })).filter(addon => addon.stock_id > 0);
+
       const response = await cartService.addToCart({
         shop_id: product.shop.id,
         stock_id: selectedStock.id,
         quantity,
+        addons: addonsForCart.length > 0 ? addonsForCart : undefined,
       });
       setCart(response.data);
       // Show success message or navigate to cart
@@ -128,8 +150,11 @@ const ProductPage = ({ params }: ProductPageProps) => {
     }
   };
 
-  const price = selectedStock?.total_price ?? selectedStock?.price ?? 0;
+  // Price calculations with addons
+  const basePrice = selectedStock?.total_price ?? selectedStock?.price ?? 0;
   const originalPrice = selectedStock?.price ?? 0;
+  const totalPrice = calculateTotalPrice(quantity);
+  const unitPriceWithAddons = quantity > 0 ? totalPrice / quantity : basePrice;
   const hasDiscount = selectedStock?.discount && selectedStock.discount > 0;
   const isOutOfStock = selectedStock?.quantity === 0;
 
@@ -436,14 +461,22 @@ const ProductPage = ({ params }: ProductPageProps) => {
               )}
 
               {/* Price */}
-              <div className="flex items-center gap-3 mb-6">
-                <span className="text-3xl font-bold text-[var(--primary)]">
-                  {tCommon('sar')} {price.toFixed(3)}
-                </span>
-                {hasDiscount && (
-                  <span className="text-lg text-[var(--text-grey)] line-through">
-                    {tCommon('sar')} {originalPrice.toFixed(3)}
+              <div className="mb-6">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl font-bold text-[var(--primary)]">
+                    {tCommon('sar')} {basePrice.toFixed(3)}
                   </span>
+                  {hasDiscount && (
+                    <span className="text-lg text-[var(--text-grey)] line-through">
+                      {tCommon('sar')} {originalPrice.toFixed(3)}
+                    </span>
+                  )}
+                </div>
+                {/* Show total with addons if different */}
+                {totalPrice !== basePrice * quantity && (
+                  <p className="text-sm text-[var(--text-grey)] mt-1">
+                    {t('totalWithAddons')}: <span className="font-semibold text-[var(--primary)]">{tCommon('sar')} {totalPrice.toFixed(3)}</span>
+                  </p>
                 )}
               </div>
 
@@ -459,28 +492,37 @@ const ProductPage = ({ params }: ProductPageProps) => {
                 </div>
               )}
 
-              {/* Stock Options */}
-              {product.stocks && product.stocks.length > 1 && (
+              {/* Extras Selection */}
+              {hasExtras && (
                 <div className="mb-6">
-                  <h3 className="font-bold text-[var(--black)] mb-3">
-                    {t('options')}
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {product.stocks.map((stock) => (
-                      <button
-                        key={stock.id}
-                        onClick={() => setSelectedStock(stock)}
-                        className={clsx(
-                          'px-4 py-2 rounded-[var(--radius-md)] border-2 transition-all',
-                          selectedStock?.id === stock.id
-                            ? 'border-[var(--primary)] bg-[var(--primary)]/5'
-                            : 'border-[var(--border)] hover:border-[var(--primary)]'
-                        )}
-                      >
-                        {stock.extras?.map((e) => e.value).join(' - ') || `خيار ${stock.id}`}
-                      </button>
-                    ))}
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="w-7 h-7 rounded-lg bg-[var(--primary)] flex items-center justify-center">
+                      <span className="text-white text-sm font-bold">✓</span>
+                    </span>
+                    <h3 className="font-bold text-gray-900">{t('options')}</h3>
                   </div>
+                  <ExtrasSelector
+                    typedExtras={typedExtras}
+                    onSelect={selectExtra}
+                  />
+                </div>
+              )}
+
+              {/* Addons Selection */}
+              {hasAddons && selectedStock?.addons && (
+                <div className="mb-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="w-7 h-7 rounded-lg bg-teal-500 flex items-center justify-center">
+                      <span className="text-white text-sm font-bold">+</span>
+                    </span>
+                    <h3 className="font-bold text-gray-900">{t('addons')}</h3>
+                  </div>
+                  <AddonsSelector
+                    addons={selectedStock.addons}
+                    addonsState={addonsState}
+                    onToggle={toggleAddon}
+                    currency={tCommon('sar')}
+                  />
                 </div>
               )}
 
