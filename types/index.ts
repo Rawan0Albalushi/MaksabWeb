@@ -343,6 +343,14 @@ export interface LoginResponse {
   user: User;
 }
 
+// Response after sending verification code (email or phone)
+export interface SendCodeResponse {
+  verifyId: string;
+  channel?: number; // 0=SMS, 1=WhatsApp
+  message?: string;
+}
+
+// Deprecated: Use SendCodeResponse instead
 export interface RegisterResponse {
   verifyId: string;
   message: string;

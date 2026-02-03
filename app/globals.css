@@ -879,16 +879,35 @@ footer {
 }
 
 /* Primary button enhancement - white background with blue text */
+.auth-page form button[type="submit"],
 .auth-page button[type="submit"] {
-  background: rgba(255, 255, 255, 1) !important;
-  color: var(--primary-dark) !important;
-  border: 2px solid var(--primary-dark) !important;
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  color: #267881 !important;
+  border: 2px solid #267881 !important;
 }
 
-.auth-page button[type="submit"]:not(:disabled):hover {
-  background: var(--primary-dark) !important;
-  color: white !important;
+.auth-page form button[type="submit"] *,
+.auth-page button[type="submit"] * {
+  color: #267881 !important;
+  fill: none !important;
+  stroke: #267881 !important;
+  transition: all 0.2s ease !important;
+}
+
+.auth-page form button[type="submit"]:hover,
+.auth-page button[type="submit"]:hover {
+  background: #267881 !important;
+  background-color: #267881 !important;
+  color: #FFFFFF !important;
   box-shadow: 0 8px 24px rgba(38, 120, 129, 0.4), 0 4px 10px rgba(38, 120, 129, 0.3) !important;
+}
+
+.auth-page form button[type="submit"]:hover *,
+.auth-page button[type="submit"]:hover * {
+  color: #FFFFFF !important;
+  fill: none !important;
+  stroke: #FFFFFF !important;
 }
 
 /* Outline button styling for social login - target buttons with border-2 class */
@@ -993,13 +1012,16 @@ footer {
 }
 
 /* Error messages - enhanced styling for better visibility */
-.auth-page p.text-sm {
+/* Only target error message paragraphs with error color class */
+.auth-page p.text-sm.text-\[var\(--error\)\],
+.auth-page p.text-sm[class*="error"] {
   background: rgba(255, 235, 238, 0.98) !important;
   border: 1px solid rgba(229, 57, 53, 0.4) !important;
   color: var(--error) !important;
   backdrop-filter: blur(10px) !important;
   -webkit-backdrop-filter: blur(10px) !important;
   box-shadow: 0 2px 8px rgba(229, 57, 53, 0.2) !important;
+  text-shadow: none !important;
 }
 
 /* Links on dark background - blue color */

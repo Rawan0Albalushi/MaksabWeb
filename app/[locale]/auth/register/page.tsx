@@ -6,12 +6,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
-import { Mail, Lock, Phone, User } from 'lucide-react';
+import { Mail, ArrowLeft } from 'lucide-react';
 import { Button, Input } from '@/components/ui';
 import { authService } from '@/services';
 import { useAuthStore } from '@/store';
-
-type RegisterMethod = 'email' | 'phone';
 
 const RegisterPage = () => {
   const t = useTranslations('auth');
@@ -25,60 +23,53 @@ const RegisterPage = () => {
     }
   }, [_hasHydrated, isAuthenticated]);
 
-  const [registerMethod, setRegisterMethod] = useState<RegisterMethod>('email');
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: '',
-  });
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     // Validation
-    if (formData.password !== formData.confirmPassword) {
-      setError('كلمة المرور غير متطابقة');
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+    if (!email) {
+      setError(t('emailRequired') || 'البريد الإلكتروني مطلوب');
       return;
     }
 
     setLoading(true);
 
     try {
-      const registerData = {
-        firstname: formData.firstName,
-        lastname: formData.lastName,
-        email: registerMethod === 'email' ? formData.email : undefined,
-        phone: registerMethod === 'phone' ? formData.phone : undefined,
-        password: formData.password,
-        password_confirmation: formData.confirmPassword,
-      };
-
-      const response = await authService.register(registerData);
+      // Send verification code to email
+      const response = await authService.sendEmailVerificationCode(email);
 
       if (response.status && response.data) {
+        // Store the contact info in sessionStorage for the verify page
+        sessionStorage.setItem('pendingRegistration', JSON.stringify({
+          method: 'email',
+          verifyId: response.data.verifyId,
+          channel: response.data.channel,
+          contact: email,
+        }));
+
         // Navigate to verification page
-        router.push(`/auth/verify?verifyId=${response.data.verifyId}&method=${registerMethod}`);
+        router.push('/auth/verify');
       } else {
-        setError(response.message || 'Registration failed');
+        setError(response.message || t('sendCodeFailed') || 'فشل إرسال كود التحقق');
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'An error occurred');
+    } catch (err: unknown) {
+      let errorMessage = t('errorOccurred') || 'حدث خطأ';
+      
+      if (err && typeof err === 'object') {
+        const axiosError = err as { response?: { data?: { message?: string } }; message?: string };
+        if (axiosError.response?.data?.message) {
+          errorMessage = axiosError.response.data.message;
+        } else if (axiosError.message) {
+          errorMessage = axiosError.message;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -105,111 +96,21 @@ const RegisterPage = () => {
               {t('registerTitle')}
             </h1>
             <p className="text-[var(--text-secondary)] text-base">
-              أنشئ حسابك وابدأ بالطلب الآن
+              {t('registerSubtitleEmail') || 'أدخل بريدك الإلكتروني للبدء'}
             </p>
           </div>
 
-          {/* Register Method Toggle */}
-          <div className="flex bg-[var(--primary-dark)]/15 rounded-lg" style={{ marginBottom: '24px', padding: '4px' }}>
-            <button
-              type="button"
-              onClick={() => setRegisterMethod('email')}
-              className={`flex-1 rounded-md text-sm font-semibold transition-all ${
-                registerMethod === 'email'
-                  ? 'bg-white text-[var(--primary-dark)] shadow-sm'
-                  : 'text-[var(--primary-dark)]/60 hover:text-[var(--primary-dark)]'
-              }`}
-              style={{ padding: '12px 18px' }}
-            >
-              {t('email')}
-            </button>
-            <button
-              type="button"
-              onClick={() => setRegisterMethod('phone')}
-              className={`flex-1 rounded-md text-sm font-semibold transition-all ${
-                registerMethod === 'phone'
-                  ? 'bg-white text-[var(--primary-dark)] shadow-sm'
-                  : 'text-[var(--primary-dark)]/60 hover:text-[var(--primary-dark)]'
-              }`}
-              style={{ padding: '12px 18px' }}
-            >
-              {t('phone')}
-            </button>
-          </div>
-
           <form onSubmit={handleSubmit}>
-            {/* Name Fields */}
-            <div className="grid grid-cols-2 gap-4" style={{ marginBottom: '20px' }}>
-              <Input
-                name="firstName"
-                label={t('firstName')}
-                placeholder="الاسم الأول"
-                value={formData.firstName}
-                onChange={handleChange}
-                leftIcon={<User size={20} />}
-                required
-              />
-              <Input
-                name="lastName"
-                label={t('lastName')}
-                placeholder="الاسم الأخير"
-                value={formData.lastName}
-                onChange={handleChange}
-              />
-            </div>
-
-            {/* Email or Phone */}
-            <div style={{ marginBottom: '20px' }}>
-              {registerMethod === 'email' ? (
-                <Input
-                  type="email"
-                  name="email"
-                  label={t('email')}
-                  placeholder="example@email.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  leftIcon={<Mail size={20} />}
-                  required
-                />
-              ) : (
-                <Input
-                  type="tel"
-                  name="phone"
-                  label={t('phone')}
-                  placeholder="+968 XXXX XXXX"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  leftIcon={<Phone size={20} />}
-                  required
-                />
-              )}
-            </div>
-
-            {/* Password */}
-            <div style={{ marginBottom: '20px' }}>
-              <Input
-                type="password"
-                name="password"
-                label={t('password')}
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={handleChange}
-                leftIcon={<Lock size={20} />}
-                hint="يجب أن تكون 6 أحرف على الأقل"
-                required
-              />
-            </div>
-
-            {/* Confirm Password */}
+            {/* Email */}
             <div style={{ marginBottom: '24px' }}>
               <Input
-                type="password"
-                name="confirmPassword"
-                label={t('confirmPassword')}
-                placeholder="••••••••"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                leftIcon={<Lock size={20} />}
+                type="email"
+                name="email"
+                label={t('email')}
+                placeholder="example@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                leftIcon={<Mail size={20} />}
                 required
               />
             </div>
@@ -222,13 +123,13 @@ const RegisterPage = () => {
                 className="w-4 h-4 mt-0.5 accent-[var(--primary)] cursor-pointer"
               />
               <span className="text-sm">
-                أوافق على{' '}
+                {t('agreeToTerms') || 'أوافق على'}{' '}
                 <Link href="/terms" className="text-[var(--primary-dark)] font-bold hover:underline">
-                  الشروط والأحكام
+                  {t('termsAndConditions') || 'الشروط والأحكام'}
                 </Link>{' '}
-                و{' '}
+                {t('and') || 'و'}{' '}
                 <Link href="/privacy" className="text-[var(--primary-dark)] font-bold hover:underline">
-                  سياسة الخصوصية
+                  {t('privacyPolicy') || 'سياسة الخصوصية'}
                 </Link>
               </span>
             </label>
@@ -240,8 +141,15 @@ const RegisterPage = () => {
             )}
 
             <div style={{ marginBottom: '32px' }}>
-              <Button type="submit" fullWidth size="lg" isLoading={loading} style={{ padding: '16px 24px' }}>
-                {t('registerTitle')}
+              <Button 
+                type="submit" 
+                fullWidth 
+                size="lg" 
+                isLoading={loading} 
+                style={{ padding: '16px 24px' }}
+                rightIcon={<ArrowLeft size={20} />}
+              >
+                {t('sendVerificationCode') || 'إرسال كود التحقق'}
               </Button>
             </div>
           </form>
@@ -272,9 +180,9 @@ const RegisterPage = () => {
       <div className="hidden lg:flex items-center justify-center bg-gradient-to-br from-[var(--primary-dark)] to-[var(--primary-dark-hover)] text-white p-12">
         <div className="text-center max-w-md w-full flex flex-col items-center justify-center">
           <Image src="/images/maksab.png" alt="Maksab Right" width={160} height={53} className="mx-auto" style={{ marginBottom: '48px' }}/>
-          <h2 className="text-3xl font-bold text-white" style={{ marginBottom: '20px' }}>انضم إلى مكسب</h2>
+          <h2 className="text-3xl font-bold text-white" style={{ marginBottom: '20px' }}>{t('joinMaksab') || 'انضم إلى مكسب'}</h2>
           <p className="text-lg text-white">
-            سجّل الآن واستمتع بعروض حصرية وتوصيل سريع لجميع طلباتك
+            {t('registerBenefit') || 'سجّل الآن واستمتع بعروض حصرية وتوصيل سريع لجميع طلباتك'}
           </p>
         </div>
       </div>
