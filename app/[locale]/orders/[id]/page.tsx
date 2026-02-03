@@ -128,7 +128,7 @@ const OrderDetailsSkeleton = () => (
   <div className="min-h-screen bg-[var(--main-bg)]">
     {/* Header Skeleton */}
     <div className="bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C]">
-      <div className="container max-w-4xl mx-auto" style={{ padding: '24px 18px 32px 18px' }}>
+      <div className="container max-w-4xl mx-auto" style={{ padding: '24px 18px 32px 18px', paddingTop: '90px' }}>
         <div className="animate-pulse">
           <div className="flex items-center justify-between mb-6">
             <div className="w-12 h-12 bg-white/10 rounded-full" />
@@ -805,7 +805,7 @@ const OrderDetailsPage = () => {
           )}
         </AnimatePresence>
 
-        <div className="container max-w-4xl mx-auto relative z-10" style={{ padding: '24px 18px 40px 18px' }}>
+        <div className="container max-w-4xl mx-auto relative z-10" style={{ padding: '24px 18px 40px 18px', paddingTop: '90px' }}>
           {/* Navigation */}
           <div className="flex items-center justify-between mb-6">
             <button

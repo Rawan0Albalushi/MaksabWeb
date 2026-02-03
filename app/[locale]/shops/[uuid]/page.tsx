@@ -864,7 +864,7 @@ export default function ShopPage({ params }: ShopPageProps) {
       <div className="min-h-screen bg-[var(--main-bg)]">
         {/* Hero Skeleton - Same style as shops page */}
         <div className="relative bg-gradient-to-br from-[var(--primary)] via-[var(--primary-hover)] to-orange-600 overflow-hidden">
-          <div className="container py-8 lg:py-12">
+          <div className="container" style={{ paddingTop: '100px', paddingBottom: '24px' }}>
             <div className="flex items-start gap-5">
               <div className="w-10 h-10 bg-white/20 rounded-xl skeleton" />
               <div className="w-24 h-24 lg:w-32 lg:h-32 bg-white/20 rounded-2xl skeleton" />
@@ -937,7 +937,7 @@ export default function ShopPage({ params }: ShopPageProps) {
           </div>
         )}
 
-        <div className="container relative z-10 px-4 sm:px-6 lg:px-8" style={{ paddingTop: '24px', paddingBottom: '16px' }}>
+        <div className="container relative z-10 px-4 sm:px-6 lg:px-8" style={{ paddingTop: '100px', paddingBottom: '16px' }}>
           {/* Shop Info */}
           <div className="flex items-start gap-4 sm:gap-6 lg:gap-8">
             {/* Logo */}

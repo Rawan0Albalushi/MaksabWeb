@@ -72,7 +72,7 @@ const FavoritesPage = () => {
     (activeTab === 'products' && favoriteProducts.length === 0);
 
   return (
-    <div className="min-h-screen bg-[var(--main-bg)] py-8">
+    <div className="min-h-screen bg-[var(--main-bg)]" style={{ paddingTop: '100px', paddingBottom: '32px' }}>
       <div className="container">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">

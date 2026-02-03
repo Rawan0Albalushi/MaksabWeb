@@ -124,14 +124,30 @@ const Header = () => {
     <>
       <header
         className={clsx(
-          'fixed top-0 inset-x-0 z-[150] transition-all duration-500 ease-out',
-          isScrolled
-            ? 'bg-white/80 backdrop-blur-xl shadow-[0_2px_20px_-4px_rgba(0,0,0,0.1)] border-b border-white/50'
-            : 'bg-white/60 backdrop-blur-md border-b border-transparent'
+          'fixed top-3 sm:top-4 inset-x-3 sm:inset-x-4 lg:inset-x-6 z-[150] transition-all duration-500 ease-out',
+          'rounded-2xl sm:rounded-3xl',
+          'bg-white/80 backdrop-blur-xl shadow-[0_8px_32px_-8px_rgba(0,0,0,0.1)] border border-white/60'
         )}
+        style={{
+          // Glass morphism effect
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.7) 100%)',
+        }}
       >
         {/* Subtle gradient overlay for glass effect */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
+        <div 
+          className="absolute inset-0 pointer-events-none rounded-2xl sm:rounded-3xl opacity-70"
+          style={{
+            background: 'linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 100%)',
+          }} 
+        />
+        
+        {/* Animated border glow effect */}
+        <div 
+          className="absolute -inset-[1px] rounded-2xl sm:rounded-3xl pointer-events-none opacity-50"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.5) 0%, transparent 50%, rgba(255,255,255,0.25) 100%)',
+          }} 
+        />
         
         <div className="container relative">
           <div className="flex items-center justify-between h-16 sm:h-[68px] lg:h-[76px]">
@@ -163,7 +179,7 @@ const Header = () => {
                       'relative py-2 text-[15px] font-medium transition-all duration-300 whitespace-nowrap group',
                       isActive
                         ? 'text-[var(--primary)]'
-                        : 'text-[var(--text-grey)] hover:text-[var(--black)]'
+                        : 'text-[var(--black)]/70 hover:text-[var(--black)]'
                     )}
                   >
                     {link.label}
@@ -194,16 +210,16 @@ const Header = () => {
                   className={clsx(
                     'flex items-center gap-1.5 px-3 py-2 rounded-full transition-all duration-300',
                     isLangDropdownOpen
-                      ? 'bg-[var(--main-bg)] shadow-inner'
-                      : 'hover:bg-[var(--main-bg)]/70'
+                      ? 'bg-[var(--black)]/10 shadow-inner'
+                      : 'hover:bg-[var(--black)]/10'
                   )}
                 >
-                  <Globe size={17} className="text-[var(--text-grey)]" />
-                  <span className="text-sm font-medium text-[var(--black)] hidden lg:inline">{localeNames[locale]}</span>
+                  <Globe size={17} className="text-[var(--black)]/60" />
+                  <span className="text-sm font-medium hidden lg:inline text-[var(--black)]/80">{localeNames[locale]}</span>
                   <ChevronDown 
                     size={14} 
                     className={clsx(
-                      'text-[var(--text-grey)] transition-transform duration-300',
+                      'transition-all duration-300 text-[var(--black)]/60',
                       isLangDropdownOpen && 'rotate-180'
                     )} 
                   />
@@ -255,7 +271,7 @@ const Header = () => {
               </div>
 
               {/* Divider - Desktop */}
-              <div className="hidden md:block w-px h-5 bg-[var(--border)]/60 mx-1" />
+              <div className="hidden md:block w-px h-5 mx-1 bg-[var(--black)]/15" />
 
               {/* Favorites - Desktop - Hidden temporarily */}
               {/* <Link
@@ -271,11 +287,11 @@ const Header = () => {
               {/* Cart */}
               <Link
                 href="/cart"
-                className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-[var(--main-bg)]/70 active:scale-95 transition-all duration-200 group"
+                className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full active:scale-95 transition-all duration-200 group hover:bg-[var(--black)]/10"
               >
                 <ShoppingCart 
                   size={19} 
-                  className="text-[var(--text-grey)] group-hover:text-[var(--primary)] transition-colors duration-200" 
+                  className="text-[var(--black)]/60 group-hover:text-[var(--primary)] transition-colors duration-200" 
                 />
                 {cartItemCount > 0 && (
                   <span className="absolute -top-0.5 -end-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-[var(--primary)] text-white text-[10px] font-bold rounded-full px-1 shadow-md shadow-[var(--primary)]/30 animate-in zoom-in duration-200">
@@ -288,7 +304,7 @@ const Header = () => {
               {!_hasHydrated ? (
                 // Loading state
                 <div className="hidden sm:flex items-center gap-2">
-                  <div className="w-20 h-9 bg-[var(--main-bg)]/70 rounded-full animate-pulse" />
+                  <div className="w-20 h-9 rounded-full animate-pulse bg-[var(--black)]/10" />
                 </div>
               ) : isAuthenticated ? (
                 // User Profile Dropdown - Desktop
@@ -302,8 +318,8 @@ const Header = () => {
                     className={clsx(
                       'flex items-center gap-2 ps-1 pe-2.5 py-1 rounded-full transition-all duration-300',
                       isProfileDropdownOpen
-                        ? 'bg-[var(--main-bg)] shadow-inner'
-                        : 'hover:bg-[var(--main-bg)]/70'
+                        ? 'bg-[var(--black)]/10 shadow-inner'
+                        : 'hover:bg-[var(--black)]/10'
                     )}
                   >
                     <Avatar
@@ -311,13 +327,13 @@ const Header = () => {
                       fallback={user?.firstname}
                       size="sm"
                     />
-                    <span className="text-sm font-medium max-w-[80px] truncate hidden md:block text-[var(--black)]">
+                    <span className="text-sm font-medium max-w-[80px] truncate hidden md:block text-[var(--black)]/80">
                       {user?.firstname}
                     </span>
                     <ChevronDown 
                       size={14} 
                       className={clsx(
-                        'text-[var(--text-grey)] transition-transform duration-300',
+                        'transition-all duration-300 text-[var(--black)]/60',
                         isProfileDropdownOpen && 'rotate-180'
                       )} 
                     />
@@ -396,7 +412,7 @@ const Header = () => {
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className="rounded-full text-[13px] h-9 hover:bg-[var(--main-bg)]/70"
+                      className="rounded-full text-[13px] h-9 hover:bg-[var(--black)]/10 text-[var(--black)]/80"
                       style={{ padding: '8px 20px' }}
                     >
                       {t('login')}
@@ -417,25 +433,25 @@ const Header = () => {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-[var(--main-bg)]/70 active:scale-95 transition-all duration-200 ms-0.5"
+                className="lg:hidden flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full active:scale-95 transition-all duration-200 ms-0.5 hover:bg-[var(--black)]/10"
                 aria-label="Toggle menu"
               >
                 <div className="relative w-5 h-5 flex items-center justify-center">
                   <span 
                     className={clsx(
-                      'absolute w-5 h-[2px] bg-[var(--black)] rounded-full transition-all duration-300',
+                      'absolute w-5 h-[2px] rounded-full transition-all duration-300 bg-[var(--black)]/80',
                       isMobileMenuOpen ? 'rotate-45' : '-translate-y-1.5'
                     )} 
                   />
                   <span 
                     className={clsx(
-                      'absolute w-5 h-[2px] bg-[var(--black)] rounded-full transition-all duration-300',
+                      'absolute w-5 h-[2px] rounded-full transition-all duration-300 bg-[var(--black)]/80',
                       isMobileMenuOpen && 'opacity-0 scale-0'
                     )} 
                   />
                   <span 
                     className={clsx(
-                      'absolute w-5 h-[2px] bg-[var(--black)] rounded-full transition-all duration-300',
+                      'absolute w-5 h-[2px] rounded-full transition-all duration-300 bg-[var(--black)]/80',
                       isMobileMenuOpen ? '-rotate-45' : 'translate-y-1.5'
                     )} 
                   />
@@ -700,8 +716,8 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Spacer for fixed header - responsive */}
-      <div className="h-16 sm:h-[68px] lg:h-[76px]" />
+      {/* Spacer for fixed header - responsive (removed since header is now part of hero) */}
+      {/* <div className="h-16 sm:h-[68px] lg:h-[76px]" /> */}
     </>
   );
 };

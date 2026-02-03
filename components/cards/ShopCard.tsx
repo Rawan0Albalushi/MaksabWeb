@@ -227,7 +227,7 @@ const ShopCard = ({ shop, variant = 'default', className }: ShopCardProps) => {
         <div className="h-9 sm:h-11 bg-white" />
 
         {/* Logo - Absolutely positioned at the boundary */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20">
           <div className="relative w-[68px] h-[68px] sm:w-[88px] sm:h-[88px] rounded-xl sm:rounded-2xl overflow-hidden bg-white ring-3 sm:ring-4 ring-[var(--primary)] shadow-xl group-hover:ring-[var(--primary-hover)] transition-all">
           {shop.logo_img ? (
             <Image

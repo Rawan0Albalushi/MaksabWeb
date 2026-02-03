@@ -1,6 +1,6 @@
 export default function ProductLoading() {
   return (
-    <div className="min-h-screen bg-[var(--main-bg)]">
+    <div className="min-h-screen bg-[var(--main-bg)]" style={{ paddingTop: '90px' }}>
       {/* Product Image Skeleton */}
       <div className="relative bg-white">
         {/* Back Button */}

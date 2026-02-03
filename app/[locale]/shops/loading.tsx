@@ -12,7 +12,7 @@ export default function ShopsLoading() {
           }} />
         </div>
         
-        <div className="container relative z-10 px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-14">
+        <div className="container relative z-10 px-4 sm:px-6 lg:px-8" style={{ paddingTop: '100px', paddingBottom: '24px' }}>
           {/* Location Row Skeleton */}
           <div className="flex items-center justify-between mb-5 sm:mb-6 lg:mb-8">
             <div className="flex items-center gap-2.5 sm:gap-3 lg:gap-4">

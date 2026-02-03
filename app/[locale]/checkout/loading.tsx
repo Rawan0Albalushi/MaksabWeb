@@ -2,13 +2,13 @@ export default function CheckoutLoading() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header - Matching actual checkout page */}
-      <div className="bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C] relative overflow-hidden min-h-[160px] sm:min-h-[180px] lg:min-h-[200px] flex flex-col">
+      <div className="bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C] relative overflow-hidden min-h-[200px] sm:min-h-[220px] lg:min-h-[240px] flex flex-col">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 start-1/4 w-48 h-48 bg-[var(--primary)]/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 end-1/4 w-40 h-40 bg-[var(--primary-dark)]/15 rounded-full blur-3xl" />
         </div>
         
-        <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-10 flex-1 flex items-center">
+        <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-10 flex-1 flex items-center" style={{ paddingTop: '90px' }}>
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-3 sm:gap-4">
               {/* Back Button */}

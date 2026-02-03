@@ -44,7 +44,7 @@ const CategoriesPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[var(--main-bg)] py-8">
+    <div className="min-h-screen bg-[var(--main-bg)]" style={{ paddingTop: '100px', paddingBottom: '32px' }}>
       <div className="container">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">

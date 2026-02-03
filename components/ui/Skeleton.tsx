@@ -37,22 +37,57 @@ const Skeleton = ({
 };
 
 // Pre-built skeleton components
+// ShopCardSkeleton - 1:1 match with ShopCard default variant structure
 export const ShopCardSkeleton = () => (
-  <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100/50">
-    {/* Image placeholder with subtle gradient */}
-    <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100/80">
-      <div className="absolute inset-0 skeleton" />
-      {/* Decorative elements to mimic actual card */}
-      <div className="absolute top-3 end-3 w-8 h-8 rounded-full bg-white/40 skeleton" />
-      <div className="absolute -bottom-6 start-4 w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-white shadow-lg border border-gray-100/50 skeleton" />
+  <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden border border-[var(--border)]">
+    {/* Background Image + Logo Container - exact match */}
+    <div className="relative">
+      {/* Background Image - fixed height, NOT aspect ratio */}
+      <div className="relative h-36 sm:h-52 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
+        <div className="absolute inset-0 skeleton" />
+        {/* Gradient overlay to match real card */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+      </div>
+
+      {/* Spacer for logo overlap - exact same height */}
+      <div className="h-9 sm:h-11 bg-white" />
+
+      {/* Logo - exact position and size as real card */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
+        <div className="relative w-[68px] h-[68px] sm:w-[88px] sm:h-[88px] rounded-xl sm:rounded-2xl overflow-hidden bg-white ring-3 sm:ring-4 ring-gray-200 shadow-xl">
+          <div className="absolute inset-0 skeleton" />
+        </div>
+      </div>
     </div>
-    <div className="p-4 pt-10 space-y-3">
-      <Skeleton width="75%" height={20} className="rounded-lg" />
-      <Skeleton width="55%" height={14} className="rounded-md" />
-      <div className="flex gap-2 pt-2">
-        <Skeleton width={55} height={24} className="rounded-full" />
-        <Skeleton width={75} height={24} className="rounded-full" />
-        <Skeleton width={55} height={24} className="rounded-full" />
+
+    {/* Content - exact same padding and structure */}
+    <div className="text-center" style={{ padding: '10px 14px 16px 14px' }}>
+      {/* Title with badge placeholder */}
+      <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+        <div className="h-5 sm:h-6 w-32 sm:w-40 bg-gray-100 rounded-lg skeleton" />
+        <div className="w-4 h-4 sm:w-5 sm:h-5 bg-gray-100 rounded-full skeleton shrink-0" />
+      </div>
+
+      {/* Description placeholder */}
+      <div className="flex justify-center mb-3 sm:mb-4">
+        <div className="h-3.5 sm:h-4 w-48 sm:w-56 bg-gray-100 rounded skeleton" />
+      </div>
+
+      {/* Rating placeholder - stars + number */}
+      <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-3 sm:mb-4">
+        <div className="h-5 sm:h-6 w-8 sm:w-10 bg-gray-100 rounded skeleton" />
+        <div className="flex items-center gap-0.5">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="w-3.5 h-3.5 sm:w-4 sm:h-4 bg-gray-100 rounded-sm skeleton" />
+          ))}
+        </div>
+        <div className="h-3.5 sm:h-4 w-8 sm:w-10 bg-gray-100 rounded skeleton" />
+      </div>
+
+      {/* Shop Info badges placeholder */}
+      <div className="flex items-center justify-center gap-2 sm:gap-3">
+        <div className="h-7 sm:h-8 w-20 sm:w-24 bg-gray-50 rounded-lg skeleton" />
+        <div className="h-7 sm:h-8 w-28 sm:w-32 bg-gray-50 rounded-lg skeleton hidden sm:block" />
       </div>
     </div>
   </div>

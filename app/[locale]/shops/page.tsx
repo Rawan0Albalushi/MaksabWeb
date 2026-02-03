@@ -179,7 +179,7 @@ const ShopsPage = () => {
         <div className="absolute top-10 start-10 w-20 h-20 bg-white/10 rounded-full blur-2xl animate-float hidden lg:block" />
         <div className="absolute bottom-10 end-20 w-32 h-32 bg-white/10 rounded-full blur-3xl animate-float hidden lg:block" style={{ animationDelay: '1s' }} />
         
-        <div className="container relative z-10 flex flex-col items-center justify-center" style={{ padding: '48px 20px 32px 20px' }}>
+        <div className="container relative z-10 flex flex-col items-center justify-center" style={{ padding: '100px 20px 32px 20px' }}>
           {/* Title & Search */}
           <div className="w-full max-w-2xl lg:max-w-3xl text-center" style={{ marginBottom: '24px' }}>
             <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white" style={{ marginBottom: '12px', padding: '0 12px' }}>

@@ -370,7 +370,7 @@ const CartSkeleton = () => (
   <div className="min-h-screen bg-[var(--main-bg)]">
     {/* Header Skeleton */}
     <div className="bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C]">
-      <div className="container max-w-6xl mx-auto" style={{ padding: '24px 18px 32px 18px' }}>
+      <div className="container max-w-6xl mx-auto" style={{ padding: '24px 18px 32px 18px', paddingTop: '90px' }}>
         <div className="animate-pulse flex items-center justify-between">
           <div>
             <div className="h-8 w-40 bg-white/10 rounded-lg mb-2" />
@@ -750,13 +750,13 @@ const CartPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C] relative overflow-hidden min-h-[160px] sm:min-h-[180px] lg:min-h-[200px] flex flex-col">
+      <div className="bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C] relative overflow-hidden min-h-[200px] sm:min-h-[220px] lg:min-h-[240px] flex flex-col">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 start-1/4 w-48 h-48 bg-[var(--primary)]/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 end-1/4 w-40 h-40 bg-[var(--primary-dark)]/15 rounded-full blur-3xl" />
         </div>
 
-        <div className="container max-w-6xl mx-auto relative z-10 flex-1 flex items-center" style={{ padding: '24px 18px' }}>
+        <div className="container max-w-6xl mx-auto relative z-10 flex-1 flex items-center" style={{ padding: '24px 18px', paddingTop: '90px' }}>
           <div className="flex items-center justify-between w-full">
             <div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">

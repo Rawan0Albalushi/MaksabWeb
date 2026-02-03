@@ -166,7 +166,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
   if (loading) {
     return (
       <div className="min-h-screen bg-[var(--main-bg)]">
-        <div className="container py-8">
+        <div className="container" style={{ paddingTop: '100px', paddingBottom: '32px' }}>
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Image Skeleton */}
             <div className="aspect-square bg-white rounded-[var(--radius-xl)] skeleton" />
@@ -204,7 +204,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
 
   return (
     <div className="min-h-screen bg-[var(--main-bg)]">
-      <div className="container py-8">
+      <div className="container" style={{ paddingTop: '100px', paddingBottom: '32px' }}>
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm mb-6 text-[var(--text-grey)]">
           <Link href="/" className="hover:text-[var(--primary)]">

@@ -10,7 +10,7 @@ export default function ShopDetailsLoading() {
           }} />
         </div>
 
-        <div className="container relative z-10 px-4 sm:px-6 lg:px-8" style={{ paddingTop: '16px', paddingBottom: '16px' }}>
+        <div className="container relative z-10 px-4 sm:px-6 lg:px-8" style={{ paddingTop: '100px', paddingBottom: '16px' }}>
           {/* Top Navigation */}
           <div className="flex items-center justify-between mb-4 sm:mb-5">
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 animate-pulse" />

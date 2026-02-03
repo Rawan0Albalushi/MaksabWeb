@@ -236,7 +236,7 @@ const PaymentResultPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--main-bg)] flex items-center justify-center py-8 px-4">
+    <div className="min-h-screen bg-[var(--main-bg)] flex items-center justify-center px-4" style={{ paddingTop: '100px', paddingBottom: '32px' }}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

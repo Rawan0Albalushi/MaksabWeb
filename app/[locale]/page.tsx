@@ -193,7 +193,7 @@ const HomePage = () => {
   return (
     <div className="min-h-screen overflow-x-hidden bg-[var(--black)]">
       {/* Hero Section */}
-      <section className="relative min-h-[auto] sm:min-h-[420px] lg:min-h-[480px] flex items-start sm:items-center">
+      <section className="relative min-h-[auto] sm:min-h-[480px] lg:min-h-[560px] flex items-start sm:items-center">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C] overflow-hidden">
           <div className="absolute top-10 sm:top-20 start-5 sm:start-10 w-32 sm:w-72 h-32 sm:h-72 bg-[var(--primary)]/20 rounded-full blur-3xl animate-pulse pointer-events-none" />
@@ -208,7 +208,7 @@ const HomePage = () => {
           />
         </div>
 
-        <div className="container relative z-10 sm:pt-6 sm:pb-6 lg:py-10" style={{ paddingTop: '70px', paddingBottom: '40px' }}>
+        <div className="container relative z-10 sm:pt-8 sm:pb-6 lg:py-12" style={{ paddingTop: '100px', paddingBottom: '50px' }}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-10 items-center">
             {/* Hero Content */}
             <motion.div

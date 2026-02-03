@@ -204,10 +204,10 @@ export const AddressSelector = ({
           <AnimatePresence>
             <motion.div
               ref={portalDropdownRef}
-              initial={{ opacity: 0, y: 10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
+              initial={{ opacity: 0, scale: 0.95, y: -8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -8 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
               onClick={(e) => e.stopPropagation()}
               onMouseDown={(e) => e.stopPropagation()}
               style={{
@@ -217,7 +217,7 @@ export const AddressSelector = ({
                 width: 320,
                 zIndex: 99999,
               }}
-              className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
+              className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl shadow-black/10 border border-white/50 overflow-hidden"
             >
               {renderDropdownContent()}
             </motion.div>
@@ -420,20 +420,20 @@ export const AddressSelector = ({
         <AnimatePresence>
           <motion.div
             ref={portalDropdownRef}
-            initial={{ opacity: 0, y: 8, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.96 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0, scale: 0.95, y: -8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -8 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             onClick={(e) => e.stopPropagation()}
             onMouseDown={(e) => e.stopPropagation()}
             style={{
               position: 'fixed',
               top: dropdownPosition.top,
               left: dropdownPosition.left,
-              width: Math.min(dropdownPosition.width, 380),
+              width: Math.min(dropdownPosition.width, 340),
               zIndex: 99999,
             }}
-            className="bg-white rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] border border-gray-200/60 overflow-hidden"
+            className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl shadow-black/10 border border-white/50 overflow-hidden"
           >
             {renderDropdownContent()}
           </motion.div>
@@ -467,125 +467,87 @@ export const AddressSelector = ({
   // Render dropdown content (shared between variants)
   function renderDropdownContent() {
     return (
-      <div className="max-h-[450px] overflow-y-auto">
+      <div className="max-h-[400px] overflow-y-auto">
         {/* Header Section */}
-        <div className="bg-gradient-to-br from-gray-50 via-white to-gray-50/50" style={{ padding: '20px 24px' }}>
-          <h3 className="text-lg font-bold text-gray-900 leading-relaxed">{t('selectLocation')}</h3>
-          <p className="text-sm text-gray-500 mt-1 leading-relaxed">{t('chooseDeliveryAddress')}</p>
+        <div className="bg-gradient-to-br from-[var(--primary)]/8 to-transparent" style={{ padding: '14px 20px' }}>
+          <p className="font-semibold text-[var(--black)]">{t('selectLocation')}</p>
+          <p className="text-xs text-[var(--text-grey)] mt-0.5">{t('chooseDeliveryAddress')}</p>
         </div>
-
-        {/* Divider */}
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
-
 
         {/* Saved Addresses Section */}
         {savedAddresses.length > 0 && (
-          <>
-            {/* Section Divider */}
-            <div className="px-4">
-              <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
-            </div>
+          <div className="py-2 px-2">
+            {/* Section Title */}
+            <p className="text-[11px] font-semibold text-[var(--text-grey)] uppercase tracking-wider px-3 py-2">
+              {t('savedAddresses')}
+            </p>
 
-            <div style={{ padding: '16px 0' }}>
-              {/* Section Title */}
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider" style={{ padding: '0 24px 12px 24px' }}>
-                {t('savedAddresses')}
-              </p>
-
-              {/* Address List */}
-              <div className="space-y-1" style={{ padding: '0 20px' }}>
-                {savedAddresses.slice(0, 5).map((addr) => {
-                  const Icon = getAddressIcon(addr.title);
-                  const isSelected = selectedAddress?.id === addr.id && !selectedAddress?.isCurrentLocation;
-                  
-                  return (
-                    <button
-                      key={addr.id}
-                      type="button"
-                      onClick={() => handleSelectAddress(addr)}
-                      className={clsx(
-                        "w-full flex items-center gap-4 rounded-xl transition-all duration-200 group",
-                        isSelected 
-                          ? "bg-[var(--primary)]/[0.08] border border-[var(--primary)]/20" 
-                          : "bg-transparent hover:bg-gray-50 border border-transparent hover:border-gray-100",
-                        "active:scale-[0.98]"
-                      )}
-                      style={{ padding: '14px 18px' }}
-                    >
-                      <div className={clsx(
-                        "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0",
-                        isSelected 
-                          ? "bg-[var(--primary)]/15" 
-                          : "bg-gray-100 group-hover:bg-[var(--primary)]/10"
-                      )}>
-                        <Icon size={20} className={clsx(
-                          "transition-colors",
-                          isSelected ? "text-[var(--primary)]" : "text-gray-500 group-hover:text-[var(--primary)]"
-                        )} />
-                      </div>
-                      <div className="text-start flex-1 min-w-0">
-                        <p className={clsx(
-                          "text-[15px] font-semibold leading-relaxed",
-                          isSelected ? "text-[var(--primary)]" : "text-gray-900"
-                        )}>{addr.title}</p>
-                        <p className="text-[13px] text-gray-500 truncate mt-0.5 leading-relaxed">{getAddressDisplayString(addr)}</p>
-                      </div>
-                      {isSelected ? (
-                        <div className="w-7 h-7 rounded-full bg-[var(--primary)] flex items-center justify-center flex-shrink-0 shadow-lg shadow-[var(--primary)]/30">
-                          <Check size={16} className="text-white" />
-                        </div>
-                      ) : addr.active ? (
-                        <span className="text-[11px] font-bold text-[var(--primary)] bg-[var(--primary)]/10 rounded-full flex-shrink-0" style={{ padding: '6px 12px' }}>
-                          {t('default')}
-                        </span>
-                      ) : (
-                        <ChevronRight size={18} className="text-gray-300 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-all flex-shrink-0" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </>
+            {/* Address List */}
+            {savedAddresses.slice(0, 5).map((addr) => {
+              const Icon = getAddressIcon(addr.title);
+              const isSelected = selectedAddress?.id === addr.id && !selectedAddress?.isCurrentLocation;
+              
+              return (
+                <button
+                  key={addr.id}
+                  type="button"
+                  onClick={() => handleSelectAddress(addr)}
+                  className={clsx(
+                    "w-full flex items-center gap-3 rounded-xl text-sm transition-all duration-200",
+                    isSelected 
+                      ? "text-[var(--primary)] bg-[var(--primary)]/8 font-semibold" 
+                      : "text-[var(--black)] hover:bg-[var(--main-bg)]"
+                  )}
+                  style={{ padding: '12px 16px' }}
+                >
+                  <div className={clsx(
+                    "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0",
+                    isSelected ? "bg-[var(--primary)]/15" : "bg-[var(--main-bg)]"
+                  )}>
+                    <Icon size={18} className={isSelected ? "text-[var(--primary)]" : "text-[var(--text-grey)]"} />
+                  </div>
+                  <div className="text-start flex-1 min-w-0">
+                    <p className="font-semibold truncate">{addr.title}</p>
+                    <p className="text-xs text-[var(--text-grey)] truncate mt-0.5">{getAddressDisplayString(addr)}</p>
+                  </div>
+                  {isSelected && (
+                    <span className="w-2 h-2 bg-[var(--primary)] rounded-full animate-pulse flex-shrink-0" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
         )}
 
         {/* Loading Addresses */}
         {isLoadingAddresses && savedAddresses.length === 0 && (
-          <div className="flex flex-col items-center justify-center" style={{ padding: '40px 24px' }}>
-            <Loader2 size={28} className="text-[var(--primary)] animate-spin" />
-            <p className="text-sm text-gray-500 mt-4 leading-relaxed">{t('loadingAddresses')}</p>
+          <div className="flex flex-col items-center justify-center py-8 px-4">
+            <Loader2 size={24} className="text-[var(--primary)] animate-spin" />
+            <p className="text-sm text-[var(--text-grey)] mt-3">{t('loadingAddresses')}</p>
           </div>
         )}
 
         {/* Add New Address */}
-        <>
-          {/* Section Divider */}
-          <div style={{ padding: '0 16px' }}>
-            <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
-          </div>
-
-          <div style={{ padding: '16px 20px' }}>
-            <button 
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsOpen(false);
-                setStartWithForm(true);
-                setTimeout(() => {
-                  setIsFormOpen(true);
-                }, 100);
-              }}
-              className="w-full flex items-center justify-center gap-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all active:scale-[0.98]"
-              style={{ padding: '16px 20px' }}
-            >
-              <Plus size={20} />
-              <span className="text-sm font-semibold">{t('addNewAddress')}</span>
-            </button>
-          </div>
-        </>
-
-        {/* Bottom Safe Area */}
-        <div className="h-2" />
+        <div className="border-t border-[var(--border)]/50 py-2 px-2">
+          <button 
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsOpen(false);
+              setStartWithForm(true);
+              setTimeout(() => {
+                setIsFormOpen(true);
+              }, 100);
+            }}
+            className="w-full flex items-center gap-3 rounded-xl text-sm text-[var(--primary)] hover:bg-[var(--primary)]/8 transition-all"
+            style={{ padding: '12px 16px' }}
+          >
+            <div className="w-10 h-10 rounded-xl bg-[var(--primary)]/10 flex items-center justify-center flex-shrink-0">
+              <Plus size={18} className="text-[var(--primary)]" />
+            </div>
+            <span className="font-semibold">{t('addNewAddress')}</span>
+          </button>
+        </div>
       </div>
     );
   }

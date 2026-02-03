@@ -392,7 +392,7 @@ const OrdersPage = () => {
           <div className="absolute bottom-0 end-1/4 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl" />
         </div>
 
-        <div className="container max-w-4xl mx-auto relative z-10" style={{ padding: '24px 18px 40px 18px' }}>
+        <div className="container max-w-4xl mx-auto relative z-10" style={{ padding: '24px 18px 40px 18px', paddingTop: '90px' }}>
           {/* Navigation */}
           <div className="flex items-center justify-between mb-6">
             <button

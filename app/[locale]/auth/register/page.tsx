@@ -90,7 +90,7 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="auth-page min-h-[calc(100vh-80px)] grid grid-cols-1 lg:grid-cols-2 bg-gradient-to-br from-[var(--primary-dark)] to-[var(--primary-dark-hover)]">
+    <div className="auth-page min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-gradient-to-br from-[var(--primary-dark)] to-[var(--primary-dark-hover)]" style={{ paddingTop: '90px' }}>
       
       {/* Left - Register Form on Background */}
       <div className="flex items-center justify-center bg-gradient-to-br from-[#FFF2EE] via-[#F4F8F7] to-[#80d1cd]/30" style={{ padding: '24px 28px' }}>
