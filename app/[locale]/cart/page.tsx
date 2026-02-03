@@ -532,6 +532,38 @@ const CartPage = () => {
         quantity,
       });
       setCart(response.data);
+      
+      // Recalculate prices after quantity update
+      // The server already has updated quantities, so calculate will return correct prices
+      if (response.data?.id) {
+        setCalculateLoading(true);
+        try {
+          let formattedLocation: { latitude: number; longitude: number } | undefined;
+          if (selectedAddress?.location) {
+            if (Array.isArray(selectedAddress.location)) {
+              formattedLocation = {
+                latitude: selectedAddress.location[0],
+                longitude: selectedAddress.location[1],
+              };
+            } else if (typeof selectedAddress.location === 'object') {
+              formattedLocation = selectedAddress.location as { latitude: number; longitude: number };
+            }
+          }
+
+          const calculateData = {
+            type: 'delivery' as const,
+            coupon: appliedCoupon || undefined,
+            address: formattedLocation,
+          };
+
+          const calcResponse = await cartService.calculateCart(response.data.id, calculateData);
+          setCalculatedPrices(calcResponse.data);
+        } catch (calcError) {
+          console.error('Error recalculating prices:', calcError);
+        } finally {
+          setCalculateLoading(false);
+        }
+      }
     } catch (error) {
       console.error('Error updating quantity:', error);
     }
