@@ -76,13 +76,11 @@ export const shopService = {
   getShops: async (filters?: ShopFilters): Promise<PaginatedResponse<Shop>> => {
     if (!filters) return get('/api/v1/rest/shops/paginate');
     
-    // Clean up undefined values and convert perPage to per_page
+    // Clean up undefined values
     const apiParams: Record<string, unknown> = {};
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined) {
-        // Convert perPage to per_page for API compatibility
-        const apiKey = key === 'perPage' ? 'per_page' : key;
-        apiParams[apiKey] = value;
+        apiParams[key] = value;
       }
     });
     
@@ -128,13 +126,11 @@ export const shopService = {
   getShopProducts: async (shopId: number, params?: ProductFilters): Promise<PaginatedResponse<Product>> => {
     if (!params) return get(`/api/v1/rest/shops/${shopId}/products/paginate`);
     
-    // Clean up undefined values and convert perPage to per_page
+    // Clean up undefined values
     const apiParams: Record<string, unknown> = {};
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined) {
-        // Convert perPage to per_page for API compatibility
-        const apiKey = key === 'perPage' ? 'per_page' : key;
-        apiParams[apiKey] = value;
+        apiParams[key] = value;
       }
     });
     
@@ -157,9 +153,7 @@ export const shopService = {
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined) {
-          // Convert perPage to per_page for API compatibility
-          const apiKey = key === 'perPage' ? 'per_page' : key;
-          apiParams[apiKey] = value;
+          apiParams[key] = value;
         }
       });
     }
@@ -175,9 +169,7 @@ export const shopService = {
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined) {
-          // Convert perPage to per_page for API compatibility
-          const apiKey = key === 'perPage' ? 'per_page' : key;
-          apiParams[apiKey] = value;
+          apiParams[key] = value;
         }
       });
     }

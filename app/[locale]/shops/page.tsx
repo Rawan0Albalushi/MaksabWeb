@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
@@ -23,7 +23,11 @@ const ShopsPage = () => {
 
   const [shops, setShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalShops, setTotalShops] = useState(0);
 
   // Get location from URL params on mount
   useEffect(() => {
@@ -31,12 +35,22 @@ const ShopsPage = () => {
     if (search) setSearchQuery(search);
   }, [searchParams]);
 
+  const PER_PAGE = 12;
+
   // Fetch shops when location changes
-  const fetchShops = useCallback(async () => {
-    setLoading(true);
+  const fetchShops = useCallback(async (page = 1, append = false) => {
+    if (page === 1) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
+    
     try {
       const location = getLocationForApi();
-      const params: Record<string, unknown> = { perPage: 20 };
+      const params: Record<string, unknown> = { 
+        perPage: PER_PAGE,
+        page 
+      };
       
       if (searchQuery) params.search = searchQuery;
 
@@ -46,37 +60,102 @@ const ShopsPage = () => {
         params
       );
       
-      setShops(response.data || []);
+      const newShops = response.data || [];
+      const total = response.meta?.total || 0;
+      const lastPage = response.meta?.last_page || 1;
+      
+      if (append) {
+        setShops(prev => [...prev, ...newShops]);
+      } else {
+        setShops(newShops);
+      }
+      
+      setTotalShops(total);
+      setCurrentPage(page);
+      setHasMore(page < lastPage);
+      
     } catch (error) {
       console.error('Error fetching shops:', error);
       try {
-        const params: Record<string, unknown> = { perPage: 20 };
+        const params: Record<string, unknown> = { 
+          perPage: PER_PAGE,
+          page 
+        };
         if (searchQuery) params.search = searchQuery;
         const response = await shopService.getShops(params);
-        setShops(response.data || []);
+        
+        const newShops = response.data || [];
+        const total = response.meta?.total || 0;
+        const lastPage = response.meta?.last_page || 1;
+        
+        if (append) {
+          setShops(prev => [...prev, ...newShops]);
+        } else {
+          setShops(newShops);
+        }
+        
+        setTotalShops(total);
+        setCurrentPage(page);
+        setHasMore(page < lastPage);
+        
       } catch {
-        setShops([]);
+        if (!append) setShops([]);
       }
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   }, [searchQuery, getLocationForApi]);
 
+  // Load more shops
+  const loadMore = useCallback(() => {
+    if (!loadingMore && hasMore) {
+      fetchShops(currentPage + 1, true);
+    }
+  }, [currentPage, loadingMore, hasMore, fetchShops]);
+
+  // Infinite scroll - intersection observer
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore && !loading) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1, rootMargin: '100px' }
+    );
+
+    const currentRef = loadMoreRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [hasMore, loadingMore, loading, loadMore]);
+
   // Fetch shops on mount
   useEffect(() => {
-    fetchShops();
+    fetchShops(1, false);
   }, [fetchShops]);
 
   // Refetch shops when location changes
   useEffect(() => {
     if (refreshTrigger > 0) {
-      fetchShops();
+      fetchShops(1, false);
     }
   }, [refreshTrigger, fetchShops]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchShops();
+    setCurrentPage(1);
+    setHasMore(true);
+    fetchShops(1, false);
   };
 
   // Get display location
@@ -161,7 +240,7 @@ const ShopsPage = () => {
                 </span>
               ) : (
                 <span>
-                  تم العثور على <strong className="text-gray-900">{shops.length}</strong> مطعم
+                  عرض <strong className="text-gray-900">{shops.length}</strong> من <strong className="text-gray-900">{totalShops}</strong> مطعم
                   {displayLocation && (
                     <span className="text-gray-400"> بالقرب من {displayLocation}</span>
                   )}
@@ -187,17 +266,34 @@ const ShopsPage = () => {
             />
           </div>
         ) : (
-          <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 xl:gap-6">
-            {shops.map((shop, index) => (
-              <div 
-                key={shop.id} 
-                className="animate-fade-in-up"
-                style={{ animationDelay: `${index * 40}ms` }}
-              >
-                <ShopCard shop={shop} />
-              </div>
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 xl:gap-6">
+              {shops.map((shop, index) => (
+                <div 
+                  key={shop.id} 
+                  className="animate-fade-in-up"
+                  style={{ animationDelay: `${Math.min(index, 12) * 40}ms` }}
+                >
+                  <ShopCard shop={shop} />
+                </div>
+              ))}
+            </div>
+            
+            {/* Infinite Scroll Trigger */}
+            <div ref={loadMoreRef} className="w-full" style={{ minHeight: '20px', marginTop: '24px' }}>
+              {loadingMore && (
+                <div className="flex flex-col items-center justify-center gap-3 py-8">
+                  <span className="w-8 h-8 border-3 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
+                  <span className="text-sm text-gray-500">جاري تحميل المزيد...</span>
+                </div>
+              )}
+              {!hasMore && shops.length > 0 && (
+                <div className="text-center py-6">
+                  <span className="text-sm text-gray-400">تم عرض جميع المطاعم ({totalShops})</span>
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
     </div>
