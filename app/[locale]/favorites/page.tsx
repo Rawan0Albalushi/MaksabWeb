@@ -72,8 +72,14 @@ const FavoritesPage = () => {
     (activeTab === 'products' && favoriteProducts.length === 0);
 
   return (
-    <div className="min-h-screen bg-[var(--main-bg)]" style={{ paddingTop: '100px', paddingBottom: '32px' }}>
-      <div className="container">
+    <div className="min-h-screen relative bg-gradient-to-b from-[#F4F5F8] via-[#e8f5f4] via-60% to-[#fff5f2]" style={{ paddingTop: '100px', paddingBottom: '32px' }}>
+      {/* Subtle decorative background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[10%] start-0 w-[400px] h-[400px] bg-[#80d1cd]/10 rounded-full blur-[120px]" />
+        <div className="absolute top-[40%] end-0 w-[500px] h-[500px] bg-[#FF3D00]/5 rounded-full blur-[150px]" />
+        <div className="absolute bottom-[20%] start-[20%] w-[400px] h-[400px] bg-[#267881]/8 rounded-full blur-[100px]" />
+      </div>
+      <div className="container relative z-10">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
           <div className="w-12 h-12 rounded-[var(--radius-lg)] bg-[var(--error-light)] flex items-center justify-center">

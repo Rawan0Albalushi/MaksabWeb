@@ -383,7 +383,13 @@ const OrdersPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen relative bg-gradient-to-b from-[#F4F5F8] via-[#e8f5f4] via-60% to-[#fff5f2]">
+      {/* Subtle decorative background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[30%] start-0 w-[400px] h-[400px] bg-[#80d1cd]/10 rounded-full blur-[120px]" />
+        <div className="absolute top-[50%] end-0 w-[500px] h-[500px] bg-[#FF3D00]/5 rounded-full blur-[150px]" />
+        <div className="absolute bottom-[10%] start-[20%] w-[400px] h-[400px] bg-[#267881]/8 rounded-full blur-[100px]" />
+      </div>
       {/* Hero Header */}
       <div className="bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C] relative overflow-hidden">
         {/* Background Pattern */}
@@ -450,7 +456,7 @@ const OrdersPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="container max-w-4xl mx-auto" style={{ padding: '24px 18px' }}>
+      <div className="container max-w-4xl mx-auto relative z-10" style={{ padding: '24px 18px' }}>
         {/* Tabs */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}

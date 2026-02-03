@@ -165,7 +165,13 @@ const ShopsPage = () => {
     currentLocation?.address?.split(',')[0];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen relative bg-gradient-to-b from-[#F4F5F8] via-[#e8f5f4] via-60% to-[#fff5f2]">
+      {/* Subtle decorative background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[30%] start-0 w-[400px] h-[400px] bg-[#80d1cd]/10 rounded-full blur-[120px]" />
+        <div className="absolute top-[50%] end-0 w-[500px] h-[500px] bg-[#FF3D00]/5 rounded-full blur-[150px]" />
+        <div className="absolute bottom-[10%] start-[20%] w-[400px] h-[400px] bg-[#267881]/8 rounded-full blur-[100px]" />
+      </div>
       {/* Hero Header Section */}
       <div className="relative bg-gradient-to-br from-[var(--primary)] via-[var(--primary-hover)] to-orange-600 overflow-hidden">
         {/* Background Pattern */}
@@ -225,7 +231,7 @@ const ShopsPage = () => {
       </div>
 
       {/* Content */}
-      <div className="container" style={{ padding: '20px 18px' }}>
+      <div className="container relative z-10" style={{ padding: '20px 18px' }}>
         {/* Results Info */}
         <div className="flex items-center justify-between" style={{ marginBottom: '16px' }}>
           <div>

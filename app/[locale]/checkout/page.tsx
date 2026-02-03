@@ -693,7 +693,7 @@ const CheckoutPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen relative bg-gradient-to-b from-[#F4F5F8] via-[#e8f5f4] via-60% to-[#fff5f2]">
         {/* Loading Header */}
         <div className="bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C] relative overflow-hidden min-h-[200px] sm:min-h-[220px] lg:min-h-[240px] flex flex-col">
           <div className="absolute inset-0 pointer-events-none">
@@ -753,7 +753,7 @@ const CheckoutPage = () => {
 
   if (!cart || cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100/50 flex items-center justify-center py-16 px-4">
+      <div className="min-h-screen relative bg-gradient-to-b from-[#F4F5F8] via-[#e8f5f4] via-60% to-[#fff5f2] flex items-center justify-center py-16 px-4">
         <EmptyState
           type="cart"
           title={tCart('empty')}
@@ -768,7 +768,13 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen relative bg-gradient-to-b from-[#F4F5F8] via-[#e8f5f4] via-60% to-[#fff5f2]">
+      {/* Subtle decorative background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[30%] start-0 w-[400px] h-[400px] bg-[#80d1cd]/10 rounded-full blur-[120px]" />
+        <div className="absolute top-[50%] end-0 w-[500px] h-[500px] bg-[#FF3D00]/5 rounded-full blur-[150px]" />
+        <div className="absolute bottom-[10%] start-[20%] w-[400px] h-[400px] bg-[#267881]/8 rounded-full blur-[100px]" />
+      </div>
       {/* Header - Similar to Cart Page */}
       <div className="bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C] relative overflow-hidden min-h-[200px] sm:min-h-[220px] lg:min-h-[240px] flex flex-col">
         {/* Decorative Background Elements */}
@@ -825,7 +831,7 @@ const CheckoutPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative z-10">
         {/* Error Alert */}
         <AnimatePresence>
           {error && (

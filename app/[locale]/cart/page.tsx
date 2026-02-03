@@ -367,7 +367,7 @@ const CartItemCard = ({
 // SKELETON LOADER
 // ============================================
 const CartSkeleton = () => (
-  <div className="min-h-screen bg-[var(--main-bg)]">
+  <div className="min-h-screen relative bg-gradient-to-b from-[#F4F5F8] via-[#e8f5f4] via-60% to-[#fff5f2]">
     {/* Header Skeleton */}
     <div className="bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C]">
       <div className="container max-w-6xl mx-auto" style={{ padding: '24px 18px 32px 18px', paddingTop: '90px' }}>
@@ -677,11 +677,16 @@ const CartPage = () => {
   // Not Authenticated State
   if (!isAuthenticated) {
     return (
-      <div className="bg-gray-50 flex items-center justify-center" style={{ minHeight: 'calc(100vh - 80px)' }}>
+      <div className="relative bg-gradient-to-b from-[#F4F5F8] via-[#e8f5f4] via-60% to-[#fff5f2] flex items-center justify-center" style={{ minHeight: 'calc(100vh - 80px)' }}>
+        {/* Subtle decorative background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-[20%] start-0 w-[300px] h-[300px] bg-[#80d1cd]/10 rounded-full blur-[100px]" />
+          <div className="absolute top-[40%] end-0 w-[400px] h-[400px] bg-[#FF3D00]/5 rounded-full blur-[120px]" />
+        </div>
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="flex flex-col items-center justify-center text-center px-4"
+          className="flex flex-col items-center justify-center text-center px-4 relative z-10"
         >
           <motion.div
             animate={{ y: [0, -10, 0] }}
@@ -713,11 +718,16 @@ const CartPage = () => {
   // Empty Cart State
   if (!cart || cartItems.length === 0) {
     return (
-      <div className="bg-gray-50 flex items-center justify-center" style={{ minHeight: 'calc(100vh - 80px)' }}>
+      <div className="relative bg-gradient-to-b from-[#F4F5F8] via-[#e8f5f4] via-60% to-[#fff5f2] flex items-center justify-center" style={{ minHeight: 'calc(100vh - 80px)' }}>
+        {/* Subtle decorative background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-[20%] start-0 w-[300px] h-[300px] bg-[#80d1cd]/10 rounded-full blur-[100px]" />
+          <div className="absolute top-[40%] end-0 w-[400px] h-[400px] bg-[#FF3D00]/5 rounded-full blur-[120px]" />
+        </div>
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="flex flex-col items-center justify-center text-center px-4"
+          className="flex flex-col items-center justify-center text-center px-4 relative z-10"
         >
           <motion.div
             animate={{ y: [0, -10, 0] }}
@@ -748,7 +758,13 @@ const CartPage = () => {
 
   // Main Cart View
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen relative bg-gradient-to-b from-[#F4F5F8] via-[#e8f5f4] via-60% to-[#fff5f2]">
+      {/* Subtle decorative background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[30%] start-0 w-[400px] h-[400px] bg-[#80d1cd]/10 rounded-full blur-[120px]" />
+        <div className="absolute top-[50%] end-0 w-[500px] h-[500px] bg-[#FF3D00]/5 rounded-full blur-[150px]" />
+        <div className="absolute bottom-[10%] start-[20%] w-[400px] h-[400px] bg-[#267881]/8 rounded-full blur-[100px]" />
+      </div>
       {/* Header */}
       <div className="bg-gradient-to-br from-[#1E272E] via-[#267881] to-[#1A222C] relative overflow-hidden min-h-[200px] sm:min-h-[220px] lg:min-h-[240px] flex flex-col">
         <div className="absolute inset-0 pointer-events-none">
@@ -794,7 +810,7 @@ const CartPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="container max-w-6xl mx-auto" style={{ padding: '24px 18px' }}>
+      <div className="container max-w-6xl mx-auto relative z-10" style={{ padding: '24px 18px' }}>
         <div className="grid lg:grid-cols-5 gap-6 lg:gap-8">
           {/* Cart Items - Takes 3 columns */}
           <div className="lg:col-span-3 order-1 space-y-4">

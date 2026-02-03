@@ -432,63 +432,65 @@ const HomePage = () => {
       </section>
       */}
 
-      {/* Stories Section */}
-      {stories.length > 0 && (
-        <section className="py-4 sm:py-8 bg-[var(--main-bg)]">
-          <div className="container">
-            <div className="flex gap-3 sm:gap-4 overflow-x-auto hide-scrollbar pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
-              {loading
-                ? Array.from({ length: 8 }).map((_, i) => (
-                    <div key={i} className="flex-shrink-0">
-                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full skeleton" />
-                    </div>
-                  ))
-                : stories.map((story, index) => (
-                    <motion.button
-                      key={story.id}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: index * 0.05 }}
-                      onClick={() => setActiveStory(story)}
-                      className="flex-shrink-0 group"
-                    >
-                      <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full p-[2px] sm:p-[3px] bg-gradient-to-br from-[var(--primary)] via-[#ff6b3d] to-[var(--primary-light)]">
-                        <div className="w-full h-full rounded-full bg-white p-[2px]">
-                          <div className="w-full h-full rounded-full overflow-hidden bg-[var(--main-bg)]">
-                            {story.file_urls?.[0] && (
-                              <Image
-                                src={story.file_urls[0]}
-                                alt=""
-                                fill
-                                className="object-cover group-hover:scale-110 transition-transform"
-                              />
-                            )}
+      {/* Main Content Area with Gradient Background */}
+      <div className="relative bg-gradient-to-b from-[#F4F5F8] via-[#e8f5f4] via-60% to-[#fff5f2]">
+        {/* Subtle decorative background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-[10%] start-0 w-[400px] h-[400px] bg-[#80d1cd]/10 rounded-full blur-[120px]" />
+          <div className="absolute top-[40%] end-0 w-[500px] h-[500px] bg-[#FF3D00]/5 rounded-full blur-[150px]" />
+          <div className="absolute bottom-[20%] start-[20%] w-[400px] h-[400px] bg-[#267881]/8 rounded-full blur-[100px]" />
+        </div>
+        
+        {/* Stories Section */}
+        {stories.length > 0 && (
+          <section className="py-4 sm:py-8 relative z-10">
+            <div className="container">
+              <div className="flex gap-3 sm:gap-4 overflow-x-auto hide-scrollbar pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+                {loading
+                  ? Array.from({ length: 8 }).map((_, i) => (
+                      <div key={i} className="flex-shrink-0">
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full skeleton" />
+                      </div>
+                    ))
+                  : stories.map((story, index) => (
+                      <motion.button
+                        key={story.id}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: index * 0.05 }}
+                        onClick={() => setActiveStory(story)}
+                        className="flex-shrink-0 group"
+                      >
+                        <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full p-[2px] sm:p-[3px] bg-gradient-to-br from-[var(--primary)] via-[#ff6b3d] to-[var(--primary-light)]">
+                          <div className="w-full h-full rounded-full bg-white p-[2px]">
+                            <div className="w-full h-full rounded-full overflow-hidden bg-[#F4F5F8]">
+                              {story.file_urls?.[0] && (
+                                <Image
+                                  src={story.file_urls[0]}
+                                  alt=""
+                                  fill
+                                  className="object-cover group-hover:scale-110 transition-transform"
+                                />
+                              )}
+                            </div>
+                          </div>
+                          <div className="absolute -bottom-0.5 -end-0.5 sm:-bottom-1 sm:-end-1 w-5 h-5 sm:w-6 sm:h-6 bg-[var(--primary)] rounded-full flex items-center justify-center border-2 border-white">
+                            <Play size={8} className="text-white fill-white ms-0.5 sm:hidden" />
+                            <Play size={10} className="text-white fill-white ms-0.5 hidden sm:block" />
                           </div>
                         </div>
-                        <div className="absolute -bottom-0.5 -end-0.5 sm:-bottom-1 sm:-end-1 w-5 h-5 sm:w-6 sm:h-6 bg-[var(--primary)] rounded-full flex items-center justify-center border-2 border-white">
-                          <Play size={8} className="text-white fill-white ms-0.5 sm:hidden" />
-                          <Play size={10} className="text-white fill-white ms-0.5 hidden sm:block" />
-                        </div>
-                      </div>
-                    </motion.button>
-                  ))}
+                      </motion.button>
+                    ))}
+              </div>
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        )}
 
-      {/* Spacer between Stories and How It Works */}
-      <div className="h-4 sm:h-8 lg:h-12 bg-[var(--main-bg)]" />
+        {/* Spacer between Stories and How It Works */}
+        <div className="h-4 sm:h-8 lg:h-12" />
 
-      {/* How It Works Section */}
-      <section className="py-8 sm:py-12 lg:py-16 bg-gradient-to-b from-white via-[#F5F5F5] to-[#F4F5F8] relative overflow-hidden">
-        {/* Background Decorations */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-10 sm:top-20 start-5 sm:start-10 w-40 sm:w-64 h-40 sm:h-64 bg-[var(--primary)]/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-10 sm:bottom-20 end-5 sm:end-10 w-48 sm:w-80 h-48 sm:h-80 bg-[#267881]/5 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 start-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[800px] h-[400px] sm:h-[800px] bg-gradient-to-br from-[var(--primary)]/3 to-[#267881]/3 rounded-full blur-[60px] sm:blur-[100px]" />
-        </div>
-
+        {/* How It Works Section */}
+        <section className="py-8 sm:py-12 lg:py-16 relative overflow-hidden">
         <div className="container relative z-10">
           <motion.div
             initial="hidden"
@@ -663,10 +665,10 @@ const HomePage = () => {
       </section>
 
       {/* Spacer between How It Works and Shops */}
-      <div className="h-4 sm:h-8 lg:h-12 bg-[var(--main-bg)]" />
+      <div className="h-4 sm:h-8 lg:h-12" />
 
       {/* Recommended Shops Section */}
-      <section className="py-6 sm:py-12 lg:py-16 bg-[var(--main-bg)]">
+      <section className="py-6 sm:py-12 lg:py-16 relative z-10">
         <div className="container">
           <motion.div
             initial="hidden"
@@ -708,9 +710,9 @@ const HomePage = () => {
               animate={{ opacity: 1, y: 0 }}
               className="flex flex-col items-center justify-center py-12 sm:py-16 lg:py-20 text-center"
             >
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4 sm:mb-6">
-                <MapPin size={32} className="text-gray-400 sm:hidden" />
-                <MapPin size={40} className="text-gray-400 hidden sm:block" />
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center mb-4 sm:mb-6 shadow-sm">
+                <MapPin size={32} className="text-[var(--primary-dark)] sm:hidden" />
+                <MapPin size={40} className="text-[var(--primary-dark)] hidden sm:block" />
               </div>
               <h3 className="text-lg sm:text-xl font-bold text-[var(--black)] mb-2">
                 {tCommon('noShopsInArea')}
@@ -738,7 +740,10 @@ const HomePage = () => {
       </section>
 
       {/* Spacer between Shops and Download App */}
-      <div className="h-4 sm:h-8 lg:h-12 bg-[var(--main-bg)]" />
+      <div className="h-4 sm:h-8 lg:h-12" />
+      
+      </div>
+      {/* End of Main Content Area with Gradient Background */}
 
       {/* Download App Section */}
       <section className="py-10 sm:py-16 lg:py-20 bg-[#1E272E] relative overflow-hidden">

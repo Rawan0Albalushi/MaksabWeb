@@ -861,7 +861,7 @@ export default function ShopPage({ params }: ShopPageProps) {
   // ============================================
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--main-bg)]">
+      <div className="min-h-screen relative bg-gradient-to-b from-[#F4F5F8] via-[#e8f5f4] via-60% to-[#fff5f2]">
         {/* Hero Skeleton - Same style as shops page */}
         <div className="relative bg-gradient-to-br from-[var(--primary)] via-[var(--primary-hover)] to-orange-600 overflow-hidden">
           <div className="container" style={{ paddingTop: '100px', paddingBottom: '24px' }}>
@@ -901,7 +901,7 @@ export default function ShopPage({ params }: ShopPageProps) {
   // ============================================
   if (!shop) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--main-bg)] p-4">
+      <div className="min-h-screen flex items-center justify-center relative bg-gradient-to-b from-[#F4F5F8] via-[#e8f5f4] via-60% to-[#fff5f2] p-4">
         <EmptyState
           type="search"
           title="المتجر غير موجود"
@@ -915,7 +915,13 @@ export default function ShopPage({ params }: ShopPageProps) {
   // MAIN RENDER
   // ============================================
   return (
-    <div className="min-h-screen bg-[var(--main-bg)]">
+    <div className="min-h-screen relative bg-gradient-to-b from-[#F4F5F8] via-[#e8f5f4] via-60% to-[#fff5f2]">
+      {/* Subtle decorative background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[30%] start-0 w-[400px] h-[400px] bg-[#80d1cd]/10 rounded-full blur-[120px]" />
+        <div className="absolute top-[50%] end-0 w-[500px] h-[500px] bg-[#FF3D00]/5 rounded-full blur-[150px]" />
+        <div className="absolute bottom-[10%] start-[20%] w-[400px] h-[400px] bg-[#267881]/8 rounded-full blur-[100px]" />
+      </div>
       {/* ===== HERO HEADER - Same style as shops page ===== */}
       <div className="relative bg-gradient-to-br from-[var(--primary)] via-[var(--primary-hover)] to-orange-600 overflow-hidden">
         {/* Background Pattern - Same as shops page */}
@@ -1171,7 +1177,7 @@ export default function ShopPage({ params }: ShopPageProps) {
       </div>
 
       {/* ===== PRODUCTS GRID ===== */}
-      <main className="container px-4 sm:px-6 lg:px-8 pb-28" style={{ paddingTop: '32px' }}>
+      <main className="container px-4 sm:px-6 lg:px-8 pb-28 relative z-10" style={{ paddingTop: '32px' }}>
         {productsLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
             {[...Array(10)].map((_, i) => (
